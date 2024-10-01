@@ -1,0 +1,263 @@
+CREATE DATABASE UserAddresses
+USE UserAddresses
+SELECT DATABASE()
+
+CREATE TABLE Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    lastname VARCHAR(255),
+    username VARCHAR(255),
+    password VARCHAR(255),
+    dni INT,
+    contact_id INT,
+    email VARCHAR(255),
+    active BOOLEAN,
+    avatar_url VARCHAR(255),
+    birth_date DATE,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Tabla PlotUsers
+CREATE TABLE PlotUsers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    plot_id INT,
+    user_id INT,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT,
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+
+-- Tabla Roles
+CREATE TABLE Roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255),
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Tabla UserRoles
+CREATE TABLE UserRoles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT,
+    user_id INT,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT,
+    FOREIGN KEY (role_id) REFERENCES Roles(id),
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+
+-- Tabla Address
+CREATE TABLE Address (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    street VARCHAR(255),
+    number VARCHAR(50),
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Auditoría de Users
+CREATE TABLE Users_audit (
+    version_id INT AUTO_INCREMENT PRIMARY KEY,  
+    id INT,  
+    version INT,  
+    name VARCHAR(255),
+    lastname VARCHAR(255),
+    username VARCHAR(255),
+    password VARCHAR(255),
+    dni INT,
+    contact_id INT,
+    email VARCHAR(255),
+    active BOOLEAN,
+    avatar_url VARCHAR(255),
+    birth_date DATE,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Auditoría de PlotUsers
+CREATE TABLE PlotUsers_audit (
+    version_id INT AUTO_INCREMENT PRIMARY KEY, 
+    id INT,  
+    version INT,  
+    plot_id INT,
+    user_id INT,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Auditoría de Roles
+CREATE TABLE Roles_audit (
+    version_id INT AUTO_INCREMENT PRIMARY KEY,  
+    id INT,  
+    version INT,  
+    description VARCHAR(255),
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Auditoría de UserRoles
+CREATE TABLE UserRoles_audit (
+    version_id INT AUTO_INCREMENT PRIMARY KEY,  
+    id INT,  
+    version INT,  
+    role_id INT,
+    user_id INT,
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+-- Auditoría de Address
+CREATE TABLE Address_audit (
+    version_id INT AUTO_INCREMENT PRIMARY KEY,  
+    id INT,  
+    version INT,  
+    street VARCHAR(255),
+    number VARCHAR(50),
+    created_datetime DATETIME,
+    last_updated_datetime DATETIME,
+    created_user INT,
+    last_updated_user INT
+);
+
+
+-- Trigger para insertar en la auditoría de Users
+DELIMITER $$
+CREATE TRIGGER trg_users_insert
+AFTER INSERT ON Users
+FOR EACH ROW
+BEGIN
+    INSERT INTO Users_audit (id, version, name, lastname, username, password, dni, contact_id, email, active, avatar_url, birth_date, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni, NEW.contact_id, NEW.email, NEW.active, NEW.avatar_url, NEW.birth_date, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+
+-- Trigger para actualizar en la auditoría de Users
+DELIMITER $$
+CREATE TRIGGER trg_users_update
+AFTER UPDATE ON Users
+FOR EACH ROW
+BEGIN
+    DECLARE latest_version INT;
+    SELECT MAX(version) INTO latest_version FROM Users_audit WHERE id = NEW.id;
+    SET latest_version = IFNULL(latest_version, 0) + 1;
+
+    INSERT INTO Users_audit (id, version, name, lastname, username, password, dni, contact_id, email, active, avatar_url, birth_date, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni, NEW.contact_id, NEW.email, NEW.active, NEW.avatar_url, NEW.birth_date, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para insertar en la auditoría de PlotUsers
+DELIMITER $$
+CREATE TRIGGER trg_plotusers_insert
+AFTER INSERT ON PlotUsers
+FOR EACH ROW
+BEGIN
+    INSERT INTO PlotUsers_audit (id, version, plot_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.plot_id, NEW.user_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para actualizar en la auditoría de PlotUsers
+DELIMITER $$
+CREATE TRIGGER trg_plotusers_update
+AFTER UPDATE ON PlotUsers
+FOR EACH ROW
+BEGIN
+    DECLARE latest_version INT;
+    SELECT MAX(version) INTO latest_version FROM PlotUsers_audit WHERE id = NEW.id;
+    SET latest_version = IFNULL(latest_version, 0) + 1;
+
+    INSERT INTO PlotUsers_audit (id, version, plot_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.plot_id, NEW.user_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para insertar en la auditoría de Roles
+DELIMITER $$
+CREATE TRIGGER trg_roles_insert
+AFTER INSERT ON Roles
+FOR EACH ROW
+BEGIN
+    INSERT INTO Roles_audit (id, version, description, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.description, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para actualizar en la auditoría de Roles
+DELIMITER $$
+CREATE TRIGGER trg_roles_update
+AFTER UPDATE ON Roles
+FOR EACH ROW
+BEGIN
+    DECLARE latest_version INT;
+    SELECT MAX(version) INTO latest_version FROM Roles_audit WHERE id = NEW.id;
+    SET latest_version = IFNULL(latest_version, 0) + 1;
+
+    INSERT INTO Roles_audit (id, version, description, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.description, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para insertar en la auditoría de UserRoles
+DELIMITER $$
+CREATE TRIGGER trg_userroles_insert
+AFTER INSERT ON UserRoles
+FOR EACH ROW
+BEGIN
+    INSERT INTO UserRoles_audit (id, version, role_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.role_id, NEW.user_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$ 
+
+-- Trigger para actualizar en la auditoría de UserRoles
+DELIMITER $$
+CREATE TRIGGER trg_userroles_update
+AFTER UPDATE ON UserRoles
+FOR EACH ROW
+BEGIN
+    DECLARE latest_version INT;
+    SELECT MAX(version) INTO latest_version FROM UserRoles_audit WHERE id = NEW.id;
+    SET latest_version = IFNULL(latest_version, 0) + 1;
+
+    INSERT INTO UserRoles_audit (id, version, role_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.role_id, NEW.user_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para insertar en la auditoría de Address
+DELIMITER $$
+CREATE TRIGGER trg_address_insert
+AFTER INSERT ON Address
+FOR EACH ROW
+BEGIN
+    INSERT INTO Address_audit (id, version, street, number, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.street, NEW.number, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+-- Trigger para actualizar en la auditoría de Address
+DELIMITER $$
+CREATE TRIGGER trg_address_update
+AFTER UPDATE ON Address
+FOR EACH ROW
+BEGIN
+    DECLARE latest_version INT;
+    SELECT MAX(version) INTO latest_version FROM Address_audit WHERE id = NEW.id;
+    SET latest_version = IFNULL(latest_version, 0) + 1;
+
+    INSERT INTO Address_audit (id, version, street, number, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.street, NEW.number, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+END $$
+
+
