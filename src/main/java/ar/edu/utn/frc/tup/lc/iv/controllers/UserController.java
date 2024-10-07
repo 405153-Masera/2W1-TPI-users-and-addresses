@@ -2,6 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,4 +30,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @PutMapping
+    public ResponseEntity<GetUserDto> updateUser(@RequestBody PutUserDto putUserDto) {
+
+        return ResponseEntity.ok(userService.updateUser(putUserDto));
+    }
 }

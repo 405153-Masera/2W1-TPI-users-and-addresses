@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
@@ -11,6 +12,8 @@ import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -141,6 +145,66 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         return getUserDtos;
+    }
+
+    @Override
+    @Transactional
+    public GetUserDto updateUser(PutUserDto putUserDto) {
+
+
+        Optional<UserEntity> optionalUser = userRepository.findById(putUserDto.getId());
+
+        if(optionalUser.isEmpty()){
+            throw new EntityNotFoundException("User not found");
+        }
+
+        UserEntity user = optionalUser.get();
+        user.setName(putUserDto.getName());
+        user.setLastname(putUserDto.getLastName());
+        user.setDni(putUserDto.getDni());
+        user.setContact_id(putUserDto.getContactId());
+        user.setEmail(putUserDto.getEmail());
+        user.setAvatar_url(putUserDto.getAvatarUrl());
+        user.setDatebirth(putUserDto.getBirthDate());
+
+        user.setLastUpdatedDate(LocalDateTime.now());
+        user.setLastUpdatedUser(putUserDto.getId());
+
+        userRoleRepository.deleteByUser(user);
+        user.getUserRoles().clear();
+
+        for (Integer roleId : putUserDto.getUserRoles()) {
+            RoleEntity role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
+
+            UserRoleEntity userRoleEntity = new UserRoleEntity();
+            userRoleEntity.setUser(user);
+            userRoleEntity.setRole(role);
+            userRoleEntity.setCreatedDate(LocalDateTime.now());
+            userRoleEntity.setCreatedUser(putUserDto.getId());
+            userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
+            userRoleEntity.setLastUpdatedUser(putUserDto.getId());
+
+            user.getUserRoles().add(userRoleEntity);
+        }
+
+        UserEntity userSaved = userRepository.save(user);
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(userSaved.getId());
+        getUserDto.setName(userSaved.getName());
+        getUserDto.setLastname(userSaved.getLastname());
+        getUserDto.setUsername(userSaved.getUsername());
+        getUserDto.setPassword(userSaved.getPassword());
+        getUserDto.setEmail(userSaved.getEmail());
+        getUserDto.setDni(userSaved.getDni());
+        getUserDto.setContact_id(userSaved.getContact_id());
+        getUserDto.setActive(userSaved.getActive());
+        getUserDto.setAvatar_url(userSaved.getAvatar_url());
+        getUserDto.setDatebirth(userSaved.getDatebirth());
+        if(userSaved.getUserRoles() != null){
+            getUserDto.setRoles(userSaved.getUserRoles().stream().map(userRoleEntity -> userRoleEntity.getRole().getDescription()).toArray(String[]::new));
+        }
+        return getUserDto;
     }
 
 }
