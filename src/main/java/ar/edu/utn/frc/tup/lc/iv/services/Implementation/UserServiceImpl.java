@@ -48,26 +48,10 @@ public class UserServiceImpl implements UserService {
         // Validaciones por si el username o el email ya existen
         validateUsername(postUserDto.getUsername());
         validateEmail(postUserDto.getEmail());
-
         // Crear un nuevo UserEntity y asignar los valores del DTO
         UserEntity userEntity = new UserEntity();
-        userEntity.setName(postUserDto.getName());
-        userEntity.setLastname(postUserDto.getLastname());
-        userEntity.setUsername(postUserDto.getUsername());
-        userEntity.setPassword(postUserDto.getPassword());
-        userEntity.setEmail(postUserDto.getEmail());
-        userEntity.setDni(postUserDto.getDni());
-        userEntity.setContact_id(postUserDto.getContact_id());
-        userEntity.setActive(postUserDto.getActive());
-        userEntity.setAvatar_url(postUserDto.getAvatar_url());
-        userEntity.setDatebirth(postUserDto.getDatebirth());
-
-        // Establecer valores de auditoría
-        userEntity.setCreatedDate(LocalDateTime.now());
-        userEntity.setCreatedUser(1);  // ID del usuario creador
-        userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(1);  // ID del usuario que realiza la actualización
-
+        //Mapeamos con el metodo
+        mapUserEntitytoPost(userEntity, postUserDto);
         // Guardar el usuario en la base de datos
         UserEntity savedUser = userRepository.save(userEntity);
 
@@ -85,16 +69,9 @@ public class UserServiceImpl implements UserService {
             if (roleEntity != null) {
                 // Crear una nueva relación en la tabla intermedia UserRoles
                 UserRoleEntity userRoleEntity = new UserRoleEntity();
-                userRoleEntity.setUser(savedUser);  // Usuario recién guardado
-                userRoleEntity.setRole(roleEntity);  // Rol encontrado
-                userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
-                userRoleEntity.setCreatedUser(1);  // ID del usuario que realiza la operación
-                userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
-                userRoleEntity.setLastUpdatedUser(1);  // ID del usuario que realiza la operación
-
+                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
                 // Guardar la relación en la tabla intermedia
                 userRoleRepository.save(userRoleEntity);
-
                 // Agregar la descripción del rol a la lista de roles asignados
                 assignedRoles.add(roleDesc);
             } else {
@@ -108,6 +85,36 @@ public class UserServiceImpl implements UserService {
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
 
         return getUserDto;
+    }
+
+    private void mapUserEntitytoPost(UserEntity userEntity , PostUserDto postUserDto) {
+
+        userEntity.setName(postUserDto.getName());
+        userEntity.setLastname(postUserDto.getLastname());
+        userEntity.setUsername(postUserDto.getUsername());
+        userEntity.setPassword(postUserDto.getPassword());
+        userEntity.setEmail(postUserDto.getEmail());
+        userEntity.setDni(postUserDto.getDni());
+        userEntity.setContact_id(postUserDto.getContact_id());
+        userEntity.setActive(postUserDto.getActive());
+        userEntity.setAvatar_url(postUserDto.getAvatar_url());
+        userEntity.setDatebirth(postUserDto.getDatebirth());
+
+        // Establecer valores de auditoría
+        userEntity.setCreatedDate(LocalDateTime.now());
+        userEntity.setCreatedUser(1);  // ID del usuario creador
+        userEntity.setLastUpdatedDate(LocalDateTime.now());
+        userEntity.setLastUpdatedUser(1);  // ID del usuario que realiza la actualización
+
+    }
+
+    private void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
+        userRoleEntity.setUser(userEntity);  // Usuario recién guardado
+        userRoleEntity.setRole(roleEntity);  // Rol encontrado
+        userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
+        userRoleEntity.setCreatedUser(1);  // ID del usuario que realiza la operación
+        userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
+        userRoleEntity.setLastUpdatedUser(1);
     }
 
     //Metodo para validar si existe alguien con ese username
