@@ -15,5 +15,5 @@ public interface UserService {
     GetUserDto updateUser(PutUserDto putUserDto);
     List<GetUserDto> getUsersByStatus(boolean active);
     void deleteUser(Integer userId);
-    Optional<GetUserDto> getUserByEmail(String email);
+    GetUserDto getUserByEmail(String email);
 }

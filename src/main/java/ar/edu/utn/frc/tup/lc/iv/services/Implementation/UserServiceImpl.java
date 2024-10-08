@@ -251,15 +251,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<GetUserDto> getUserByEmail(String email) {
-        //Valida si el correo electrónico es nulo o está vacío y devuelve un mensaje
-        if (email == null || email.isEmpty()) {
-            throw new RuntimeException("Email must not be null or empty");
+    public GetUserDto getUserByEmail(String email) {
+        Optional<UserEntity> userEntity = userRepository.getUserByEmail(email);
+        if(userEntity.isEmpty()){
+            throw new EntityNotFoundException("User not found");
         }
-        return userRepository.getUserByEmail(email)
-                // Si se encuentra un usuario, asigna UserEntity a un objeto GetUserDto
-                .map(userEntity -> modelMapper.map(userEntity, GetUserDto.class));
+
+            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
+            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity.get());
+
+            String[] rolesString = roles.stream()
+                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
+                    .toArray(String[]::new);
+            getUserDto.setRoles(rolesString);
+
+        return getUserDto;
     }
+
+//    @Override
+//    public Optional<GetUserDto> getUserByEmail(String email) {
+//        //Valida si el correo electrónico es nulo o está vacío y devuelve un mensaje
+//        if (email == null || email.isEmpty()) {
+//            throw new RuntimeException("Email must not be null or empty");
+//        }
+//        return userRepository.getUserByEmail(email)
+//                // Si se encuentra un usuario, asigna UserEntity a un objeto GetUserDto
+//                .map(userEntity -> modelMapper.map(userEntity, GetUserDto.class));
+//
+//
+//    }
 }
 
 
