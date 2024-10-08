@@ -170,8 +170,10 @@ public class UserServiceImpl implements UserService {
         user.setLastUpdatedDate(LocalDateTime.now());
         user.setLastUpdatedUser(putUserDto.getId());
 
+        UserEntity userSaved = userRepository.save(user);
+
         userRoleRepository.deleteByUser(user);
-        user.getUserRoles().clear();
+        //user.getUserRoles().clear();
 
         for (Integer roleId : putUserDto.getUserRoles()) {
             RoleEntity role = roleRepository.findById(roleId)
@@ -185,10 +187,11 @@ public class UserServiceImpl implements UserService {
             userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
             userRoleEntity.setLastUpdatedUser(putUserDto.getId());
 
-            user.getUserRoles().add(userRoleEntity);
+            userRoleRepository.save(userRoleEntity);
+            //user.getUserRoles().add(userRoleEntity);
         }
 
-        UserEntity userSaved = userRepository.save(user);
+        //UserEntity userSaved = userRepository.save(user);
         GetUserDto getUserDto = new GetUserDto();
         getUserDto.setId(userSaved.getId());
         getUserDto.setName(userSaved.getName());
@@ -201,9 +204,15 @@ public class UserServiceImpl implements UserService {
         getUserDto.setActive(userSaved.getActive());
         getUserDto.setAvatar_url(userSaved.getAvatar_url());
         getUserDto.setDatebirth(userSaved.getDatebirth());
-        if(userSaved.getUserRoles() != null){
-            getUserDto.setRoles(userSaved.getUserRoles().stream().map(userRoleEntity -> userRoleEntity.getRole().getDescription()).toArray(String[]::new));
-        }
+
+        List<UserRoleEntity> updatedUserRoles = userRoleRepository.findByUser(userSaved);
+
+        // Mapear los roles a un arreglo de Strings y asignarlos al DTO
+        String[] roles = updatedUserRoles.stream()
+                .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
+                .toArray(String[]::new);
+
+        getUserDto.setRoles(roles);
         return getUserDto;
     }
 

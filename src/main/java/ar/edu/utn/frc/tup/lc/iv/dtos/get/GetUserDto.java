@@ -25,5 +25,4 @@ public class GetUserDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate datebirth;
     private String[] roles ;
-
 }

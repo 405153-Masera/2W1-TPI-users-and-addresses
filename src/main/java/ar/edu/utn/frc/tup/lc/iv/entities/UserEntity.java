@@ -60,10 +60,5 @@ public class UserEntity {
 
     @Column(name = "last_updated_user")
     private Integer lastUpdatedUser;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserRoleEntity> userRoles;
-
-    @OneToMany(mappedBy = "user")
-    private List<PlotUserEntity> plotUsers;
+    
 }
