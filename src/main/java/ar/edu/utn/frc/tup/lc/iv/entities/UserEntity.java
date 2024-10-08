@@ -63,5 +63,4 @@ public class UserEntity {
     @Column(name = "last_updated_user")
     private Integer lastUpdatedUser;
 
-
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRoleEntity,Integer> {
@@ -14,4 +15,6 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity,Integer
     void deleteByUser(UserEntity user);
 
     List<UserRoleEntity> findByUser(UserEntity userSaved);
+
+    Optional<List<UserRoleEntity>> findByRoleId(Integer roleId);
 }

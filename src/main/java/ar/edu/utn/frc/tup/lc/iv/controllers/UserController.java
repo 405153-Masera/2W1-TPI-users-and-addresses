@@ -43,6 +43,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/role")
+    public ResponseEntity<List<GetUserDto>> getUsersByRole(@RequestParam Integer roleId) {
+        List<GetUserDto> users = userService.getUsersByRole(roleId);
+        return ResponseEntity.ok(users);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) {

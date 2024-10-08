@@ -260,6 +260,31 @@ public class UserServiceImpl implements UserService {
                 // Si se encuentra un usuario, asigna UserEntity a un objeto GetUserDto
                 .map(userEntity -> modelMapper.map(userEntity, GetUserDto.class));
     }
+
+    @Override
+    public List<GetUserDto> getUsersByRole(Integer roleId) {
+        Optional<List<UserRoleEntity>> usersRoleOptional = userRoleRepository.findByRoleId(roleId);
+        List<GetUserDto> usersDto = new ArrayList<>();
+
+        if(usersRoleOptional.isEmpty()){
+            throw new EntityNotFoundException("Users not found");
+        }
+
+        for (UserRoleEntity userRoleEntity : usersRoleOptional.get()){
+            UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId()).get();
+            GetUserDto userDto = modelMapper.map(userEntity, GetUserDto.class);
+
+            List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
+
+            String[] roles = roleDtos.stream()
+                    .map(GetRoleDto::getDescription)
+                    .toArray(String[]::new);
+            userDto.setRoles(roles);
+            usersDto.add(userDto);
+        }
+
+        return usersDto;
+    }
 }
 
 
