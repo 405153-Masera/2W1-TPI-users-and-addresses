@@ -12,4 +12,5 @@ public interface UserService {
     GetUserDto createUser(PostUserDto postUserDto);
     List<GetUserDto> getAllUsers();
     GetUserDto updateUser(PutUserDto putUserDto);
+    List<GetUserDto> getUsersByStatus(boolean active);
 }

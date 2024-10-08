@@ -205,6 +205,29 @@ public class UserServiceImpl implements UserService {
         getUserDto.setRoles(roles);
         return getUserDto;
     }
+
+    @Override
+    public List<GetUserDto> getUsersByStatus(boolean isActive) {
+        Optional<List<UserEntity>> userEntities = userRepository.findByActive(isActive);
+        if(userEntities.isEmpty()){
+            throw new EntityNotFoundException("Users not found");
+        }
+        List<GetUserDto> userDtos = new ArrayList<>();
+
+        for(UserEntity userEntity : userEntities.get()){
+
+            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
+            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity);
+
+            String[] rolesString = roles.stream()
+                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
+                    .toArray(String[]::new);
+            getUserDto.setRoles(rolesString);
+
+            userDtos.add(getUserDto);
+        }
+        return userDtos;
+    }
 }
 
 

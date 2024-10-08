@@ -35,4 +35,11 @@ public class UserController {
 
         return ResponseEntity.ok(userService.updateUser(putUserDto));
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<GetUserDto>> getUsersByStatus(@RequestParam boolean isActive) {
+        List<GetUserDto> users = userService.getUsersByStatus(isActive);
+        return ResponseEntity.ok(users);
+    }
+
 }
