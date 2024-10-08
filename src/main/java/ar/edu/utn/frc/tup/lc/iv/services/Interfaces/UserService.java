@@ -12,9 +12,10 @@ import java.util.Optional;
 public interface UserService {
     GetUserDto createUser(PostUserDto postUserDto);
     List<GetUserDto> getAllUsers();
+    GetUserDto getUserById(Integer userId);
     GetUserDto updateUser(PutUserDto putUserDto);
     List<GetUserDto> getUsersByStatus(boolean active);
     void deleteUser(Integer userId);
-    Optional<GetUserDto> getUserByEmail(String email);
+    GetUserDto getUserByEmail(String email);
     List<GetUserDto> getUsersByRole(Integer roleId);
 }

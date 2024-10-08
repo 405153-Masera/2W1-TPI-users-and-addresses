@@ -26,6 +26,11 @@ public class UserController {
         return ResponseEntity.ok(createdUserDto);
     }
 
+    @GetMapping("get/{id}")
+    public ResponseEntity<GetUserDto> getUserById(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
     @GetMapping()
     public ResponseEntity<List<GetUserDto>> getUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -58,9 +63,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
-        Optional<GetUserDto> userDto = userService.getUserByEmail(email);
-        return userDto.map(ResponseEntity::ok)
-                .orElseGet(() ->ResponseEntity.notFound().build());
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
 }
