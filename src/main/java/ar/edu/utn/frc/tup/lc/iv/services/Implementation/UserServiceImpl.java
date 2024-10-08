@@ -155,6 +155,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public GetUserDto getUserById(Integer userId) {
+        UserEntity userEntity = userRepository.findById(userId).orElse(null);
+
+        if (userEntity == null) {
+            throw new EntityNotFoundException("Usuario no encontrado con la id: " + userId);
+        }
+
+        GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
+        String[] roles = roleService.getRolesByUser(userId).stream()
+                .map(GetRoleDto::getDescription)
+                .toArray(String[]::new);
+
+        getUserDto.setRoles(roles);
+
+        return getUserDto;
+
+    }
+
+    @Override
     @Transactional
     public GetUserDto updateUser(PutUserDto putUserDto) {
 
