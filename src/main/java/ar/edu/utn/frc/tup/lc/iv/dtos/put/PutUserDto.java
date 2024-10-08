@@ -15,9 +15,9 @@ public class PutUserDto {
     private String name;
     private String lastName;
     private String dni;
-    private Integer contactId;
+    private Integer contact_id;
     private String email;
-    private String avatarUrl;
-    private LocalDate birthDate;
+    private String avatar_url;
+    private LocalDate datebirth;
     private List<Integer> userRoles;
 }

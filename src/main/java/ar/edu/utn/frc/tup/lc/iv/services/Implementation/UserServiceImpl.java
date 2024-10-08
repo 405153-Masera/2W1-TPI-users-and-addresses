@@ -151,7 +151,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public GetUserDto updateUser(PutUserDto putUserDto) {
 
-
         Optional<UserEntity> optionalUser = userRepository.findById(putUserDto.getId());
 
         if(optionalUser.isEmpty()){
@@ -162,10 +161,10 @@ public class UserServiceImpl implements UserService {
         user.setName(putUserDto.getName());
         user.setLastname(putUserDto.getLastName());
         user.setDni(putUserDto.getDni());
-        user.setContact_id(putUserDto.getContactId());
+        user.setContact_id(putUserDto.getContact_id());
         user.setEmail(putUserDto.getEmail());
-        user.setAvatar_url(putUserDto.getAvatarUrl());
-        user.setDatebirth(putUserDto.getBirthDate());
+        user.setAvatar_url(putUserDto.getAvatar_url());
+        user.setDatebirth(putUserDto.getDatebirth());
 
         user.setLastUpdatedDate(LocalDateTime.now());
         user.setLastUpdatedUser(putUserDto.getId());
@@ -173,7 +172,6 @@ public class UserServiceImpl implements UserService {
         UserEntity userSaved = userRepository.save(user);
 
         userRoleRepository.deleteByUser(user);
-        //user.getUserRoles().clear();
 
         for (Integer roleId : putUserDto.getUserRoles()) {
             RoleEntity role = roleRepository.findById(roleId)
@@ -188,26 +186,11 @@ public class UserServiceImpl implements UserService {
             userRoleEntity.setLastUpdatedUser(putUserDto.getId());
 
             userRoleRepository.save(userRoleEntity);
-            //user.getUserRoles().add(userRoleEntity);
         }
 
-        //UserEntity userSaved = userRepository.save(user);
-        GetUserDto getUserDto = new GetUserDto();
-        getUserDto.setId(userSaved.getId());
-        getUserDto.setName(userSaved.getName());
-        getUserDto.setLastname(userSaved.getLastname());
-        getUserDto.setUsername(userSaved.getUsername());
-        getUserDto.setPassword(userSaved.getPassword());
-        getUserDto.setEmail(userSaved.getEmail());
-        getUserDto.setDni(userSaved.getDni());
-        getUserDto.setContact_id(userSaved.getContact_id());
-        getUserDto.setActive(userSaved.getActive());
-        getUserDto.setAvatar_url(userSaved.getAvatar_url());
-        getUserDto.setDatebirth(userSaved.getDatebirth());
-
+        GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);
         List<UserRoleEntity> updatedUserRoles = userRoleRepository.findByUser(userSaved);
 
-        // Mapear los roles a un arreglo de Strings y asignarlos al DTO
         String[] roles = updatedUserRoles.stream()
                 .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
                 .toArray(String[]::new);
@@ -215,7 +198,6 @@ public class UserServiceImpl implements UserService {
         getUserDto.setRoles(roles);
         return getUserDto;
     }
-
 }
 
 
