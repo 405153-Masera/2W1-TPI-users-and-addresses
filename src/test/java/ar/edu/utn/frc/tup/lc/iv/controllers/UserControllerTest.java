@@ -36,7 +36,7 @@ class UserControllerTest {
         GetUserDto getUserDto = new GetUserDto();
         getUserDto.setEmail(email);
 
-        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(getUserDto));
+        when(userService.getUserByEmail(anyString())).thenReturn(getUserDto);
 
         ResponseEntity<GetUserDto> response = userController.getUserByEmail(email);
 
