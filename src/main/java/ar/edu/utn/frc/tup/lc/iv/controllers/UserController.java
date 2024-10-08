@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -48,4 +49,12 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
+        Optional<GetUserDto> userDto = userService.getUserByEmail(email);
+        return userDto.map(ResponseEntity::ok)
+                .orElseGet(() ->ResponseEntity.notFound().build());
+    }
+
 }

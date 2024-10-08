@@ -249,6 +249,17 @@ public class UserServiceImpl implements UserService {
         // Guardar los cambios en la base de datos
         userRepository.save(userEntity);
     }
+
+    @Override
+    public Optional<GetUserDto> getUserByEmail(String email) {
+        //Valida si el correo electrónico es nulo o está vacío y devuelve un mensaje
+        if (email == null || email.isEmpty()) {
+            throw new RuntimeException("Email must not be null or empty");
+        }
+        return userRepository.getUserByEmail(email)
+                // Si se encuentra un usuario, asigna UserEntity a un objeto GetUserDto
+                .map(userEntity -> modelMapper.map(userEntity, GetUserDto.class));
+    }
 }
 
 

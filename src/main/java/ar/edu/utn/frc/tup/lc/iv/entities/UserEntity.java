@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.entities;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Table(name = "users")
 @Entity
@@ -60,5 +62,6 @@ public class UserEntity {
 
     @Column(name = "last_updated_user")
     private Integer lastUpdatedUser;
+
 
 }
