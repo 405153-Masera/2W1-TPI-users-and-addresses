@@ -13,4 +13,5 @@ public interface UserService {
     List<GetUserDto> getAllUsers();
     GetUserDto updateUser(PutUserDto putUserDto);
     List<GetUserDto> getUsersByStatus(boolean active);
+    void deleteUser(Integer userId);
 }
