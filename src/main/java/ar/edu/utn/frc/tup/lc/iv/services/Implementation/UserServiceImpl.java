@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService {
         userRoleEntity.setLastUpdatedUser(1);
     }
 
+
     //Metodo para validar si existe alguien con ese username
     private void validateUsername(String username) {
         if (userRepository.findByUsername(username) != null) {
@@ -204,6 +205,27 @@ public class UserServiceImpl implements UserService {
 
         getUserDto.setRoles(roles);
         return getUserDto;
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Integer userId) {
+        // Buscar el usuario por su ID
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+
+        // Si no se encuentra el usuario, lanzar una excepción
+        if (optionalUser.isEmpty()) {
+            throw new EntityNotFoundException("Usuario no encontrado con la id: " + userId);
+        }
+        // Obtener el usuario
+        UserEntity userEntity = optionalUser.get();
+        // Realizar la baja lógica: marcar el usuario como inactivo
+        userEntity.setActive(false);
+        // Actualizar la fecha y usuario que realiza la baja
+        userEntity.setLastUpdatedDate(LocalDateTime.now());
+        userEntity.setLastUpdatedUser(1);
+        // Guardar los cambios en la base de datos
+        userRepository.save(userEntity);
     }
 }
 
