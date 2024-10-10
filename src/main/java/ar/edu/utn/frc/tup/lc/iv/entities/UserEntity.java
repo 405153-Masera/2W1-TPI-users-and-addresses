@@ -1,6 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.entities;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,6 +43,7 @@ public class UserEntity {
     @Column
     private String avatar_url;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "birth_date")
     private LocalDate datebirth;
 

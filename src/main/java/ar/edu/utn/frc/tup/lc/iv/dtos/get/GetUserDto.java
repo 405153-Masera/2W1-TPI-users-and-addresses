@@ -22,7 +22,7 @@ public class GetUserDto {
     private String dni;
     private Boolean active;
     private String avatar_url;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate datebirth;
     private String[] roles ;
 }
