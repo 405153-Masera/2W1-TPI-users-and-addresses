@@ -1,6 +1,5 @@
 package ar.edu.utn.frc.tup.lc.iv.dtos.post;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,12 +31,12 @@ public class PostUserDto {
     @Email(message = "El correo electrónico debe ser válido")
     private String email;
 
+    @NotNull(message = "El telefono no puede ser nulo")
+    private String phone_number;
+
     @NotNull(message = "El DNI no puede ser nulo")
     @Size(min = 1, max = 11, message = "El DNI debe ser valido")
     private String dni;
-
-    @NotNull(message = "El contacto no puede ser nulo")
-    private Integer contact_id;
 
     @NotNull(message = "El estado no puede ser nulo")
     private Boolean active;
@@ -49,4 +48,5 @@ public class PostUserDto {
 
     @NotNull(message = "Los roles no pueden ser nulos")
     private String[] roles ;
+
 }

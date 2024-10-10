@@ -13,6 +13,9 @@ import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactType;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.PersonType;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,6 +57,7 @@ public class UserServiceImpl implements UserService {
         // Validaciones por si el username o el email ya existen
         validateUsername(postUserDto.getUsername());
         validateEmail(postUserDto.getEmail());
+
         // Crear un nuevo UserEntity y asignar los valores del DTO
         UserEntity userEntity = new UserEntity();
         //Mapeamos con el metodo
@@ -86,10 +90,15 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        //guardar contactos
+        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
+        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
+
         // Mapear el UserEntity guardado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
-
+        getUserDto.setEmail(postUserDto.getEmail());
+        getUserDto.setPhone_number(postUserDto.getPhone_number());
         // TODO: Agregar los contactos del usuario, necesitamos a Micro Contacto
 
         return getUserDto;

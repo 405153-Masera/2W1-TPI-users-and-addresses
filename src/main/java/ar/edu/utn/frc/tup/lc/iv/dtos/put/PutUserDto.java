@@ -31,7 +31,7 @@ public class PutUserDto {
     private String dni;
 
     @NotNull(message = "El contacto no puede ser nulo")
-    private Integer contact_id;
+    private String phone_number;
 
     @NotNull(message = "El correo electrónico no puede ser nulo")
     @Email(message = "El correo electrónico debe ser válido")

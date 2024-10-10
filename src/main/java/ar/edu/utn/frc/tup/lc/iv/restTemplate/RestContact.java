@@ -1,11 +1,14 @@
 package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactType;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +79,26 @@ public class RestContact {
             }
         }
         return null;
+    }
+
+    public boolean saveContact(Integer userId, String email, int contactType) {
+
+        Contact contact = new Contact();
+        contact.setUserId(userId);
+        contact.setValue(email);
+        //falta person type
+
+        if(contactType == 1){
+            contact.setContactType(new ContactType(1, "Correo Electrónico"));
+        }else {
+            contact.setContactType(new ContactType(2, "Teléfono Móvil"));
+        }
+
+        ResponseEntity<Void> response = restTemplate.postForEntity("https://67079de18e86a8d9e42c2c03.mockapi.io/api/contacts/Contacts", contact, Void.class);
+        if(response.getStatusCode().is2xxSuccessful()){
+            return true; //por el momento devuelve boolean porque no devuelve nada el endpoint
+        }else {
+            return false;
+        }
     }
 }
