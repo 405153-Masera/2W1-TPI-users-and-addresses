@@ -115,8 +115,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
-
     // Metodo para mepear el UserEntity a GetUserDto
     private GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
@@ -167,7 +165,7 @@ public class UserServiceImpl implements UserService {
     //Metodo para validar si existe alguien con ese username
     private void validateUsername(String username) {
         if (userRepository.findByUsername(username) != null) {
-            throw new IllegalArgumentException("Error al crear el usuario: el nombre de usuario ya está en uso.");
+            throw new IllegalArgumentException("Error creating user: username already in use.");
         }
     }
 
@@ -206,7 +204,6 @@ public class UserServiceImpl implements UserService {
         mapUserRolesAndContacts(userEntity,getUserDto);
 
         return getUserDto;
-
     }
 
     @Override
@@ -262,26 +259,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<GetUserDto> getUsersByStatus(boolean isActive){ // Todo, mapear bien el contacto
-        Optional<List<UserEntity>> userEntities = userRepository.findByActive(isActive);
-        if(userEntities.isEmpty()){
-            throw new EntityNotFoundException("Users not found");
-        }
-        List<GetUserDto> userDtos = new ArrayList<>();
+    public List<GetUserDto> getUsersByStatus(boolean isActive){
+        List<UserEntity> userEntities = userRepository.findByActive(isActive)
+                .orElseThrow(() -> new EntityNotFoundException("Users not found"));
 
-        for(UserEntity userEntity : userEntities.get()){
+        return userEntities.stream()
+                .map(userEntity -> {
+                    GetUserDto getUserDto = new GetUserDto();
+                    mapUserEntitytoGet(userEntity,getUserDto);
+                    mapUserRolesAndContacts(userEntity,getUserDto);
 
-            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
-            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity);
-
-            String[] rolesString = roles.stream()
-                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
-                    .toArray(String[]::new);
-            getUserDto.setRoles(rolesString);
-
-            userDtos.add(getUserDto);
-        }
-        return userDtos;
+                    return getUserDto;
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -306,42 +295,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUserDto getUserByEmail(String email) { // TODO
-//        Optional<UserEntity> userEntity = userRepository.getUserByEmail(email);
-//        if(userEntity.isEmpty()){
-//            throw new EntityNotFoundException("User not found");
-//        }
-//
-//            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
-//            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity.get());
-//
-//            String[] rolesString = roles.stream()
-//                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
-//                    .toArray(String[]::new);
-//            getUserDto.setRoles(rolesString);
+    public GetUserDto getUserByEmail(String email) {
 
-        return null;
+        Integer userId = restContact.getUserIdByEmail(email);
+        if (userId == null) {
+            throw new EntityNotFoundException("User not found with email: " + email);
+        }
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        GetUserDto getUserDto = new GetUserDto();
+        mapUserEntitytoGet(userEntity,getUserDto);
+        mapUserRolesAndContacts(userEntity,getUserDto);
+        return getUserDto;
     }
 
     @Override
     public List<GetUserDto> getUsersByRole(Integer roleId) {
-        Optional<List<UserRoleEntity>> usersRoleOptional = userRoleRepository.findByRoleId(roleId);
+
+        List<UserRoleEntity> usersRole = userRoleRepository.findByRoleId(roleId)
+                .orElseThrow(() -> new EntityNotFoundException("Users not found with role id: " + roleId));
+
         List<GetUserDto> usersDto = new ArrayList<>();
 
-        if(usersRoleOptional.isEmpty()){
-            throw new EntityNotFoundException("Users not found");
-        }
-
-        for (UserRoleEntity userRoleEntity : usersRoleOptional.get()){
+        for (UserRoleEntity userRoleEntity : usersRole){
             UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId()).get();
+
             GetUserDto userDto = modelMapper.map(userEntity, GetUserDto.class);
-
-            List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
-
-            String[] roles = roleDtos.stream()
-                    .map(GetRoleDto::getDescription)
-                    .toArray(String[]::new);
-            userDto.setRoles(roles);
+            mapUserEntitytoGet(userEntity, userDto);
+            mapUserRolesAndContacts(userEntity, userDto);
             usersDto.add(userDto);
         }
 

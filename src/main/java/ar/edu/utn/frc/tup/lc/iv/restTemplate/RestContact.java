@@ -62,4 +62,19 @@ public class RestContact {
 
         return emails;
     }
+
+    public Integer getUserIdByEmail(String email) {
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
+        if (response.getBody().isArray()) {
+            for (JsonNode node : response.getBody()) {
+                String contactValue = node.get("value").asText();
+                String contactType = node.get("contactType").get("id").asText();
+
+                if (contactType.equals("1") && contactValue.equals(email)) {
+                    return node.get("userId").asInt();
+                }
+            }
+        }
+        return null;
+    }
 }
