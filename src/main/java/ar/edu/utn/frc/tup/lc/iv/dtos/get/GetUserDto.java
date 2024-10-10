@@ -18,8 +18,8 @@ public class GetUserDto {
     private String username;
     private String password;
     private String email;
+    private String phone_number;
     private String dni;
-    private Integer contact_id;
     private Boolean active;
     private String avatar_url;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

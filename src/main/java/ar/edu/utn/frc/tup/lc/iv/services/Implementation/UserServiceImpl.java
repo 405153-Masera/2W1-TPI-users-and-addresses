@@ -7,9 +7,12 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.models.User;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,6 +45,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private RestContact restContact;
 
     public GetUserDto createUser(PostUserDto postUserDto) {
 
@@ -87,15 +93,14 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    // Metodo
     private void mapUserEntitytoPost(UserEntity userEntity , PostUserDto postUserDto) {
 
         userEntity.setName(postUserDto.getName());
         userEntity.setLastname(postUserDto.getLastname());
         userEntity.setUsername(postUserDto.getUsername());
         userEntity.setPassword(postUserDto.getPassword());
-        userEntity.setEmail(postUserDto.getEmail());
         userEntity.setDni(postUserDto.getDni());
-        userEntity.setContact_id(postUserDto.getContact_id());
         userEntity.setActive(postUserDto.getActive());
         userEntity.setAvatar_url(postUserDto.getAvatar_url());
         userEntity.setDatebirth(postUserDto.getDatebirth());
@@ -108,6 +113,44 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    // Metodo para mepear el UserEntity a GetUserDto
+    private GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
+        getUserDto.setId(userEntity.getId());
+        getUserDto.setName(userEntity.getName());
+        getUserDto.setLastname(userEntity.getLastname());
+        getUserDto.setUsername(userEntity.getUsername());
+        getUserDto.setPassword(userEntity.getPassword());
+        getUserDto.setDni(userEntity.getDni());
+        getUserDto.setActive(userEntity.getActive());
+        getUserDto.setAvatar_url(userEntity.getAvatar_url());
+        getUserDto.setDatebirth(userEntity.getDatebirth());
+
+        return getUserDto;
+    }
+
+    // Metodo para mapear los Roles y Contactos de un usuario
+    private void mapUserRolesAndContacts(UserEntity userEntity , GetUserDto getUserDto) {
+        List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
+
+        // Convierto la lista de GetRoleDto a un arreglo de String[] (solo para ver los nombres)
+        String[] roles = roleDtos.stream()
+                .map(GetRoleDto::getDescription) // Mapeamos cada GetRoleDto a su descripción
+                .toArray(String[]::new); // Convertimos el Stream a un arreglo de String
+
+        getUserDto.setRoles(roles);  // Asignar los roles como String[] al DTO
+
+        // Buscamos los contactos del usuario y los asignamos
+        List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
+        for (GetContactDto contactDto : contactDtos) {
+            if(contactDto.getType_contact() == 1){ // Si el valor es 1, es un email
+                getUserDto.setEmail(contactDto.getValue());
+            }else{ // Si no, es un teléfono
+                getUserDto.setPhone_number(contactDto.getValue());
+            }
+        }
+    }
+
+    // Metodo para mapear la entidad UserRole
     private void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
@@ -156,18 +199,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GetUserDto getUserById(Integer userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElse(null);
 
-        if (userEntity == null) {
-            throw new EntityNotFoundException("Usuario no encontrado con la id: " + userId);
-        }
+        UserEntity  userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
-        String[] roles = roleService.getRolesByUser(userId).stream()
-                .map(GetRoleDto::getDescription)
-                .toArray(String[]::new);
-
-        getUserDto.setRoles(roles);
+        GetUserDto getUserDto = new GetUserDto()    ;
+        mapUserEntitytoGet(userEntity,getUserDto);
+        mapUserRolesAndContacts(userEntity,getUserDto);
 
         return getUserDto;
 
@@ -187,8 +225,8 @@ public class UserServiceImpl implements UserService {
         user.setName(putUserDto.getName());
         user.setLastname(putUserDto.getLastName());
         user.setDni(putUserDto.getDni());
-        user.setContact_id(putUserDto.getContact_id());
-        user.setEmail(putUserDto.getEmail());
+//        user.setContact_id(putUserDto.getContact_id());
+//        user.setEmail(putUserDto.getEmail());
         user.setAvatar_url(putUserDto.getAvatar_url());
         user.setDatebirth(putUserDto.getDatebirth());
 

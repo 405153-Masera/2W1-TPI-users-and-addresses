@@ -37,12 +37,6 @@ public class UserEntity {
     private String dni;
 
     @Column
-    private Integer contact_id;
-
-    @Column
-    private String email;
-
-    @Column
     private Boolean active;
 
     @Column
