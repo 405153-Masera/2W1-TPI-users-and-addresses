@@ -29,7 +29,7 @@ public class RestContact {
         if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
                 // tomamos los valores
-                String typeContact = node.get("contactType").get("type").asText();
+                String typeContact = node.get("contactType").get("id").asText();
                 String value = node.get("value").asText();
 
                 // Creamos el dto
@@ -42,5 +42,24 @@ public class RestContact {
         }
 
         return contacts;
+    }
+
+    public List<String> getAllEmails(){
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
+
+        List<String> emails = new ArrayList<>();
+
+        if (response.getBody().isArray()) {
+            for (JsonNode node : response.getBody()) {
+                String typeContact = node.get("contactType").get("id").asText();
+                String value = node.get("value").asText();
+
+                if (typeContact.equals("1")) {
+                    emails.add(value);
+                }
+            }
+        }
+
+        return emails;
     }
 }

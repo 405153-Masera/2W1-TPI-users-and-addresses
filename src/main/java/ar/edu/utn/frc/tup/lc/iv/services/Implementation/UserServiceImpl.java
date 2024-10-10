@@ -90,6 +90,8 @@ public class UserServiceImpl implements UserService {
         GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
 
+        // TODO: Agregar los contactos del usuario, necesitamos a Micro Contacto
+
         return getUserDto;
     }
 
@@ -112,6 +114,8 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastUpdatedUser(1);  // ID del usuario que realiza la actualización
 
     }
+
+
 
     // Metodo para mepear el UserEntity a GetUserDto
     private GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
@@ -167,10 +171,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    //Metodo para validar si existe alguien con ese email
+    // Metodo para validar si existe alguien con ese email TODO
     private void validateEmail(String email) {
-        if (userRepository.findByEmail(email) != null) {
-            throw new IllegalArgumentException("Error al crear el usuario: el correo electrónico ya está en uso.");
+        List<String> emails = restContact.getAllEmails();   // Obtener todos los emails
+        if (emails.contains(email)) {
+            throw new IllegalArgumentException("Error creating user: email already in use.");
         }
     }
 
@@ -179,16 +184,9 @@ public class UserServiceImpl implements UserService {
 
         List<GetUserDto> getUserDtos = userEntities.stream()
                 .map(userEntity -> {
-                    GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
-
-                    List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
-
-                    // Convierto la lista de GetRoleDto a un arreglo de String[] (solo para ver los nombres)
-                    String[] roles = roleDtos.stream()
-                            .map(GetRoleDto::getDescription) // Mapeamos cada GetRoleDto a su descripción
-                            .toArray(String[]::new); // Convertimos el Stream a un arreglo de String
-
-                    getUserDto.setRoles(roles);  // Asignar los roles como String[] al DTO
+                    GetUserDto getUserDto = new GetUserDto();
+                    mapUserEntitytoGet(userEntity,getUserDto);
+                    mapUserRolesAndContacts(userEntity,getUserDto);
 
                     return getUserDto;
                 })
@@ -203,7 +201,7 @@ public class UserServiceImpl implements UserService {
         UserEntity  userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        GetUserDto getUserDto = new GetUserDto()    ;
+        GetUserDto getUserDto = new GetUserDto();
         mapUserEntitytoGet(userEntity,getUserDto);
         mapUserRolesAndContacts(userEntity,getUserDto);
 
@@ -213,7 +211,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public GetUserDto updateUser(PutUserDto putUserDto) {
+    public GetUserDto updateUser(PutUserDto putUserDto) { // Todo, actualizar contacto
 
         Optional<UserEntity> optionalUser = userRepository.findById(putUserDto.getId());
 
@@ -264,7 +262,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<GetUserDto> getUsersByStatus(boolean isActive) {
+    public List<GetUserDto> getUsersByStatus(boolean isActive){ // Todo, mapear bien el contacto
         Optional<List<UserEntity>> userEntities = userRepository.findByActive(isActive);
         if(userEntities.isEmpty()){
             throw new EntityNotFoundException("Users not found");
@@ -308,21 +306,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUserDto getUserByEmail(String email) {
-        Optional<UserEntity> userEntity = userRepository.getUserByEmail(email);
-        if(userEntity.isEmpty()){
-            throw new EntityNotFoundException("User not found");
-        }
+    public GetUserDto getUserByEmail(String email) { // TODO
+//        Optional<UserEntity> userEntity = userRepository.getUserByEmail(email);
+//        if(userEntity.isEmpty()){
+//            throw new EntityNotFoundException("User not found");
+//        }
+//
+//            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
+//            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity.get());
+//
+//            String[] rolesString = roles.stream()
+//                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
+//                    .toArray(String[]::new);
+//            getUserDto.setRoles(rolesString);
 
-            GetUserDto getUserDto = modelMapper.map(userEntity, GetUserDto.class);
-            List<UserRoleEntity> roles = userRoleRepository.findByUser(userEntity.get());
-
-            String[] rolesString = roles.stream()
-                    .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
-                    .toArray(String[]::new);
-            getUserDto.setRoles(rolesString);
-
-        return getUserDto;
+        return null;
     }
 
     @Override
@@ -349,19 +347,6 @@ public class UserServiceImpl implements UserService {
 
         return usersDto;
     }
-
-//    @Override
-//    public Optional<GetUserDto> getUserByEmail(String email) {
-//        //Valida si el correo electrónico es nulo o está vacío y devuelve un mensaje
-//        if (email == null || email.isEmpty()) {
-//            throw new RuntimeException("Email must not be null or empty");
-//        }
-//        return userRepository.getUserByEmail(email)
-//                // Si se encuentra un usuario, asigna UserEntity a un objeto GetUserDto
-//                .map(userEntity -> modelMapper.map(userEntity, GetUserDto.class));
-//
-//
-//    }
 }
 
 
