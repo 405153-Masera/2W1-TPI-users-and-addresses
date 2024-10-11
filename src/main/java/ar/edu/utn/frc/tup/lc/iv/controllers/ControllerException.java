@@ -1,6 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.common.ErrorApi;
+import ar.edu.utn.frc.tup.lc.iv.exceptions.ErrorResponse;
+import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,12 @@ public class ControllerException {
     public ResponseEntity<ErrorApi> handleError(ResponseStatusException e) {
         ErrorApi error = buildError(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
         return ResponseEntity.status(e.getStatusCode()).body(error);
+    }
+
+    @ExceptionHandler(RoleUserException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(RoleUserException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(error, ex.getStatus());
     }
 
     private ErrorApi buildError(String message, HttpStatus status) {
