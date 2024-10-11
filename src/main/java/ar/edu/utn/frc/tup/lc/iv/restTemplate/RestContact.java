@@ -1,14 +1,11 @@
 package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactType;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +16,7 @@ public class RestContact {
     @Autowired
     private RestTemplate restTemplate;
 
-    String url = "https://my-json-server.typicode.com/405786MoroBenjamin/contact-responses/contacts";
+    String url = "http://localhost:8083/contact/search";
 
     public List<GetContactDto> getContactById(int id) {
 
@@ -81,20 +78,15 @@ public class RestContact {
         return null;
     }
 
-    public boolean saveContact(Integer userId, String email, int contactType) {
+    public boolean saveContact(Integer userId, String email, int contactType, int personType) {
 
         Contact contact = new Contact();
         contact.setUserId(userId);
         contact.setValue(email);
-        //falta person type
+        contact.setContactType(contactType);
+        contact.setPersonType(personType);
 
-        if(contactType == 1){
-            contact.setContactType(new ContactType(1, "Correo Electrónico"));
-        }else {
-            contact.setContactType(new ContactType(2, "Teléfono Móvil"));
-        }
-
-        ResponseEntity<Void> response = restTemplate.postForEntity("https://67079de18e86a8d9e42c2c03.mockapi.io/api/contacts/Contacts", contact, Void.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact", contact, Void.class);
         if(response.getStatusCode().is2xxSuccessful()){
             return true; //por el momento devuelve boolean porque no devuelve nada el endpoint
         }else {

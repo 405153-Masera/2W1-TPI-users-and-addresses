@@ -7,15 +7,11 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
-import ar.edu.utn.frc.tup.lc.iv.models.User;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactType;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.PersonType;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,7 +20,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,8 +86,8 @@ public class UserServiceImpl implements UserService {
         }
 
         //guardar contactos
-        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
-        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
+        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1,3);
+        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2,3);
 
         // Mapear el UserEntity guardado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);
