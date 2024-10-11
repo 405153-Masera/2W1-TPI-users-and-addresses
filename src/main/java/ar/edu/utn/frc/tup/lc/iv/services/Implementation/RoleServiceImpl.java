@@ -1,6 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
@@ -10,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,5 +58,23 @@ public class RoleServiceImpl implements RoleService {
             }
         }
         return roles;
+    }
+
+    @Override
+    public GetRoleDto createRole(PostRoleDto postRoleDto) {
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setDescription(postRoleDto.getDescription());
+        roleEntity.setCreatedUser(1);
+        roleEntity.setCreatedDate(LocalDateTime.now());
+        roleEntity.setLastUpdatedDate(LocalDateTime.now());
+        roleEntity.setLastUpdatedUser(1);
+
+        roleRepository.save(roleEntity);
+
+        GetRoleDto getRoleDto = new GetRoleDto();
+
+        modelMapper.map(roleEntity, getRoleDto);
+
+        return getRoleDto;
     }
 }
