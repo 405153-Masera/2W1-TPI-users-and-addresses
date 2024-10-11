@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Contact {
     private Integer userId;
-    private Integer personType;
-    private Integer contactType;
+    private Integer personTypeId;
+    private Integer contactTypeId;
     private String value;
 }

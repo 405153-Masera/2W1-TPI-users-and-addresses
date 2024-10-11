@@ -83,8 +83,9 @@ public class RestContact {
         Contact contact = new Contact();
         contact.setUserId(userId);
         contact.setValue(email);
-        contact.setContactType(contactType);
-        contact.setPersonType(personType);
+        contact.setPersonTypeId(personType);
+        contact.setContactTypeId(contactType);
+
 
         ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact", contact, Void.class);
         if(response.getStatusCode().is2xxSuccessful()){
