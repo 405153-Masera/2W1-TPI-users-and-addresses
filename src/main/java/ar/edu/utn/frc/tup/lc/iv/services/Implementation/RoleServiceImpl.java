@@ -4,11 +4,13 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -42,6 +44,9 @@ public class RoleServiceImpl implements RoleService {
 
     public List<GetRoleDto> getRolesByUser(int userId) {
         List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
+        if(userRoles.isEmpty()){
+            throw new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND);
+        }
         List<GetRoleDto> roles = new ArrayList<>();
 
         for (UserRoleEntity userRole : userRoles) {
@@ -69,7 +74,7 @@ public class RoleServiceImpl implements RoleService {
         roleEntity.setLastUpdatedDate(LocalDateTime.now());
         roleEntity.setLastUpdatedUser(1);
 
-        roleRepository.save(roleEntity);
+        roleEntity = roleRepository.save(roleEntity);
 
         GetRoleDto getRoleDto = new GetRoleDto();
 

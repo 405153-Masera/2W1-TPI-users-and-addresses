@@ -2,6 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "userroles")
+@Builder
 public class UserRoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
