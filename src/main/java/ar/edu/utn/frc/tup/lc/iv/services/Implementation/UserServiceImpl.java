@@ -305,9 +305,12 @@ public class UserServiceImpl implements UserService {
         if (userId == null) {
             throw new EntityNotFoundException("User not found with email: " + email);
         }
+
+
+
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-
+        //falta traer el email y nro de teléfono
         GetUserDto getUserDto = new GetUserDto();
         mapUserEntitytoGet(userEntity,getUserDto);
         mapUserRolesAndContacts(userEntity,getUserDto);

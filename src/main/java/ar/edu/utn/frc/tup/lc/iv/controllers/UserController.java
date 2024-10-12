@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PutMapping
+    @PutMapping()
     public ResponseEntity<GetUserDto> updateUser(@RequestBody PutUserDto putUserDto) {
 
         return ResponseEntity.ok(userService.updateUser(putUserDto));
