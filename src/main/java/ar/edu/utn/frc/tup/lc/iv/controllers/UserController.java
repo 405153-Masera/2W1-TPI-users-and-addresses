@@ -1,6 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
@@ -66,6 +67,12 @@ public class UserController {
     @GetMapping("/{email}")
     public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
+    // Se maneja en post x temas de seguridad
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
+        return ResponseEntity.ok(userService.verifyLogin(postLoginDto.getPassword(), postLoginDto.getDni()));
     }
 
 }

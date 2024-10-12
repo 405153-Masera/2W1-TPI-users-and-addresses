@@ -336,6 +336,16 @@ public class UserServiceImpl implements UserService {
 
         return usersDto;
     }
+
+    @Override
+    public boolean verifyLogin(String password, String dni) {
+        UserEntity userEntity = userRepository.findByDni(dni);
+        if (userEntity == null) {
+            return false;
+        }
+        return userEntity.getPassword().equals(password);
+
+    }
 }
 
 
