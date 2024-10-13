@@ -127,7 +127,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUsersByRole() {
+    void getUsersByRole_Success() {
         //Given
         GetUserDto userDto = new GetUserDto();
         userDto.setId(10);
@@ -171,5 +171,129 @@ class UserServiceImplTest {
         assertThrows(EntityNotFoundException.class, () ->{
             userServiceSpy.getUsersByRole(1);
         });
+    }
+
+    @Test
+    void verifyLogin_True(){
+        //Given
+        String password = "123456";
+        String dni = "45236220";
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setPassword(password);
+
+        //When
+        Mockito.when(userRepositoryMock.findByDni(dni)).thenReturn(userEntity);
+
+        //Then
+        boolean result = userServiceSpy.verifyLogin(password, dni);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void verifyLogin_False(){
+        //Given
+        String password = "123456";
+        String dni = "45236220";
+
+        //When
+        Mockito.when(userRepositoryMock.findByDni(dni)).thenReturn(null);
+
+        //Then
+        boolean result = userServiceSpy.verifyLogin(password, dni);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void getUserByStatus_Success(){
+        //Given
+        List<UserEntity> userEntityList = new ArrayList<>();
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(10);
+        userEntity.setName("Pablo");
+        userEntity.setDni("35654225");
+        userEntity.setActive(true);
+
+        userEntityList.add(userEntity);
+        userEntityList.add(userEntity);
+
+        //When
+        Mockito.when(userRepositoryMock.findByActive(true)).thenReturn(Optional.of(userEntityList));
+
+        //Then
+        List<GetUserDto> result = userServiceSpy.getUsersByStatus(true);
+
+        assertEquals(2, result.size());
+        assertTrue(true, String.valueOf(result.get(0).getActive()));
+        assertEquals(10, result.get(1).getId());
+    }
+
+    @Test
+    void getUserByStatus_EntityNotFound(){
+        //When
+        Mockito.when(userRepositoryMock.findByActive(true)).thenReturn(Optional.empty());
+
+        //Then
+        assertThrows(EntityNotFoundException.class, () ->{
+            userServiceSpy.getUsersByStatus(true);
+        });
+    }
+
+    @Test
+    void getUserById_Success(){
+        //Given
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(10);
+        userEntity.setName("Pablo");
+        userEntity.setDni("35654225");
+        userEntity.setActive(true);
+
+        //When
+        Mockito.when(userRepositoryMock.findById(10)).thenReturn(Optional.of(userEntity));
+
+        //Then
+        GetUserDto result = userServiceSpy.getUserById(10);
+
+        assertNotNull(result);
+        assertEquals(userEntity.getName(), result.getName());
+        assertEquals(userEntity.getId(), result.getId());
+    }
+
+    @Test
+    void getUserById_EntityNotFound(){
+        //When
+        Mockito.when(userRepositoryMock.findById(10)).thenReturn(Optional.empty());
+
+        //Then
+        assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.getUserById(10);
+        });
+    }
+
+    @Test
+    void getAllUsers_Success(){
+        //Given
+        List<UserEntity> userEntityList = new ArrayList<>();
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(10);
+        userEntity.setName("Pablo");
+        userEntity.setDni("35654225");
+        userEntity.setActive(true);
+
+        userEntityList.add(userEntity);
+
+        //When
+        Mockito.when(userRepositoryMock.findAll()).thenReturn(userEntityList);
+
+        //Then
+        List<GetUserDto> result = userServiceSpy.getAllUsers();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(userEntity.getName(), result.get(0).getName());
     }
 }
