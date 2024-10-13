@@ -86,15 +86,14 @@ public class UserServiceImpl implements UserService {
         }
 
         //guardar contactos
-        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1,3);
-        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2,3);
+        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
+        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
 
         // Mapear el UserEntity guardado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
         getUserDto.setEmail(postUserDto.getEmail());
         getUserDto.setPhone_number(postUserDto.getPhone_number());
-        // TODO: Agregar los contactos del usuario, necesitamos a Micro Contacto
 
         return getUserDto;
     }
@@ -212,9 +211,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public GetUserDto updateUser(PutUserDto putUserDto) { // Todo, actualizar contacto
+    public GetUserDto updateUser(Integer userId,PutUserDto putUserDto) {
 
-        Optional<UserEntity> optionalUser = userRepository.findById(putUserDto.getId());
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
 
         if(optionalUser.isEmpty()){
             throw new EntityNotFoundException("User not found");
@@ -224,41 +223,55 @@ public class UserServiceImpl implements UserService {
         user.setName(putUserDto.getName());
         user.setLastname(putUserDto.getLastName());
         user.setDni(putUserDto.getDni());
-//        user.setContact_id(putUserDto.getContact_id());
-//        user.setEmail(putUserDto.getEmail());
         user.setAvatar_url(putUserDto.getAvatar_url());
         user.setDatebirth(putUserDto.getDatebirth());
 
         user.setLastUpdatedDate(LocalDateTime.now());
-        user.setLastUpdatedUser(putUserDto.getId());
+        user.setLastUpdatedUser(userId);
 
         UserEntity userSaved = userRepository.save(user);
 
+        // Actualizar los contactos del usuario
+        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
+        restContact.updateContact(userSaved.getId(), putUserDto.getPhone_number(), 2);
+
         userRoleRepository.deleteByUser(user);
 
-        for (Integer roleId : putUserDto.getUserRoles()) {
-            RoleEntity role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new EntityNotFoundException("Role not found with id: " + roleId));
+        String[] roles = putUserDto.getRoles();
 
+        // Asignar los nuevos roles al usuario
+        List<String> assignedRoles = new ArrayList<>();
+        for (String roleDesc : roles) {
+            // Buscar el rol por su descripción
+            RoleEntity role = roleRepository.findByDescription(roleDesc);
+            if (role == null) {
+                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
+            }
+
+            // Crear una nueva relación en la tabla intermedia UserRoles
             UserRoleEntity userRoleEntity = new UserRoleEntity();
             userRoleEntity.setUser(user);
             userRoleEntity.setRole(role);
             userRoleEntity.setCreatedDate(LocalDateTime.now());
-            userRoleEntity.setCreatedUser(putUserDto.getId());
+            userRoleEntity.setCreatedUser(userId);
             userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
-            userRoleEntity.setLastUpdatedUser(putUserDto.getId());
+            userRoleEntity.setLastUpdatedUser(userId);
 
+            // Guardar la relación en la tabla intermedia
             userRoleRepository.save(userRoleEntity);
+
+            // Agregar la descripción del rol a la lista de roles asignados
+            assignedRoles.add(roleDesc);
         }
 
+        // Mapear el usuario actualizado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);
-        List<UserRoleEntity> updatedUserRoles = userRoleRepository.findByUser(userSaved);
+        getUserDto.setRoles(assignedRoles.toArray(new String[0])); // Asignar los roles al DTO
 
-        String[] roles = updatedUserRoles.stream()
-                .map(userRoleEntity -> userRoleEntity.getRole().getDescription())
-                .toArray(String[]::new);
+        // Asignar los contactos actualizados
+        getUserDto.setEmail(putUserDto.getEmail());
+        getUserDto.setPhone_number(putUserDto.getPhone_number());
 
-        getUserDto.setRoles(roles);
         return getUserDto;
     }
 
