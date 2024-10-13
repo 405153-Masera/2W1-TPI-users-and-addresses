@@ -57,8 +57,10 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = new UserEntity();
         //Mapeamos con el metodo
         mapUserEntitytoPost(userEntity, postUserDto);
+        System.out.println(userEntity);
         // Guardar el usuario en la base de datos
         UserEntity savedUser = userRepository.save(userEntity);
+        System.out.println(savedUser);
 
         // Obtener los roles del PostUserDto
         String[] roleDescriptions = postUserDto.getRoles();
@@ -166,14 +168,14 @@ public class UserServiceImpl implements UserService {
     }
 
     //Metodo para validar si existe alguien con ese username
-    private void validateUsername(String username) {
+    public void validateUsername(String username) {
         if (userRepository.findByUsername(username) != null) {
             throw new IllegalArgumentException("Error creating user: username already in use.");
         }
     }
 
     // Metodo para validar si existe alguien con ese email TODO
-    private void validateEmail(String email) {
+    public void validateEmail(String email) {
         List<String> emails = restContact.getAllEmails();   // Obtener todos los emails
         if (emails.contains(email)) {
             throw new IllegalArgumentException("Error creating user: email already in use.");
