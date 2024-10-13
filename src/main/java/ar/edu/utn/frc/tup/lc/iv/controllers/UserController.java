@@ -25,38 +25,81 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<GetUserDto> createUser(@Valid @RequestBody PostUserDto postUserDto) {
-        GetUserDto createdUserDto = userService.createUser(postUserDto);
-        return ResponseEntity.ok(createdUserDto);
+        GetUserDto result = userService.createUser(postUserDto);
+
+        //Si falla el service
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Crea el usuario
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("get/{id}")
     public ResponseEntity<GetUserDto> getUserById(@PathVariable Integer id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        GetUserDto response = userService.getUserById(id);
+
+        //Si no encuentra el usuario
+        if(response == null){
+          return ResponseEntity.notFound().build();
+        }
+
+        //Si lo encuentra
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping()
     public ResponseEntity<List<GetUserDto>> getUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+        List<GetUserDto> result = userService.getAllUsers();
+
+        //Si no trae la lista
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Si trae la lista
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping()
     public ResponseEntity<GetUserDto> updateUser(@RequestBody PutUserDto putUserDto) {
+        GetUserDto result = userService.updateUser(putUserDto);
 
-        return ResponseEntity.ok(userService.updateUser(putUserDto));
+        //Si falla el service
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Si hace la modificación
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/status")
     public ResponseEntity<List<GetUserDto>> getUsersByStatus(@RequestParam boolean isActive) {
-        List<GetUserDto> users = userService.getUsersByStatus(isActive);
-        return ResponseEntity.ok(users);
+        List<GetUserDto> result = userService.getUsersByStatus(isActive);
+
+        //Si no trae la lista
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Si trae la lista
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/role")
     public ResponseEntity<List<GetUserDto>> getUsersByRole(@RequestParam Integer roleId) {
-        List<GetUserDto> users = userService.getUsersByRole(roleId);
-        return ResponseEntity.ok(users);
-    }
+        List<GetUserDto> result = userService.getUsersByRole(roleId);
 
+        //Si no trae la lista
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Si trae la lista
+        return ResponseEntity.ok(result);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) {
@@ -66,13 +109,29 @@ public class UserController {
 
     @GetMapping("/{email}")
     public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+        GetUserDto result = userService.getUserByEmail(email);
+
+        //Si no encuentra al usuario
+        if(result == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        //Si encuentra al usuario
+        return ResponseEntity.ok(result);
     }
 
     // Se maneja en post x temas de seguridad
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
-        return ResponseEntity.ok(userService.verifyLogin(postLoginDto.getPassword(), postLoginDto.getDni()));
+        boolean result = userService.verifyLogin(postLoginDto.getPassword(), postLoginDto.getDni());
+
+        //Si no está registrado
+        if(!result){
+            return ResponseEntity.notFound().build();
+        }
+
+        //Está registrado
+        return ResponseEntity.ok(result);
     }
 
 }

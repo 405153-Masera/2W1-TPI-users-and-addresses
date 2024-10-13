@@ -63,27 +63,14 @@ public class RoleControllerTest {
     }
 
     @Test
-    void getRoles_NoContent() throws Exception{
-        //When
-        Mockito.when(roleServiceMock.getAllRoles()).thenReturn(new ArrayList<>());
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/roles")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        Mockito.verify(roleServiceMock, times(1)).getAllRoles();
-    }
-
-    @Test
-    void getRoles_InternalServerError() throws Exception{
+    void getRoles_BadRequest() throws Exception{
         //When
         Mockito.when(roleServiceMock.getAllRoles()).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/roles")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
 
         Mockito.verify(roleServiceMock, times(1)).getAllRoles();
     }

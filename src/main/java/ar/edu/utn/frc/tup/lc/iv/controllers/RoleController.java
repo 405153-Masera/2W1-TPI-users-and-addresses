@@ -21,12 +21,7 @@ public class RoleController {
 
         //Si falla el service
         if(result == null) {
-            return ResponseEntity.internalServerError().build();
-        }
-
-        //Si trae la lista vacia
-        else if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.badRequest().build();
         }
 
         //Trae la lista
