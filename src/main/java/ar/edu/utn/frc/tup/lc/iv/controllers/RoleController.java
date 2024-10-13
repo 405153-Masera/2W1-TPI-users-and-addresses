@@ -17,9 +17,32 @@ public class RoleController {
 
     @GetMapping()
     public ResponseEntity<List<GetRoleDto>> getRoles() {
-        return ResponseEntity.ok(roleService.getAllRoles());
+        List<GetRoleDto> result = roleService.getAllRoles();
+
+        //Si falla el service
+        if(result == null) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        //Si trae la lista vacia
+        else if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        //Trae la lista
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping()
-    public ResponseEntity<GetRoleDto> createRole(@RequestBody PostRoleDto postRoleDto) { return ResponseEntity.ok(roleService.createRole(postRoleDto)); }
+    public ResponseEntity<GetRoleDto> createRole(@RequestBody PostRoleDto postRoleDto) {
+        GetRoleDto result = roleService.createRole(postRoleDto);
+
+        //Si no puede crear el rol
+        if(result == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Crea el rol
+        return ResponseEntity.ok(result);
+    }
 }
