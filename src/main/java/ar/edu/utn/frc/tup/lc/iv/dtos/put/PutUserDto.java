@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +27,7 @@ public class PutUserDto {
     private String dni;
 
     @NotNull(message = "El contacto no puede ser nulo")
-    private String phone_number;
+    private String phoneNumber;
 
     @NotNull(message = "El correo electrónico no puede ser nulo")
     @Email(message = "El correo electrónico debe ser válido")

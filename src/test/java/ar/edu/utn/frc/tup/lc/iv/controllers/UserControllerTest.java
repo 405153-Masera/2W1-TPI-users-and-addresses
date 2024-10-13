@@ -280,17 +280,17 @@ class UserControllerTest {
     @Test
     void updateUserIT_Success() throws Exception{
         //Given
-        PutUserDto putUserDto = new PutUserDto(1, "Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), Arrays.asList(2));
+        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
 
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456",
                 "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"});
 
         //When
-        Mockito.when(userServiceMock.updateUser(putUserDto)).thenReturn(getUserDto);
+        Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putUserDto)))
@@ -298,26 +298,26 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.phone_number").value("1111111"))
                 .andExpect(jsonPath("$.roles[0]").value("Security"));
 
-        Mockito.verify(userServiceMock, times(1)).updateUser(putUserDto);
+        Mockito.verify(userServiceMock, times(1)).updateUser(1, putUserDto);
     }
 
     @Test
     void updateUserIT_BadRequest() throws Exception{
         //Given
-        PutUserDto putUserDto = new PutUserDto(1, "Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), Arrays.asList(2));
+        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
 
         //When
-        Mockito.when(userServiceMock.updateUser(putUserDto)).thenReturn(null);
+        Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putUserDto)))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, times(1)).updateUser(putUserDto);
+        Mockito.verify(userServiceMock, times(1)).updateUser(1, putUserDto);
     }
 
     @Test

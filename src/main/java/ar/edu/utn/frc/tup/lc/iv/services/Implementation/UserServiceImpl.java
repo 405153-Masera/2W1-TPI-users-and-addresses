@@ -233,7 +233,7 @@ public class UserServiceImpl implements UserService {
 
         // Actualizar los contactos del usuario
         restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
-        restContact.updateContact(userSaved.getId(), putUserDto.getPhone_number(), 2);
+        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
 
         userRoleRepository.deleteByUser(user);
 
@@ -270,7 +270,7 @@ public class UserServiceImpl implements UserService {
 
         // Asignar los contactos actualizados
         getUserDto.setEmail(putUserDto.getEmail());
-        getUserDto.setPhone_number(putUserDto.getPhone_number());
+        getUserDto.setPhone_number(putUserDto.getPhoneNumber());
 
         return getUserDto;
     }

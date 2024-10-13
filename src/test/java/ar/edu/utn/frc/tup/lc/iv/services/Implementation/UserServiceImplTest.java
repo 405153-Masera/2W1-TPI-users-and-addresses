@@ -13,7 +13,6 @@ import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -274,7 +273,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getAllUsers_Success(){
+    void getAllUsers(){
         //Given
         List<UserEntity> userEntityList = new ArrayList<>();
 
@@ -296,4 +295,24 @@ class UserServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(userEntity.getName(), result.get(0).getName());
     }
+
+    @Test
+    void validateEmail_True(){
+        //Given
+        String email = "hola@hola";
+        //TODO: hace falta terminar el método del service
+    }
+
+//    @Test
+//    void validateUsername_IllegalArgument(){
+//        //Given
+//        String username = "martaaa1";
+//
+//        //When
+//        Mockito.when(userRepositoryMock.findByUsername(username)).thenReturn(null);
+//
+//        //Then
+//        assertThrows(IllegalArgumentException.class,
+//                () -> userServiceSpy.validateUsername(username));
+//    }
 }
