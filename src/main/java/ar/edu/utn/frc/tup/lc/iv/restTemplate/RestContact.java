@@ -1,6 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -78,19 +80,36 @@ public class RestContact {
         return null;
     }
 
-    public boolean saveContact(Integer userId, String email, int contactType, int personType) {
+    public boolean saveContact(Integer userId, String value, int contactType) {
 
-        Contact contact = new Contact();
+        ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
-        contact.setValue(email);
-        contact.setPersonTypeId(personType);
+        contact.setValue(value);
         contact.setContactTypeId(contactType);
 
 
-        ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact", contact, Void.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
         if(response.getStatusCode().is2xxSuccessful()){
             return true; //por el momento devuelve boolean porque no devuelve nada el endpoint
         }else {
+            return false;
+        }
+    }
+
+    public boolean updateContact(Integer userId, String value, int contactType) {
+        String updateUrl = "http://localhost:8083/contact/owner/" + userId;
+
+        ContactPutRequest contact = new ContactPutRequest();
+        contact.setValue(value);
+        contact.setContactTypeId(contactType);
+
+        try {
+            // Hacemos un PUT al microservicio de contactos
+            restTemplate.put(updateUrl, contact);
+            return true;  // si no lanza excepciones, devolvemos true indicando éxito
+        } catch (Exception e) {
+            // En caso de error, se devuelve false
+            e.printStackTrace();
             return false;
         }
     }

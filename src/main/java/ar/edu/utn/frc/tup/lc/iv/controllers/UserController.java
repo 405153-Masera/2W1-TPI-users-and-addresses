@@ -62,9 +62,9 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping()
-    public ResponseEntity<GetUserDto> updateUser(@RequestBody PutUserDto putUserDto) {
-        GetUserDto result = userService.updateUser(putUserDto);
+    @PutMapping("{id}")
+    public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer id,@RequestBody PutUserDto putUserDto) {
+        GetUserDto result = userService.updateUser(id,putUserDto);
 
         //Si falla el service
         if(result == null){

@@ -15,9 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PutUserDto {
 
-    @NotNull(message = "El id no puede ser nulo")
-    private Integer id;
-
     @NotNull(message = "El nombre no puede ser nulo")
     @Size(min = 1, max = 50, message = "El nombre debe tener entre 1 y 50 caracteres")
     private String name;
@@ -43,5 +40,5 @@ public class PutUserDto {
     private LocalDate datebirth;
 
     @NotNull(message = "Los roles no pueden ser nulos")
-    private List<Integer> userRoles;
+    private String[] roles ;
 }

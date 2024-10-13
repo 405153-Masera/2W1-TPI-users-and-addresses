@@ -13,7 +13,7 @@ public interface UserService {
     GetUserDto createUser(PostUserDto postUserDto);
     List<GetUserDto> getAllUsers();
     GetUserDto getUserById(Integer userId);
-    GetUserDto updateUser(PutUserDto putUserDto);
+    GetUserDto updateUser(Integer userId,PutUserDto putUserDto);
     List<GetUserDto> getUsersByStatus(boolean active);
     void deleteUser(Integer userId);
     GetUserDto getUserByEmail(String email);
