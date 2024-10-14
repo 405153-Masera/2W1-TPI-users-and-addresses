@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Metodo
-    private void mapUserEntitytoPost(UserEntity userEntity , PostUserDto postUserDto) {
+    public void mapUserEntitytoPost(UserEntity userEntity , PostUserDto postUserDto) {
 
         userEntity.setName(postUserDto.getName());
         userEntity.setLastname(postUserDto.getLastname());
@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Metodo para mepear el UserEntity a GetUserDto
-    private GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
+    public GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
         getUserDto.setName(userEntity.getName());
         getUserDto.setLastname(userEntity.getLastname());
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Metodo para mapear los Roles y Contactos de un usuario
-    private void mapUserRolesAndContacts(UserEntity userEntity , GetUserDto getUserDto) {
+    public void mapUserRolesAndContacts(UserEntity userEntity , GetUserDto getUserDto) {
         List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
 
         // Convierto la lista de GetRoleDto a un arreglo de String[] (solo para ver los nombres)
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Metodo para mapear la entidad UserRole
-    private void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
+    public void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
         userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
@@ -218,7 +218,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
 
         if(optionalUser.isEmpty()){
-            throw new EntityNotFoundException("User not found");
+            throw new EntityNotFoundException("User not found with id: " + userId);
         }
 
         UserEntity user = optionalUser.get();

@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
@@ -27,6 +28,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -221,6 +223,80 @@ class UserServiceImplTest {
         assertEquals(userEntity.getDatebirth(), result.getDatebirth());
         assertEquals(userEntity.getActive(), result.getActive());
         assertEquals("hola@hola", result.getEmail());
+    }
+    @Test
+    void updateUser_Success(){
+        //Given
+        Integer userId = 1;
+        PutUserDto putUserDto = new PutUserDto();
+        putUserDto.setName("New Name");
+        putUserDto.setLastName("New Lastname");
+        putUserDto.setDni("30752987");
+        putUserDto.setAvatar_url("urlAvatar");
+        putUserDto.setDatebirth(LocalDate.of(1997, 12, 3));
+        putUserDto.setEmail("email@email");
+        putUserDto.setPhoneNumber("12345678");
+        putUserDto.setRoles(new String[]{"Admin"});
+
+        //User to update
+        UserEntity userToUpdated = new UserEntity();
+        userToUpdated.setId(userId);
+
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setDescription("Admin");
+
+        //When
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
+        when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
+        when(modelMapperMock.map(userToUpdated, GetUserDto.class)).thenReturn(new GetUserDto());
+
+        GetUserDto result = userServiceSpy.updateUser(userId, putUserDto);
+
+        assertEquals(putUserDto.getName(), result.getName());
+        assertEquals(putUserDto.getLastName(), result.getLastname());
+        assertEquals(putUserDto.getDni(), result.getDni());
+        assertEquals(putUserDto.getAvatar_url(), result.getAvatar_url());
+        assertEquals(putUserDto.getDatebirth(), result.getDatebirth());
+        assertEquals(putUserDto.getEmail(), result.getEmail());
+    }
+
+    @Test
+    void updateUser_EntityNotFound(){
+        when(userRepositoryMock.findById(1)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.updateUser(1, new PutUserDto());
+        });
+        assertEquals("User not found with id: 1", exception.getMessage());
+    }
+
+    @Test
+    void updateUser_RoleNotFound(){
+        //Given
+        Integer userId = 1;
+        PutUserDto putUserDto = new PutUserDto();
+        putUserDto.setName("New Name");
+        putUserDto.setLastName("New Lastname");
+        putUserDto.setDni("30752987");
+        putUserDto.setAvatar_url("urlAvatar");
+        putUserDto.setDatebirth(LocalDate.of(1997, 12, 3));
+        putUserDto.setEmail("email@email");
+        putUserDto.setPhoneNumber("12345678");
+        putUserDto.setRoles(new String[]{"Admins"});
+
+        UserEntity userToUpdated = new UserEntity();
+        userToUpdated.setId(userId);
+
+        //When
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
+        when(roleRepositoryMock.findByDescription("Admins")).thenReturn(null);
+
+         Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.updateUser(userId, putUserDto);
+        });
+
+         assertEquals("Role not found with description: Admins", exception.getMessage());
     }
 
     @Test
@@ -506,4 +582,99 @@ class UserServiceImplTest {
 //        assertThrows(IllegalArgumentException.class,
 //                () -> userServiceSpy.validateUsername(username));
 //    }
+
+    //Test para los mapeadores
+    @Test
+    public void mapUserEntityToPost() {
+        PostUserDto postUserDto = new PostUserDto();
+        postUserDto.setName("Martin");
+        postUserDto.setLastname("Masera");
+        postUserDto.setUsername("MartinMasera");
+        postUserDto.setPassword("5358365");
+        postUserDto.setDni("12345678");
+        postUserDto.setActive(true);
+        postUserDto.setAvatar_url("url");
+        postUserDto.setDatebirth(LocalDate.now());
+
+        UserEntity userEntity = new UserEntity();
+
+        userServiceSpy.mapUserEntitytoPost(userEntity, postUserDto);
+
+        assertEquals("Martin", userEntity.getName());
+        assertEquals("Masera", userEntity.getLastname());
+        assertEquals("MartinMasera", userEntity.getUsername());
+        assertEquals("5358365", userEntity.getPassword());
+        assertEquals("12345678", userEntity.getDni());
+        assertEquals(true, userEntity.getActive());
+        assertEquals("url", userEntity.getAvatar_url());
+        assertEquals(postUserDto.getDatebirth(), userEntity.getDatebirth());
+    }
+
+    @Test
+    public void testMapUserEntityToGet() {
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setName("Martin");
+        userEntity.setLastname("Masera");
+        userEntity.setUsername("MartinMasera");
+        userEntity.setPassword("5358365");
+        userEntity.setDni("12345678");
+        userEntity.setActive(true);
+        userEntity.setAvatar_url("url");
+        userEntity.setDatebirth(LocalDate.now());
+
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto = userServiceSpy.mapUserEntitytoGet(userEntity, getUserDto);
+        assertEquals(1, getUserDto.getId());
+        assertEquals("Martin", getUserDto.getName());
+        assertEquals("Masera", getUserDto.getLastname());
+        assertEquals("MartinMasera", getUserDto.getUsername());
+        assertEquals("5358365", getUserDto.getPassword());
+    }
+
+
+    @Test
+    public void testMapUserRolesAndContacts() {
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        List<GetRoleDto> roles = Arrays.asList(
+                new GetRoleDto(1,"Admin"),
+                new GetRoleDto(2 ,"User")
+        );
+        when(roleServiceMock.getRolesByUser(userEntity.getId())).thenReturn(roles);
+
+        List<GetContactDto> contacts = Arrays.asList(
+                new GetContactDto(1, "email@email.com"),
+                new GetContactDto(2, "1234567")
+        );
+        when(restContactMock.getContactById(userEntity.getId())).thenReturn(contacts);
+
+        GetUserDto getUserDto = new GetUserDto();
+        userServiceSpy.mapUserRolesAndContacts(userEntity, getUserDto);
+
+        assertEquals("Admin", getUserDto.getRoles()[0]);
+        assertEquals("User", getUserDto.getRoles()[1]);
+        assertEquals("email@email.com", getUserDto.getEmail());
+        assertEquals("1234567", getUserDto.getPhone_number());
+    }
+
+    @Test
+    public void testMapUserRolEntity() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setId(1);
+
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        userServiceSpy.mapUserRolEntity(userRoleEntity, userEntity, roleEntity);
+
+        assertEquals(userEntity.getId(), userRoleEntity.getUser().getId());
+        assertEquals(roleEntity.getId(), userRoleEntity.getRole().getId());
+        assertEquals(LocalDateTime.now().getYear(), userRoleEntity.getCreatedDate().getYear());
+        assertEquals(userEntity.getId(), userRoleEntity.getCreatedUser());
+    }
 }
