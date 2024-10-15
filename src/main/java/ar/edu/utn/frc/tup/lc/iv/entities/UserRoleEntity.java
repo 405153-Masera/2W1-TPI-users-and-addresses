@@ -27,6 +27,8 @@ public class UserRoleEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    //Todo: ver de aplicar la baja logica
+
     @Column(name = "created_datetime")
     private LocalDateTime createdDate;
 

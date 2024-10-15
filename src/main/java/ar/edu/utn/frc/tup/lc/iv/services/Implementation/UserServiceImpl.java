@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setAvatar_url(postUserDto.getAvatar_url());
         userEntity.setDatebirth(postUserDto.getDatebirth());
 
+        //Todo: cambiar para poner bien el usuario que realiza la operación
         // Establecer valores de auditoría
         userEntity.setCreatedDate(LocalDateTime.now());
         userEntity.setCreatedUser(1);  // ID del usuario creador
@@ -162,6 +163,8 @@ public class UserServiceImpl implements UserService {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
         userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
+
+        //Todo: cambiar para poner bien el usuario que realiza la operación
         userRoleEntity.setCreatedUser(1);  // ID del usuario que realiza la operación
         userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
         userRoleEntity.setLastUpdatedUser(1);
@@ -237,6 +240,7 @@ public class UserServiceImpl implements UserService {
         restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
         restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
 
+        //Todo: ver de aplicar la baja logica
         userRoleRepository.deleteByUser(user);
 
         String[] roles = putUserDto.getRoles();
