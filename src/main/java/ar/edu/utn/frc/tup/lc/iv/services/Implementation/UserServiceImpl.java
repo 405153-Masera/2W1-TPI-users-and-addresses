@@ -352,6 +352,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId) {
+        Optional<UserEntity> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
+        if (userEntity.isEmpty()) {
+            throw new EntityNotFoundException("User not found with plot id: " + plotId);
+        }
+
+        GetUserDto getUserDto = new GetUserDto();
+        mapUserEntitytoGet(userEntity.get(),getUserDto);
+
+        return getUserDto;
+    }
+
+    @Override
     public List<GetUserDto> getUsersByRole(Integer roleId) {
 
         List<UserRoleEntity> usersRole = userRoleRepository.findByRoleId(roleId)
