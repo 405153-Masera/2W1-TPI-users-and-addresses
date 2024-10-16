@@ -78,7 +78,7 @@ public class RoleControllerTest {
     @Test
     void createRole_Success() throws Exception{
         //Given
-        PostRoleDto postRoleDto = new PostRoleDto("Admin", 5);
+        PostRoleDto postRoleDto = new PostRoleDto("Admin", 1);
 
         GetRoleDto getRoleDto = new GetRoleDto(1, "Admin");
 
@@ -99,7 +99,7 @@ public class RoleControllerTest {
     @Test
     void createRole_BadRequest() throws Exception{
         //Given
-        PostRoleDto postRoleDto = new PostRoleDto("Admin", 5);
+        PostRoleDto postRoleDto = new PostRoleDto("Admin",1 );
 
         //When
         Mockito.when(roleServiceMock.createRole(Mockito.any(PostRoleDto.class))).thenReturn(null);

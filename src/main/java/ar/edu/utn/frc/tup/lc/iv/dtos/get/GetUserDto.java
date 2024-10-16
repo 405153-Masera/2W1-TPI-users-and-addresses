@@ -25,4 +25,5 @@ public class GetUserDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate datebirth;
     private String[] roles ;
+    private Integer plot_id;
 }
