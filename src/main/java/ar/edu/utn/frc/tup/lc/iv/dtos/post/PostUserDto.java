@@ -49,4 +49,6 @@ public class PostUserDto {
     @NotNull(message = "Los roles no pueden ser nulos")
     private String[] roles ;
 
+    private Integer userUpdateId;
+
 }

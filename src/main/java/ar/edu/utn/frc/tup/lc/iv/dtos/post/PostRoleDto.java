@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class PostRoleDto {
     @NotNull (message = "El rol no puede ser nulo.")
     private String description;
+    private Integer userUpdateId;
 }

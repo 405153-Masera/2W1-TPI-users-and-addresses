@@ -77,6 +77,8 @@ public class UserServiceImpl implements UserService {
                 // Crear una nueva relación en la tabla intermedia UserRoles
                 UserRoleEntity userRoleEntity = new UserRoleEntity();
                 mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
+                userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+                userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
                 // Guardar la relación en la tabla intermedia
                 userRoleRepository.save(userRoleEntity);
                 // Agregar la descripción del rol a la lista de roles asignados
@@ -111,13 +113,10 @@ public class UserServiceImpl implements UserService {
         userEntity.setActive(postUserDto.getActive());
         userEntity.setAvatar_url(postUserDto.getAvatar_url());
         userEntity.setDatebirth(postUserDto.getDatebirth());
-
-        //Todo: cambiar para poner bien el usuario que realiza la operación
-        // Establecer valores de auditoría
         userEntity.setCreatedDate(LocalDateTime.now());
-        userEntity.setCreatedUser(1);  // ID del usuario creador
+        userEntity.setCreatedUser(postUserDto.getUserUpdateId());  // ID del usuario creador
         userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(1);  // ID del usuario que realiza la actualización
+        userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());  // ID del usuario que realiza la actualización
 
     }
 
@@ -163,11 +162,7 @@ public class UserServiceImpl implements UserService {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
         userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
-
-        //Todo: cambiar para poner bien el usuario que realiza la operación
-        userRoleEntity.setCreatedUser(1);  // ID del usuario que realiza la operación
         userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
-        userRoleEntity.setLastUpdatedUser(1);
     }
 
     //Metodo para validar si existe alguien con ese username
@@ -177,7 +172,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // Metodo para validar si existe alguien con ese email TODO
+    // Metodo para validar si existe alguien con ese email
     public void validateEmail(String email) {
         List<String> emails = restContact.getAllEmails();   // Obtener todos los emails
         if (emails.contains(email)) {
@@ -232,7 +227,7 @@ public class UserServiceImpl implements UserService {
         user.setDatebirth(putUserDto.getDatebirth());
 
         user.setLastUpdatedDate(LocalDateTime.now());
-        user.setLastUpdatedUser(userId);
+        user.setLastUpdatedUser(putUserDto.getUserUpdateId());
 
         UserEntity userSaved = userRepository.save(user);
 
@@ -259,9 +254,9 @@ public class UserServiceImpl implements UserService {
             userRoleEntity.setUser(user);
             userRoleEntity.setRole(role);
             userRoleEntity.setCreatedDate(LocalDateTime.now());
-            userRoleEntity.setCreatedUser(userId);
+            userRoleEntity.setCreatedUser(putUserDto.getUserUpdateId());
             userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
-            userRoleEntity.setLastUpdatedUser(userId);
+            userRoleEntity.setLastUpdatedUser(putUserDto.getUserUpdateId());
 
             // Guardar la relación en la tabla intermedia
             userRoleRepository.save(userRoleEntity);
@@ -298,7 +293,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(Integer userId) {
+    public void deleteUser(Integer userId,Integer userUpdateId) {
         // Buscar el usuario por su ID
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
 
@@ -312,7 +307,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setActive(false);
         // Actualizar la fecha y usuario que realiza la baja
         userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(1);
+        userEntity.setLastUpdatedUser(userUpdateId);
         // Guardar los cambios en la base de datos
         userRepository.save(userEntity);
     }

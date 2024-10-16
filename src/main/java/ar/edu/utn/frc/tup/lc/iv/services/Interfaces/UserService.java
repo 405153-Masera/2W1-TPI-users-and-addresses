@@ -15,7 +15,7 @@ public interface UserService {
     GetUserDto getUserById(Integer userId);
     GetUserDto updateUser(Integer userId,PutUserDto putUserDto);
     List<GetUserDto> getUsersByStatus(boolean active);
-    void deleteUser(Integer userId);
+    void deleteUser(Integer userId,Integer userUpdateId);
     GetUserDto getUserByEmail(String email);
     List<GetUserDto> getUsersByRole(Integer roleId);
     boolean verifyLogin(String password, String dni);

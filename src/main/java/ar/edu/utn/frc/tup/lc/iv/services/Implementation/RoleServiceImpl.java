@@ -69,10 +69,10 @@ public class RoleServiceImpl implements RoleService {
     public GetRoleDto createRole(PostRoleDto postRoleDto) {
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setDescription(postRoleDto.getDescription());
-        roleEntity.setCreatedUser(1);
+        roleEntity.setCreatedUser(postRoleDto.getUserUpdateId());
         roleEntity.setCreatedDate(LocalDateTime.now());
         roleEntity.setLastUpdatedDate(LocalDateTime.now());
-        roleEntity.setLastUpdatedUser(1);
+        roleEntity.setLastUpdatedUser(postRoleDto.getUserUpdateId());
 
         roleEntity = roleRepository.save(roleEntity);
 

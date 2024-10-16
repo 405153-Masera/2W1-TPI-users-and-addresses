@@ -41,4 +41,6 @@ public class PutUserDto {
     @NotNull(message = "Los roles no pueden ser nulos")
     @Size(min = 1, message = "Debe tener al menos un rol")
     private String[] roles ;
+
+    private Integer userUpdateId;
 }
