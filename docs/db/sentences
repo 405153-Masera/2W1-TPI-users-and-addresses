@@ -56,16 +56,6 @@ CREATE TABLE UserRoles (
     FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
--- Tabla Address
-CREATE TABLE Address (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    street VARCHAR(255),
-    number VARCHAR(50),
-    created_datetime DATETIME,
-    last_updated_datetime DATETIME,
-    created_user INT,
-    last_updated_user INT
-);
 
 -- Auditoría de Users
 CREATE TABLE Users_audit (
@@ -126,20 +116,6 @@ CREATE TABLE UserRoles_audit (
     created_user INT,
     last_updated_user INT
 );
-
--- Auditoría de Address
-CREATE TABLE Address_audit (
-    version_id INT AUTO_INCREMENT PRIMARY KEY,  
-    id INT,  
-    version INT,  
-    street VARCHAR(255),
-    number VARCHAR(50),
-    created_datetime DATETIME,
-    last_updated_datetime DATETIME,
-    created_user INT,
-    last_updated_user INT
-);
-
 
 -- Trigger para insertar en la auditoría de Users
 DELIMITER $$
@@ -238,27 +214,4 @@ BEGIN
     VALUES (NEW.id, latest_version, NEW.role_id, NEW.user_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
 END $$
 
--- Trigger para insertar en la auditoría de Address
-DELIMITER $$
-CREATE TRIGGER trg_address_insert
-AFTER INSERT ON Address
-FOR EACH ROW
-BEGIN
-    INSERT INTO Address_audit (id, version, street, number, created_datetime, last_updated_datetime, created_user, last_updated_user)
-    VALUES (NEW.id, 1, NEW.street, NEW.number, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
-END $$
-
--- Trigger para actualizar en la auditoría de Address
-DELIMITER $$
-CREATE TRIGGER trg_address_update
-AFTER UPDATE ON Address
-FOR EACH ROW
-BEGIN
-    DECLARE latest_version INT;
-    SELECT MAX(version) INTO latest_version FROM Address_audit WHERE id = NEW.id;
-    SET latest_version = IFNULL(latest_version, 0) + 1;
-
-    INSERT INTO Address_audit (id, version, street, number, created_datetime, last_updated_datetime, created_user, last_updated_user)
-    VALUES (NEW.id, latest_version, NEW.street, NEW.number, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
-END $$
 
