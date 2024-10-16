@@ -117,7 +117,7 @@ class UserControllerTest {
         getUserDto.setName("Pedro");
 
         PostUserDto postUserDto = new PostUserDto("Pedro", "Diaz", "PepeDiaz", "123456", "pepedi@jkl", "45645456",
-                "45464546", true, "", LocalDate.now(), roles);
+                "45464546", true, "", LocalDate.now(), roles, 5);
 
         //When
         Mockito.when(userServiceMock.createUser(postUserDto)).thenReturn(getUserDto);
@@ -142,7 +142,7 @@ class UserControllerTest {
         getUserDto.setName("Pedro");
 
         PostUserDto postUserDto = new PostUserDto("Pedro", "Diaz", "PepeDiaz", "123456", "pepedi@jkl", "45645456",
-                "45464546", true, "", LocalDate.now(), roles);
+                "45464546", true, "", LocalDate.now(), roles, 5);
 
         //When
         Mockito.when(userServiceMock.createUser(Mockito.any(PostUserDto.class))).thenReturn(null);
@@ -267,21 +267,21 @@ class UserControllerTest {
     @Test
     void deleteUserIT() throws Exception{
         //When
-        Mockito.doNothing().when(userServiceMock).deleteUser(1);
+        Mockito.doNothing().when(userServiceMock).deleteUser(1,5);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(userServiceMock, times(1)).deleteUser(1);
+        Mockito.verify(userServiceMock, times(1)).deleteUser(1,5);
     }
 
     @Test
     void updateUserIT_Success() throws Exception{
         //Given
         PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"}, 5);
 
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456",
                 "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"});
@@ -305,7 +305,7 @@ class UserControllerTest {
     void updateUserIT_BadRequest() throws Exception{
         //Given
         PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"}, 5);
 
         //When
         Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);

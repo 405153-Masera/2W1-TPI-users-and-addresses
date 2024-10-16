@@ -320,7 +320,7 @@ class UserServiceImplTest {
         when(userRepositoryMock.findById(1)).thenReturn(Optional.of(userEntity));
 
         //Then
-        userServiceSpy.deleteUser(1);
+        userServiceSpy.deleteUser(1,5);
 
         Mockito.verify(userRepositoryMock, times(1)).save(userEntity);
         assertEquals(false, userEntity.getActive());
@@ -333,7 +333,7 @@ class UserServiceImplTest {
         //When
         when(userRepositoryMock.findById(1)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> {
-            userServiceSpy.deleteUser(1);
+            userServiceSpy.deleteUser(1,5);
         });
     }
 
