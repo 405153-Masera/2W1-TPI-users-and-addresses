@@ -4,9 +4,11 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.repositories.PlotUserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
@@ -40,6 +42,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private PlotUserRepository plotUserRepository;
 
     @Autowired
     private RoleService roleService;
@@ -89,6 +94,16 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // Guardar relacion plotUser
+        PlotUserEntity plotUserEntity = new PlotUserEntity();
+        plotUserEntity.setPlotId(postUserDto.getPlot_id());
+        plotUserEntity.setUser(savedUser);
+        plotUserEntity.setCreatedDate(LocalDateTime.now());
+        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
+        plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
+        plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        plotUserRepository.save(plotUserEntity);
+
         //guardar contactos
         restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
         restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
@@ -131,6 +146,11 @@ public class UserServiceImpl implements UserService {
         getUserDto.setActive(userEntity.getActive());
         getUserDto.setAvatar_url(userEntity.getAvatar_url());
         getUserDto.setDatebirth(userEntity.getDatebirth());
+
+        PlotUserEntity plotUserEntity = plotUserRepository.findByUser(userEntity);
+        if(plotUserEntity != null){
+            getUserDto.setPlot_id(plotUserEntity.getPlotId());
+        }
 
         return getUserDto;
     }

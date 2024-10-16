@@ -51,4 +51,6 @@ public class PostUserDto {
 
     private Integer userUpdateId;
 
+    private Integer plot_id;
+
 }
