@@ -48,7 +48,7 @@ class UserControllerTest {
     void getUserByEmailIT_Success() throws Exception{
         //Given
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456",
-                "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"});
+                "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"},1);
 
         //When
         Mockito.when(userServiceMock.getUserByEmail("lucii@gmail")).thenReturn(getUserDto);
@@ -117,7 +117,7 @@ class UserControllerTest {
         getUserDto.setName("Pedro");
 
         PostUserDto postUserDto = new PostUserDto("Pedro", "Diaz", "PepeDiaz", "123456", "pepedi@jkl", "45645456",
-                "45464546", true, "", LocalDate.now(), roles);
+                "45464546", true, "", LocalDate.now(), roles,1,1);
 
         //When
         Mockito.when(userServiceMock.createUser(postUserDto)).thenReturn(getUserDto);
@@ -142,7 +142,7 @@ class UserControllerTest {
         getUserDto.setName("Pedro");
 
         PostUserDto postUserDto = new PostUserDto("Pedro", "Diaz", "PepeDiaz", "123456", "pepedi@jkl", "45645456",
-                "45464546", true, "", LocalDate.now(), roles);
+                "45464546", true, "", LocalDate.now(), roles,1,1);
 
         //When
         Mockito.when(userServiceMock.createUser(Mockito.any(PostUserDto.class))).thenReturn(null);
@@ -161,7 +161,7 @@ class UserControllerTest {
         //Given
         String[] roles = {"SuperAdmin"};
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456", "lucii@gmail", "3515623",
-                "4523545", true, "", LocalDate.now(), roles);
+                "4523545", true, "", LocalDate.now(), roles,1);
 
         //When
         Mockito.when(userServiceMock.getUserById(1)).thenReturn(getUserDto);
@@ -194,7 +194,7 @@ class UserControllerTest {
         //Given
         List<GetUserDto> getUserDtoList = new ArrayList<>();
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456", "lucii@gmail", "3515623",
-                "4523545", true, "", LocalDate.now(), new String[]{"SuperAdmin"});
+                "4523545", true, "", LocalDate.now(), new String[]{"SuperAdmin"},1);
 
         getUserDtoList.add(getUserDto);
         getUserDtoList.add(getUserDto);
@@ -232,7 +232,7 @@ class UserControllerTest {
         //Given
         List<GetUserDto> getUserDtoList = new ArrayList<>();
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456", "lucii@gmail", "3515623",
-                "4523545", true, "", LocalDate.now(), new String[]{"Admin"});
+                "4523545", true, "", LocalDate.now(), new String[]{"Admin"},1);
 
         getUserDtoList.add(getUserDto);
 
@@ -267,24 +267,24 @@ class UserControllerTest {
     @Test
     void deleteUserIT() throws Exception{
         //When
-        Mockito.doNothing().when(userServiceMock).deleteUser(1);
+        Mockito.doNothing().when(userServiceMock).deleteUser(1,1);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(userServiceMock, times(1)).deleteUser(1);
+        Mockito.verify(userServiceMock, times(1)).deleteUser(1,1);
     }
 
     @Test
     void updateUserIT_Success() throws Exception{
         //Given
         PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"},1);
 
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456",
-                "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"});
+                "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"},1);
 
         //When
         Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
@@ -305,7 +305,7 @@ class UserControllerTest {
     void updateUserIT_BadRequest() throws Exception{
         //Given
         PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"});
+                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"},1);
 
         //When
         Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);

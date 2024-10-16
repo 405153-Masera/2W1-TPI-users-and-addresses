@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.dtos.post;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
