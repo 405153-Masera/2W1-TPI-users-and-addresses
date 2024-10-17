@@ -1,6 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Interfaces;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,5 @@ public interface UserService {
     GetUserDto getUserByEmail(String email);
     GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId);
     List<GetUserDto> getUsersByRole(Integer roleId);
-    boolean verifyLogin(String password, String dni);
+    boolean verifyLogin(PostLoginDto postLoginDto);
 }

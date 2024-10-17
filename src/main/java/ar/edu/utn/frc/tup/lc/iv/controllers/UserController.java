@@ -133,7 +133,7 @@ public class UserController {
     // Se maneja en post x temas de seguridad
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
-        boolean result = userService.verifyLogin(postLoginDto.getPassword(), postLoginDto.getDni());
+        boolean result = userService.verifyLogin(postLoginDto);
 
         //Si no está registrado
         if(!result){

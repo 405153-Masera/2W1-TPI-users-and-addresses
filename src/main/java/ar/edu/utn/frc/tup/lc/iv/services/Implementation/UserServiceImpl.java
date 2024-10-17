@@ -2,6 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
@@ -386,12 +387,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean verifyLogin(String password, String dni) {
-        UserEntity userEntity = userRepository.findByDni(dni);
-        if (userEntity == null) {
+    public boolean verifyLogin(PostLoginDto postLoginDto) {
+        GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());
+        if (user == null) {
             return false;
         }
-        return userEntity.getPassword().equals(password);
+        return user.getPassword().equals(postLoginDto.getPassword());
 
     }
 }
