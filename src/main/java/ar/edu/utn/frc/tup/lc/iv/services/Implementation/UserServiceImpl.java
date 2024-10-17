@@ -358,9 +358,10 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User not found with plot id: " + plotId);
         }
 
+        UserEntity user = userEntity.get();
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntitytoGet(userEntity.get(),getUserDto);
-
+        mapUserEntitytoGet(user,getUserDto);
+        mapUserRolesAndContacts(user,getUserDto);
         return getUserDto;
     }
 
