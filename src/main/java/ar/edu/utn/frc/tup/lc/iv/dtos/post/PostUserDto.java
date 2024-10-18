@@ -33,6 +33,7 @@ public class PostUserDto {
     private String email;
 
     @NotNull(message = "El telefono no puede ser nulo")
+    @Size(min = 10, max = 20, message = "El numero de telefono debe tener un formato valido")
     private String phone_number;
 
     @NotNull(message = "El DNI no puede ser nulo")
@@ -52,6 +53,7 @@ public class PostUserDto {
 
     private Integer userUpdateId;
 
+    @NotNull(message = "El id de lote no puede ser nulo")
     private Integer plot_id;
 
     private Integer telegram_id;
