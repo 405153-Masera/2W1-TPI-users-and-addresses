@@ -27,6 +27,7 @@ public class PutUserDto {
     private String dni;
 
     @NotNull(message = "El contacto no puede ser nulo")
+    @Size(min = 10, max = 20, message = "El numero de telefono debe tener un formato valido")
     private String phoneNumber;
 
     @NotNull(message = "El correo electrónico no puede ser nulo")
