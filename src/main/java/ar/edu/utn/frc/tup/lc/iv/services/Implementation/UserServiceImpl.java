@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
                 assignedRoles.add(roleDesc);
             } else {
                 // Si no se encuentra el rol, lanzar una excepción
-                throw new RuntimeException("The role with the description '" + roleDesc + "' does not exist.");
+                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
             }
         }
 
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
         boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
 
         if (!emailSaved && !phoneSaved) {
-            throw new RuntimeException("Failed to save contact information. Email saved: " + emailSaved + ", Phone saved: " + phoneSaved);
+            throw new RuntimeException("Failed to save contact information.");
         }
 
         // Mapear el UserEntity guardado a GetUserDto
@@ -268,10 +268,6 @@ public class UserServiceImpl implements UserService {
         mapPutUserToUserEntiy(putUserDto,user);
         UserEntity userSaved = userRepository.save(user);
 
-        // Actualizar los contactos del usuario
-        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
-        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
-
         //Borramos la relacion de la tabla intermedia entre Rol y User
         userRoleRepository.deleteByUser(user);
 
@@ -303,6 +299,10 @@ public class UserServiceImpl implements UserService {
             // Agregar la descripción del rol a la lista de roles asignados
             assignedRoles.add(roleDesc);
         }
+        
+        // Actualizar los contactos del usuario
+        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
+        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
 
         // Mapear el usuario actualizado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);

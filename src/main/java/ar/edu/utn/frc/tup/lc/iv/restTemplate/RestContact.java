@@ -114,10 +114,12 @@ public class RestContact {
             // Hacemos un PUT al microservicio de contactos
             restTemplate.put(updateUrl, contact);
             return true;  // si no lanza excepciones, devolvemos true indicando éxito
-        } catch (Exception e) {
-            // En caso de error, se devuelve false
-            e.printStackTrace();
-            return false;
+        } catch (HttpClientErrorException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Server error while creating the user" + e.getMessage());
         }
     }
 }
