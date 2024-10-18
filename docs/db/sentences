@@ -139,7 +139,7 @@ BEGIN
     SET latest_version = IFNULL(latest_version, 0) + 1;
 
     INSERT INTO Users_audit (id, version, name, lastname, username, password, dni, contact_id, email, active, avatar_url, birth_date, telegram_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
-    VALUES (NEW.id, latest_version, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni, NEW.contact_id, NEW.email, NEW.active, NEW.avatar_url, NEW.birth_date, tekegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+    VALUES (NEW.id, latest_version, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni, NEW.contact_id, NEW.email, NEW.active, NEW.avatar_url, NEW.birth_date, telegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
 END $$
 
 -- Trigger para insertar en la auditoría de PlotUsers
