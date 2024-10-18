@@ -26,4 +26,5 @@ public class GetUserDto {
     private LocalDate datebirth;
     private String[] roles ;
     private Integer plot_id;
+    private Integer telegram_id;
 }

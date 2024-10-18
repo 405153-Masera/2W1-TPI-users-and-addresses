@@ -54,4 +54,6 @@ public class PostUserDto {
 
     private Integer plot_id;
 
+    private Integer telegram_id;
+
 }

@@ -43,4 +43,6 @@ public class PutUserDto {
     private String[] roles ;
 
     private Integer userUpdateId;
+
+    private Integer telegram_id;
 }

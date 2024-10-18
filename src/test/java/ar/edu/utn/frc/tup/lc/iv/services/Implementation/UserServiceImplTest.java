@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static javax.management.Query.eq;
 import static org.mockito.ArgumentMatchers.any;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -585,7 +584,7 @@ class UserServiceImplTest {
 
     //Test para los mapeadores
     @Test
-    public void mapUserEntityToPost() {
+    public void mapUserPostToUserEntity() {
         PostUserDto postUserDto = new PostUserDto();
         postUserDto.setName("Martin");
         postUserDto.setLastname("Masera");
@@ -598,7 +597,7 @@ class UserServiceImplTest {
 
         UserEntity userEntity = new UserEntity();
 
-        userServiceSpy.mapUserEntitytoPost(userEntity, postUserDto);
+        userServiceSpy.mapUserPostToUserEntity(userEntity, postUserDto);
 
         assertEquals("Martin", userEntity.getName());
         assertEquals("Masera", userEntity.getLastname());
@@ -625,7 +624,7 @@ class UserServiceImplTest {
         userEntity.setDatebirth(LocalDate.now());
 
         GetUserDto getUserDto = new GetUserDto();
-        getUserDto = userServiceSpy.mapUserEntitytoGet(userEntity, getUserDto);
+        getUserDto = userServiceSpy.mapUserEntityToGet(userEntity, getUserDto);
         assertEquals(1, getUserDto.getId());
         assertEquals("Martin", getUserDto.getName());
         assertEquals("Masera", getUserDto.getLastname());

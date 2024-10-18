@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         // Crear un nuevo UserEntity y asignar los valores del DTO
         UserEntity userEntity = new UserEntity();
         //Mapeamos con el metodo
-        mapUserEntitytoPost(userEntity, postUserDto);
+        mapUserPostToUserEntity(userEntity, postUserDto);
         System.out.println(userEntity);
         // Guardar el usuario en la base de datos
         UserEntity savedUser = userRepository.save(userEntity);
@@ -97,12 +97,7 @@ public class UserServiceImpl implements UserService {
 
         // Guardar relacion plotUser
         PlotUserEntity plotUserEntity = new PlotUserEntity();
-        plotUserEntity.setPlotId(postUserDto.getPlot_id());
-        plotUserEntity.setUser(savedUser);
-        plotUserEntity.setCreatedDate(LocalDateTime.now());
-        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
-        plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
-        plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        mapPostToPlotUserEntity(plotUserEntity,postUserDto,savedUser);
         plotUserRepository.save(plotUserEntity);
 
         //guardar contactos
@@ -114,12 +109,22 @@ public class UserServiceImpl implements UserService {
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
         getUserDto.setEmail(postUserDto.getEmail());
         getUserDto.setPhone_number(postUserDto.getPhone_number());
+        getUserDto.setPlot_id(postUserDto.getPlot_id());
 
         return getUserDto;
     }
 
+    public void mapPostToPlotUserEntity(PlotUserEntity plotUserEntity, PostUserDto postUserDto, UserEntity savedUser) {
+        plotUserEntity.setPlotId(postUserDto.getPlot_id());
+        plotUserEntity.setUser(savedUser);
+        plotUserEntity.setCreatedDate(LocalDateTime.now());
+        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
+        plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
+        plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+    };
+
     // Metodo
-    public void mapUserEntitytoPost(UserEntity userEntity , PostUserDto postUserDto) {
+    public void mapUserPostToUserEntity(UserEntity userEntity , PostUserDto postUserDto) {
 
         userEntity.setName(postUserDto.getName());
         userEntity.setLastname(postUserDto.getLastname());
@@ -133,11 +138,11 @@ public class UserServiceImpl implements UserService {
         userEntity.setCreatedUser(postUserDto.getUserUpdateId());  // ID del usuario creador
         userEntity.setLastUpdatedDate(LocalDateTime.now());
         userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());  // ID del usuario que realiza la actualización
-
+        userEntity.setTelegram_id(postUserDto.getTelegram_id());
     }
 
     // Metodo para mepear el UserEntity a GetUserDto
-    public GetUserDto mapUserEntitytoGet(UserEntity userEntity , GetUserDto getUserDto) {
+    public GetUserDto mapUserEntityToGet(UserEntity userEntity , GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
         getUserDto.setName(userEntity.getName());
         getUserDto.setLastname(userEntity.getLastname());
@@ -147,6 +152,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setActive(userEntity.getActive());
         getUserDto.setAvatar_url(userEntity.getAvatar_url());
         getUserDto.setDatebirth(userEntity.getDatebirth());
+        getUserDto.setTelegram_id(userEntity.getTelegram_id());
 
         PlotUserEntity plotUserEntity = plotUserRepository.findByUser(userEntity);
         if(plotUserEntity != null){
@@ -171,9 +177,9 @@ public class UserServiceImpl implements UserService {
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
         for (GetContactDto contactDto : contactDtos) {
             if(contactDto.getType_contact() == 1){ // Si el valor es 1, es un email
-                getUserDto.setEmail(contactDto.getValue());
+                getUserDto.setEmail(contactDto.getValue().toLowerCase()); //Guardamos email en minuscula
             }else{ // Si no, es un teléfono
-                getUserDto.setPhone_number(contactDto.getValue());
+                getUserDto.setPhone_number(contactDto.getValue()); //Guardamos el telefono
             }
         }
     }
@@ -202,12 +208,12 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<GetUserDto> getAllUsers() {
-        List<UserEntity> userEntities = userRepository.findAll();
+        List<UserEntity> userEntities = userRepository.findAllActives();
 
         List<GetUserDto> getUserDtos = userEntities.stream()
                 .map(userEntity -> {
                     GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntitytoGet(userEntity,getUserDto);
+                    mapUserEntityToGet(userEntity,getUserDto);
                     mapUserRolesAndContacts(userEntity,getUserDto);
 
                     return getUserDto;
@@ -224,10 +230,21 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntitytoGet(userEntity,getUserDto);
+        mapUserEntityToGet(userEntity,getUserDto);
         mapUserRolesAndContacts(userEntity,getUserDto);
 
         return getUserDto;
+    }
+
+    public void mapPutUserToUserEntiy(PutUserDto putUserDto, UserEntity userEntity) {
+        userEntity.setName(putUserDto.getName());
+        userEntity.setLastname(putUserDto.getLastName());
+        userEntity.setDni(putUserDto.getDni());
+        userEntity.setAvatar_url(putUserDto.getAvatar_url());
+        userEntity.setDatebirth(putUserDto.getDatebirth());
+        userEntity.setLastUpdatedDate(LocalDateTime.now());
+        userEntity.setLastUpdatedUser(putUserDto.getUserUpdateId());
+        userEntity.setTelegram_id(putUserDto.getTelegram_id());
     }
 
     @Override
@@ -241,22 +258,15 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity user = optionalUser.get();
-        user.setName(putUserDto.getName());
-        user.setLastname(putUserDto.getLastName());
-        user.setDni(putUserDto.getDni());
-        user.setAvatar_url(putUserDto.getAvatar_url());
-        user.setDatebirth(putUserDto.getDatebirth());
-
-        user.setLastUpdatedDate(LocalDateTime.now());
-        user.setLastUpdatedUser(putUserDto.getUserUpdateId());
-
+        //Utilizamos el metodo para mapear el user
+        mapPutUserToUserEntiy(putUserDto,user);
         UserEntity userSaved = userRepository.save(user);
 
         // Actualizar los contactos del usuario
         restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
         restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
 
-        //Todo: ver de aplicar la baja logica
+        //Borramos la relacion de la tabla intermedia entre Rol y User
         userRoleRepository.deleteByUser(user);
 
         String[] roles = putUserDto.getRoles();
@@ -272,6 +282,8 @@ public class UserServiceImpl implements UserService {
 
             // Crear una nueva relación en la tabla intermedia UserRoles
             UserRoleEntity userRoleEntity = new UserRoleEntity();
+
+            //Mapeamos la entidad UserRoleEntity
             userRoleEntity.setUser(user);
             userRoleEntity.setRole(role);
             userRoleEntity.setCreatedDate(LocalDateTime.now());
@@ -305,7 +317,7 @@ public class UserServiceImpl implements UserService {
         return userEntities.stream()
                 .map(userEntity -> {
                     GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntitytoGet(userEntity,getUserDto);
+                    mapUserEntityToGet(userEntity,getUserDto);
                     mapUserRolesAndContacts(userEntity,getUserDto);
 
                     return getUserDto;
@@ -341,13 +353,10 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User not found with email: " + email);
         }
 
-
-
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        //falta traer el email y nro de teléfono
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntitytoGet(userEntity,getUserDto);
+        mapUserEntityToGet(userEntity,getUserDto);
         mapUserRolesAndContacts(userEntity,getUserDto);
         return getUserDto;
     }
@@ -361,7 +370,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity user = userEntity.get();
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntitytoGet(user,getUserDto);
+        mapUserEntityToGet(user,getUserDto);
         mapUserRolesAndContacts(user,getUserDto);
         return getUserDto;
     }
@@ -378,7 +387,7 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId()).get();
 
             GetUserDto userDto = modelMapper.map(userEntity, GetUserDto.class);
-            mapUserEntitytoGet(userEntity, userDto);
+            mapUserEntityToGet(userEntity, userDto);
             mapUserRolesAndContacts(userEntity, userDto);
             usersDto.add(userDto);
         }

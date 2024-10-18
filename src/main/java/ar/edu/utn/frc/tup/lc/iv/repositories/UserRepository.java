@@ -12,12 +12,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     UserEntity findByUsername(String username);
-    //UserEntity findByEmail(String email);
+
     Optional<UserEntity> findById(Integer integer);
     Optional<List<UserEntity>> findByActive(boolean isActive);
 
     UserEntity findByDni(String dni);
-    //Optional<UserEntity> getUserByEmail(String email);
+
 
     @Query("SELECT u FROM UserEntity u " +
             "JOIN UserRoleEntity ur ON ur.user.id = u.id " +
@@ -27,4 +27,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
             "AND pu.plotId = :plotId " +
             "AND u.active = true")
     Optional<UserEntity> findUsersByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
+
+    @Query("SELECT o FROM UserEntity o WHERE o.active = true")
+    List<UserEntity> findAllActives();
 }
