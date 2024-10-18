@@ -53,6 +53,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RestContact restContact;
 
+    @Override
+    @Transactional
     public GetUserDto createUser(PostUserDto postUserDto) {
 
         // Validaciones por si el username o el email ya existen
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
                 assignedRoles.add(roleDesc);
             } else {
                 // Si no se encuentra el rol, lanzar una excepción
-                throw new RuntimeException("El rol con la descripción '" + roleDesc + "' no existe.");
+                throw new RuntimeException("The role with the description '" + roleDesc + "' does not exist.");
             }
         }
 
@@ -101,8 +103,12 @@ public class UserServiceImpl implements UserService {
         plotUserRepository.save(plotUserEntity);
 
         //guardar contactos
-        restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
-        restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
+        boolean emailSaved = restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
+        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
+
+        if (!emailSaved && !phoneSaved) {
+            throw new RuntimeException("Failed to save contact information. Email saved: " + emailSaved + ", Phone saved: " + phoneSaved);
+        }
 
         // Mapear el UserEntity guardado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);

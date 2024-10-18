@@ -5,9 +5,12 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,12 +90,16 @@ public class RestContact {
         contact.setValue(value);
         contact.setContactTypeId(contactType);
 
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
+            return response.getStatusCode().is2xxSuccessful(); //
 
-        ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
-        if(response.getStatusCode().is2xxSuccessful()){
-            return true; //por el momento devuelve boolean porque no devuelve nada el endpoint
-        }else {
-            return false;
+        } catch (HttpClientErrorException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Server error while creating the user" + e.getMessage());
         }
     }
 
