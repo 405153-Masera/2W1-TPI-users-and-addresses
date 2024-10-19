@@ -29,30 +29,60 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Implementacion de {@link UserService},
+ * contiene toda la lógica relacionada con usuarios.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
+    /**
+     * ModelMapper para convertir entre entidades y dtos.
+     */
     @Autowired
     private ModelMapper modelMapper;
 
+    /**
+     * Repositorio para manejar User entities.
+     */
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Repositorio para manejar Role entities.
+     */
     @Autowired
     private RoleRepository roleRepository;
 
+    /**
+     * Repositorio para manejar UserRole entities.
+     */
     @Autowired
     private UserRoleRepository userRoleRepository;
 
+    /**
+     * Repositorio para manejar PlotUser entities.
+     */
     @Autowired
     private PlotUserRepository plotUserRepository;
 
+    /** Servicio para manejar la lógica de roles. */
     @Autowired
     private RoleService roleService;
 
+    /** Servicio para manejar el restTemplate de contactos. */
     @Autowired
     private RestContact restContact;
 
+
+    /**
+     * Crea un usuario.
+     *
+     * @param postUserDto
+     * @return el usuario creado.
+     * @throws EntityNotFoundException sí no encuentra un rol con la descripción asignada.
+     * @throws RuntimeException si falla el intento de guardar contactos.
+     */
     @Override
     @Transactional
     public GetUserDto createUser(PostUserDto postUserDto) {
@@ -120,6 +150,14 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Metodo para mapear de un PostUserDto y un UserEntity
+     * a un PlotUserEntity
+     *
+     * @param plotUserEntity un PlotUserEntity.
+     * @param postUserDto un PostUserDto.
+     * @param savedUser un UserEntity.
+     */
     public void mapPostToPlotUserEntity(PlotUserEntity plotUserEntity, PostUserDto postUserDto, UserEntity savedUser) {
         plotUserEntity.setPlotId(postUserDto.getPlot_id());
         plotUserEntity.setUser(savedUser);
@@ -129,7 +167,12 @@ public class UserServiceImpl implements UserService {
         plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
     };
 
-    // Metodo
+    /**
+     * Metodo para mapear de un PostUserDto a un UserEntity
+     *
+     * @param userEntity un UserEntity.
+     * @param postUserDto un PostUserDto.
+     */
     public void mapUserPostToUserEntity(UserEntity userEntity , PostUserDto postUserDto) {
 
         userEntity.setName(postUserDto.getName());
@@ -147,7 +190,12 @@ public class UserServiceImpl implements UserService {
         userEntity.setTelegram_id(postUserDto.getTelegram_id());
     }
 
-    // Metodo para mepear el UserEntity a GetUserDto
+    /**
+     * Metodo para mapear de un UserEntity a un GetUserDto
+     *
+     * @param userEntity un UserEntity.
+     * @param getUserDto un GetUserDto.
+     */
     public GetUserDto mapUserEntityToGet(UserEntity userEntity , GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
         getUserDto.setName(userEntity.getName());
@@ -168,7 +216,12 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
-    // Metodo para mapear los Roles y Contactos de un usuario
+    /**
+     * Metodo para mapear roles y contactos de un usuario a un GetUserDto
+     *
+     * @param userEntity un UserEntity.
+     * @param getUserDto un GetUserDto.
+     */
     public void mapUserRolesAndContacts(UserEntity userEntity , GetUserDto getUserDto) {
         List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
 
@@ -190,7 +243,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // Metodo para mapear la entidad UserRole
+    /**
+     * Metodo para mapear de un UserEntity y un RoleEntity a un UserRoleEntity
+     *
+     * @param userEntity un UserEntity.
+     * @param roleEntity un RoleEntity.
+     * @param userRoleEntity un UserRoleEntity
+     */
     public void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
@@ -198,14 +257,26 @@ public class UserServiceImpl implements UserService {
         userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
     }
 
-    //Metodo para validar si existe alguien con ese username
+    /**
+     * Metodo para validar si existe un username igual guardado en la
+     * base de datos.
+     *
+     * @param username un string que contiene el username a buscar.
+     * @throws IllegalArgumentException si existe un username igual en la base de datos.
+     */
     public void validateUsername(String username) {
         if (userRepository.findByUsername(username) != null) {
             throw new IllegalArgumentException("Error creating user: username already in use.");
         }
     }
 
-    // Metodo para validar si existe alguien con ese email
+    /**
+     * Metodo para validar si existe un email igual guardado en la
+     * base de datos.
+     *
+     * @param email un string que contiene el email a buscar.
+     * @throws IllegalArgumentException si existe un email igual en la base de datos.
+     */
     public void validateEmail(String email) {
         List<String> emails = restContact.getAllEmails();   // Obtener todos los emails
         if (emails.contains(email)) {
@@ -213,6 +284,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Obtener todos los usuarios.
+     *
+     * @return una lista con todos los usuarios.
+     */
     public List<GetUserDto> getAllUsers() {
         List<UserEntity> userEntities = userRepository.findAllActives();
 
@@ -229,6 +305,13 @@ public class UserServiceImpl implements UserService {
         return getUserDtos;
     }
 
+    /**
+     * Obtener un usuario por medio de un userId.
+     *
+     * @param userId identificador de un usuario.
+     * @return un usuario que coincida con la id proporcionada.
+     * @throws EntityNotFoundException si no encuentra un usuario con la misma id en la base de datos.
+     */
     @Override
     public GetUserDto getUserById(Integer userId) {
 
@@ -242,6 +325,12 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Metodo para mapear de un PutUserDto a un UserEntity.
+     *
+     * @param userEntity un UserEntity.
+     * @param putUserDto un PutUserDto.
+     */
     public void mapPutUserToUserEntiy(PutUserDto putUserDto, UserEntity userEntity) {
         userEntity.setName(putUserDto.getName());
         userEntity.setLastname(putUserDto.getLastName());
@@ -253,6 +342,16 @@ public class UserServiceImpl implements UserService {
         userEntity.setTelegram_id(putUserDto.getTelegram_id());
     }
 
+    /**
+     * Actualiza un usuario.
+     *
+     * @param userId la id del usuario a actualizar.
+     * @param putUserDto el dto con la información necesaria para actualizar un usuario.
+     * @throws EntityNotFoundException si no se encuentra un usuario con la id proporcionada como parametro
+     * en la base de datos.
+     * @throws EntityNotFoundException si no se encuentra un rol con la misma descripción en la base de datos.
+     * @return el usuario actualizado.
+     */
     @Override
     @Transactional
     public GetUserDto updateUser(Integer userId,PutUserDto putUserDto) {
@@ -315,6 +414,13 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Obtener todos los usuarios por un estado.
+     *
+     * @param isActive representa el estado del usuario.
+     * @return una lista de usuarios con ese estado.
+     * @throws EntityNotFoundException si no se encuentra algún usuario con ese estado.
+     */
     @Override
     public List<GetUserDto> getUsersByStatus(boolean isActive){
         List<UserEntity> userEntities = userRepository.findByActive(isActive)
@@ -330,6 +436,13 @@ public class UserServiceImpl implements UserService {
                 }).collect(Collectors.toList());
     }
 
+    /**
+     * Realiza una baja lógica de un usuario.
+     *
+     * @param userId id del usuario a borrar.
+     * @param userUpdateId id del usuario que realiza la acción.
+     * @throws EntityNotFoundException si no encuentra un usuario asignado a la id pasada por parametro.
+     */
     @Override
     @Transactional
     public void deleteUser(Integer userId,Integer userUpdateId) {
@@ -351,6 +464,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
     }
 
+    /**
+     * Obtener un usuario por email.
+     * @param email correo electronico de un usuario
+     * @throws EntityNotFoundException si no se encuentra un usuario con el email proporcionado por parametro.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el id coincidente al email.
+     * @return un usuario si existe.
+     */
     @Override
     public GetUserDto getUserByEmail(String email) {
 
@@ -367,6 +487,14 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Obtener un usuario de rol "Owner" con un plotId especifíco.
+     *
+     * @param plotId identificador de un lote.
+     * @throws EntityNotFoundException si no encuentra a un usuario asignado al lote según la id de
+     * lote proporcionada por parametro.
+     * @return un usuario si existe.
+     */
     @Override
     public GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId) {
         Optional<UserEntity> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
@@ -381,6 +509,13 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Obtener un usuario por un rol.
+     *
+     * @param roleId identificador de un rol.
+     * @throws EntityNotFoundException si no encuentra algun usuario coincidente al rol proporcionado por parametro.
+     * @return una lista de usuarios coincidentes con el rol.
+     */
     @Override
     public List<GetUserDto> getUsersByRole(Integer roleId) {
 
@@ -401,6 +536,12 @@ public class UserServiceImpl implements UserService {
         return usersDto;
     }
 
+    /**
+     * Verifica un inicio de sesión.
+     *
+     * @param postLoginDto dto con informacion requerida para el metodo.
+     * @return un booleano de confirmación.
+     */
     @Override
     public boolean verifyLogin(PostLoginDto postLoginDto) {
         GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());

@@ -1,6 +1,5 @@
 package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.Contact;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,18 +14,33 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase asociada al restTemplate para consumir el microservicio de contactos.
+ */
 @Service
 public class RestContact {
 
+    /**
+     * Instancia de restTemplate para utilizar dentro de la clase.
+     */
     @Autowired
     private RestTemplate restTemplate;
 
+    /**
+     * Direccion url donde se levanta el microservicio de contactos.
+     */
     String url = "http://localhost:8083/contact/search";
 
-    public List<GetContactDto> getContactById(int id) {
+    /**
+     * Metodo para obtener una lista de contactos según una id de usuario.
+     *
+     * @param userId identificador de un usuario.
+     * @return una lista de {@link GetContactDto}
+     */
+    public List<GetContactDto> getContactById(int userId) {
 
         // JsonNode para no tener que hacer varias clases
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "?userId=" + id, JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "?userId=" + userId, JsonNode.class);
 
         List<GetContactDto> contacts = new ArrayList<>();
 
@@ -49,6 +63,11 @@ public class RestContact {
         return contacts;
     }
 
+    /**
+     * Metodo para obtener una lista de todos los emails.
+     *
+     * @return una lista de tipo {@link String}
+     */
     public List<String> getAllEmails(){
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
 
@@ -68,6 +87,12 @@ public class RestContact {
         return emails;
     }
 
+    /**
+     * Metodo para obtener una id de usuario por un parametro Email.
+     *
+     * @param email correo electronico de un usuario.
+     * @return una id de usuario tipo {@link Integer}
+     */
     public Integer getUserIdByEmail(String email) {
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
         if (response.getBody().isArray()) {
@@ -83,6 +108,14 @@ public class RestContact {
         return null;
     }
 
+    /**
+     * Metodo para guardar un contacto de un usuario en el microservicio de contactos.
+     *
+     * @param userId identificador de un usuario.
+     * @param value valor del contacto a guardar.
+     * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
+     * @return un booleano indicando si se pudo o no guardar el contacto.
+     */
     public boolean saveContact(Integer userId, String value, int contactType) {
 
         ContactRequest contact = new ContactRequest();
