@@ -19,6 +19,7 @@ public interface UserService {
     void deleteUser(Integer userId,Integer userUpdateId);
     GetUserDto getUserByEmail(String email);
     GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId);
+    List<GetUserDto> getAllUsersByPlotId(Integer plotId);
     List<GetUserDto> getUsersByRole(Integer roleId);
     boolean verifyLogin(PostLoginDto postLoginDto);
 }

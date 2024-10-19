@@ -369,7 +369,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId) {
-        Optional<UserEntity> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
+        Optional<UserEntity> userEntity = userRepository.findUserByPlotIdAndOwnerRole(plotId);
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("User not found with plot id: " + plotId);
         }
@@ -379,6 +379,24 @@ public class UserServiceImpl implements UserService {
         mapUserEntityToGet(user,getUserDto);
         mapUserRolesAndContacts(user,getUserDto);
         return getUserDto;
+    }
+
+    @Override
+    public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
+        Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
+        if (userEntity.isEmpty()) {
+            throw new EntityNotFoundException("Users not found with plot id: " + plotId);
+        }
+
+        List<UserEntity> users = userEntity.get();
+        List<GetUserDto> usersDto = new ArrayList<>();
+        for (UserEntity user : users) {
+            GetUserDto userDto = new GetUserDto();
+            mapUserEntityToGet(user, userDto);
+            mapUserRolesAndContacts(user, userDto);
+            usersDto.add(userDto);
+        }
+        return usersDto;
     }
 
     @Override

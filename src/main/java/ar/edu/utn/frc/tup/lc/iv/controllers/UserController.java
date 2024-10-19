@@ -130,6 +130,16 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("all/plot/{plotId}")
+    public ResponseEntity<List<GetUserDto>> getAllUsersByPlotIdAndOwnerRole(@PathVariable Integer plotId) {
+        List<GetUserDto> result = userService.getAllUsersByPlotId(plotId);
+        if(result == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
     // Se maneja en post x temas de seguridad
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
