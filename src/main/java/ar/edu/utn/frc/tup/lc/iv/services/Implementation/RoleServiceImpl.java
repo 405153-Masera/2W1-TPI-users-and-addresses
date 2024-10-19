@@ -13,23 +13,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementacion de {@link RoleService},
+ * contiene toda la lógica relacionada con roles.
+ */
 @Service
 public class RoleServiceImpl implements RoleService {
+
+    /**
+     * Repositorio para manejar Role entities.
+     */
     @Autowired
     private RoleRepository roleRepository;
 
+    /**
+     * Repositorio para manejar UserRole entities.
+     */
     @Autowired
     private UserRoleRepository userRoleRepository;
 
+    /**
+     * ModelMapper para convertir entre entidades y dtos.
+     */
     @Autowired
     private ModelMapper modelMapper;
 
+    /**
+     * Obtener todos los roles.
+     *
+     * @return una lista con todos los roles.
+     */
     public List<GetRoleDto> getAllRoles() {
         List<RoleEntity> roleEntities = roleRepository.findAll();
 
@@ -42,9 +60,16 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtener todos los roles por usuario.
+     *
+     * @param userId identificador de un usuario.
+     * @return una lista con todos los roles coincidentes al usuario.
+     * @throws RoleUserException si el usuario no tiene roles asignados o no existe.
+     */
     public List<GetRoleDto> getRolesByUser(int userId) {
         List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
-        if(userRoles.isEmpty()){
+        if (userRoles.isEmpty()) {
             throw new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND);
         }
         List<GetRoleDto> roles = new ArrayList<>();
@@ -65,6 +90,12 @@ public class RoleServiceImpl implements RoleService {
         return roles;
     }
 
+    /**
+     * Crea un rol.
+     *
+     * @param postRoleDto dto con información requerida para el alta de un rol.
+     * @return el rol creado.
+     */
     @Override
     public GetRoleDto createRole(PostRoleDto postRoleDto) {
         RoleEntity roleEntity = new RoleEntity();
