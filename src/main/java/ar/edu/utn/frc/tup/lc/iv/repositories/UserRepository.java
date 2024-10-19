@@ -53,7 +53,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
             + "WHERE r.description = 'Owner' "
             + "AND pu.plotId = :plotId "
             + "AND u.active = true")
-    Optional<UserEntity> findUsersByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
+    Optional<UserEntity> findUserByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
 
     /**
      * Busca una lista de usuarios activos.

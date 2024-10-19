@@ -513,31 +513,13 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+
     /**
-     * Obtener un usuario por un rol.
-     *
-     * @param roleId identificador de un rol.
-     * @throws EntityNotFoundException si no encuentra algun usuario coincidente al rol proporcionado por parametro.
-     * @return una lista de usuarios coincidentes con el rol.
+     * Obtener un usuario por rpñ.
+     * @param roleId identificador de rol.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el rol proporcionado por parametro.
+     * @return un usuario si existe.
      */
-    @Override
-    public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
-        Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
-        if (userEntity.isEmpty()) {
-            throw new EntityNotFoundException("Users not found with plot id: " + plotId);
-        }
-
-        List<UserEntity> users = userEntity.get();
-        List<GetUserDto> usersDto = new ArrayList<>();
-        for (UserEntity user : users) {
-            GetUserDto userDto = new GetUserDto();
-            mapUserEntityToGet(user, userDto);
-            mapUserRolesAndContacts(user, userDto);
-            usersDto.add(userDto);
-        }
-        return usersDto;
-    }
-
     @Override
     public List<GetUserDto> getUsersByRole(Integer roleId) {
 
