@@ -7,7 +7,6 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Interfaz que contiene la lógica de usuarios.
@@ -44,7 +43,7 @@ public interface UserService {
      * @param putUserDto el dto con la información necesaria para actualizar un usuario.
      * @return el usuario actualizado.
      */
-    GetUserDto updateUser(Integer userId,PutUserDto putUserDto);
+    GetUserDto updateUser(Integer userId, PutUserDto putUserDto);
 
     /**
      * Obtener todos los usuarios por un estado.
@@ -60,7 +59,7 @@ public interface UserService {
      * @param userId id del usuario a borrar.
      * @param userUpdateId id del usuario que realiza la acción.
      */
-    void deleteUser(Integer userId,Integer userUpdateId);
+    void deleteUser(Integer userId, Integer userUpdateId);
 
     /**
      * Obtener un usuario por email.

@@ -3,6 +3,9 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,10 @@ import java.util.List;
 /**
  * Clase asociada al restTemplate para consumir el microservicio de contactos.
  */
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class RestContact {
 
@@ -29,7 +36,7 @@ public class RestContact {
     /**
      * Direccion url donde se levanta el microservicio de contactos.
      */
-    String url = "http://localhost:8083/contact/search";
+    private String url = "http://localhost:8083/contact/search";
 
     /**
      * Metodo para obtener una lista de contactos según una id de usuario.
@@ -68,7 +75,7 @@ public class RestContact {
      *
      * @return una lista de tipo {@link String}
      */
-    public List<String> getAllEmails(){
+    public List<String> getAllEmails() {
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
 
         List<String> emails = new ArrayList<>();
@@ -125,17 +132,24 @@ public class RestContact {
 
         try {
             ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
-            return response.getStatusCode().is2xxSuccessful(); //
+            return response.getStatusCode().is2xxSuccessful();
 
         } catch (HttpClientErrorException e) {
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Server error while creating the user" + e.getMessage());
         }
     }
 
+    /**
+     * Metodo para modificar el contacto de un usuario en el microservicio de contactos.
+     *
+     * @param userId identificador de un usuario.
+     * @param value valor del contacto a guardar.
+     * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
+     * @return un booleano indicando si se pudo o no modificar el contacto.
+     */
     public boolean updateContact(Integer userId, String value, int contactType) {
         String updateUrl = "http://localhost:8083/contact/owner/" + userId;
 
@@ -149,8 +163,7 @@ public class RestContact {
             return true;  // si no lanza excepciones, devolvemos true indicando éxito
         } catch (HttpClientErrorException e) {
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Server error while creating the user" + e.getMessage());
         }

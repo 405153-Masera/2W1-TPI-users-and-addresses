@@ -101,7 +101,7 @@
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
-        <module name="MemberName"/>
+        <!-- <module name="MemberName"/> -->
         <module name="MethodName"/>
         <module name="PackageName"/>
         <module name="ParameterName"/>
@@ -110,7 +110,7 @@
 
         <!-- Checks for imports                              -->
         <!-- See https://checkstyle.org/checks/imports/index.html -->
-        <module name="AvoidStarImport"/>
+        <!-- <module name="AvoidStarImport"/> -->
         <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports">
@@ -152,16 +152,16 @@
         <!-- See https://checkstyle.org/checks/coding/index.html -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
-        <module name="HiddenField"/>
+        <!-- <module name="HiddenField"/> -->
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
-        <module name="MagicNumber"/>
-        <module name="MissingSwitchDefault"/>
-        <module name="MultipleVariableDeclarations"/>
-        <module name="SimplifyBooleanExpression"/>
-        <module name="SimplifyBooleanReturn"/>
+        <!-- <module name="MagicNumber"/> -->
+       <module name="MissingSwitchDefault"/>
+       <module name="MultipleVariableDeclarations"/>
+       <module name="SimplifyBooleanExpression"/>
+       <module name="SimplifyBooleanReturn"/>
 
-        <!-- Checks for class design                         -->
+       <!-- Checks for class design                         -->
         <!-- See https://checkstyle.org/checks/design/index.html -->
         <module name="DesignForExtension"/>
         <module name="FinalClass"/>

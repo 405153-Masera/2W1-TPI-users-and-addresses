@@ -6,6 +6,7 @@ import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class RoleController {
     public ResponseEntity<List<GetRoleDto>> getRoles() {
         List<GetRoleDto> result = roleService.getAllRoles();
 
-        if(result == null) {
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(result);
@@ -47,7 +48,7 @@ public class RoleController {
     public ResponseEntity<GetRoleDto> createRole(@RequestBody PostRoleDto postRoleDto) {
         GetRoleDto result = roleService.createRole(postRoleDto);
 
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(result);

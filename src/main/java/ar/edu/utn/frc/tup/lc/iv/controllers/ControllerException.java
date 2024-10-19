@@ -23,6 +23,7 @@ public class ControllerException {
      * Metodo para manejo de excepcion de clase INTERNAL_SERVER_ERROR.
      *
      * @return una respuesta de INTERNAL_SERVER_ERROR.
+     * @param e excepcion.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorApi> handleError(Exception e) {
@@ -34,6 +35,7 @@ public class ControllerException {
      * Metodo para manejo de excepcion de clase BAD_REQUEST.
      *
      * @return una respuesta de BAD_REQUEST.
+     * @param e excepcion.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorApi> handleError(MethodArgumentNotValidException e) {
@@ -45,6 +47,7 @@ public class ControllerException {
      * Metodo para manejo de excepcion de clase NOT_FOUND.
      *
      * @return una respuesta de NOT_FOUND.
+     * @param e excepcion.
      */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorApi> handleError(EntityNotFoundException e) {
@@ -56,6 +59,7 @@ public class ControllerException {
      * Metodo para arrojar errores de tipo HTTP.
      *
      * @return una respuesta de error tipo HTTP.
+     * @param e excepcion.
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorApi> handleError(ResponseStatusException e) {
@@ -66,6 +70,7 @@ public class ControllerException {
      * Metodo personalizado de manejo de error para RoleUser.
      *
      * @return respuesta de error personalizado.
+     * @param ex excepcion.
      */
     @ExceptionHandler(RoleUserException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(RoleUserException ex) {
@@ -74,7 +79,7 @@ public class ControllerException {
     }
 
     /**
-     * Metodo para construir un objeto error API
+     * Metodo para construir un objeto error API.
      *
      * @param message mensaje de error a arrojar.
      * @param status código de HTTP.

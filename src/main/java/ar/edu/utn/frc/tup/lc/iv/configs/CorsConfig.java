@@ -14,7 +14,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
     /**
      * Clase principal de la configuración de Cors.
-     *
+     * @param registry registro del Cors.
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {

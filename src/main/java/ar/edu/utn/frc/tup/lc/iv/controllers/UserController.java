@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    /** Servicio para manejar la lógica de usuarios */
+    /** Servicio para manejar la lógica de usuarios. */
     @Autowired
     private UserService userService;
 
@@ -36,7 +36,7 @@ public class UserController {
         GetUserDto result = userService.createUser(postUserDto);
 
         //Si falla el service
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -54,7 +54,7 @@ public class UserController {
     public ResponseEntity<GetUserDto> getUserById(@PathVariable Integer userId) {
         GetUserDto response = userService.getUserById(userId);
 
-        if(response == null){
+        if (response == null) {
           return ResponseEntity.notFound().build();
         }
 
@@ -70,7 +70,7 @@ public class UserController {
     public ResponseEntity<List<GetUserDto>> getUsers() {
         List<GetUserDto> result = userService.getAllUsers();
 
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -81,13 +81,15 @@ public class UserController {
      * Modifica un usuario buscado por id.
      *
      * @return el usuario modificado con campos actualizados.
+     * @param userId identificador de un usuario.
+     * @param putUserDto dto con inforamción necesaria para modificar un usuario.
      */
     @PutMapping("/put/{userId}")
-    public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId,@RequestBody PutUserDto putUserDto) {
-        GetUserDto result = userService.updateUser(userId,putUserDto);
+    public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId, @RequestBody PutUserDto putUserDto) {
+        GetUserDto result = userService.updateUser(userId, putUserDto);
 
         //Si falla el service
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -106,7 +108,7 @@ public class UserController {
         List<GetUserDto> result = userService.getUsersByStatus(isActive);
 
         //Si no trae la lista
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -125,7 +127,7 @@ public class UserController {
         List<GetUserDto> result = userService.getUsersByRole(roleId);
 
         //Si no trae la lista
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -157,7 +159,7 @@ public class UserController {
         GetUserDto result = userService.getUserByEmail(email);
 
         //Si no encuentra al usuario
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.notFound().build();
         }
 
@@ -174,7 +176,7 @@ public class UserController {
     @GetMapping("/get/owner/{plotId}")
     public ResponseEntity<GetUserDto> getUserByPlotIdAndOwnerRole(@PathVariable Integer plotId) {
         GetUserDto result = userService.getUserByPlotIdAndOwnerRole(plotId);
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.notFound().build();
         }
 
@@ -192,7 +194,7 @@ public class UserController {
         boolean result = userService.verifyLogin(postLoginDto);
 
         //Si no está registrado
-        if(!result){
+        if (!result) {
             return ResponseEntity.notFound().build();
         }
 

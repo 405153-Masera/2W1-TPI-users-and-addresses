@@ -20,9 +20,10 @@ public class RestConfig {
      * utiliza para hacer llamadas a API REST.
      *
      * @return una instancia de resTemplate.
+     * @param builder constructor de restTemplate.
      */
     @Bean
-    RestTemplate restTemplate(RestTemplateBuilder builder){
+    RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(5))
                 .setReadTimeout(Duration.ofSeconds(10))

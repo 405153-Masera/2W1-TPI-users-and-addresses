@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
  * Excepción enviada por un error de Rol.
  */
 @Getter
-public class RoleUserException extends RuntimeException{
+public class RoleUserException extends RuntimeException {
 
     /**
      * Variable tipo HttpStatus.
@@ -16,6 +16,8 @@ public class RoleUserException extends RuntimeException{
 
     /**
      * Constructor de la clase.
+     * @param message mensaje de error.
+     * @param status código de error.
      */
     public RoleUserException(String message, HttpStatus status) {
         super(message);

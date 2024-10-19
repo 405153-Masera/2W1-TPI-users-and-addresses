@@ -77,7 +77,7 @@ public class GetUserDto {
     /**
      * Lista de los roles que tiene el usuario.
      */
-    private String[] roles ;
+    private String[] roles;
 
     /**
      * Identificador del lote asignado al usuario.

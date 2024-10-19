@@ -15,6 +15,7 @@ public class ErrorResponse {
 
     /**
      * Constructor de la clase.
+     * @param message variable mensaje.
      */
     public ErrorResponse(String message) {
         this.message = message;
@@ -22,6 +23,7 @@ public class ErrorResponse {
 
     /**
      * Setter de la clase.
+     * @param message variable mensaje.
      */
     public void setMessage(String message) {
         this.message = message;

@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
             if (roleEntity != null) {
                 // Crear una nueva relación en la tabla intermedia UserRoles
                 UserRoleEntity userRoleEntity = new UserRoleEntity();
-                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
+                mapUserRolEntity(userRoleEntity, savedUser, roleEntity);
                 userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
                 userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
                 // Guardar la relación en la tabla intermedia
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
 
         // Guardar relacion plotUser
         PlotUserEntity plotUserEntity = new PlotUserEntity();
-        mapPostToPlotUserEntity(plotUserEntity,postUserDto,savedUser);
+        mapPostToPlotUserEntity(plotUserEntity, postUserDto, savedUser);
         plotUserRepository.save(plotUserEntity);
 
         //guardar contactos
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Metodo para mapear de un PostUserDto y un UserEntity
-     * a un PlotUserEntity
+     * a un PlotUserEntity.
      *
      * @param plotUserEntity un PlotUserEntity.
      * @param postUserDto un PostUserDto.
@@ -168,12 +168,12 @@ public class UserServiceImpl implements UserService {
     };
 
     /**
-     * Metodo para mapear de un PostUserDto a un UserEntity
+     * Metodo para mapear de un PostUserDto a un UserEntity.
      *
      * @param userEntity un UserEntity.
      * @param postUserDto un PostUserDto.
      */
-    public void mapUserPostToUserEntity(UserEntity userEntity , PostUserDto postUserDto) {
+    public void mapUserPostToUserEntity(UserEntity userEntity, PostUserDto postUserDto) {
 
         userEntity.setName(postUserDto.getName());
         userEntity.setLastname(postUserDto.getLastname());
@@ -191,12 +191,13 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Metodo para mapear de un UserEntity a un GetUserDto
+     * Metodo para mapear de un UserEntity a un GetUserDto.
      *
      * @param userEntity un UserEntity.
      * @param getUserDto un GetUserDto.
+     * @return un GetUserDto del usuario mapeado.
      */
-    public GetUserDto mapUserEntityToGet(UserEntity userEntity , GetUserDto getUserDto) {
+    public GetUserDto mapUserEntityToGet(UserEntity userEntity, GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
         getUserDto.setName(userEntity.getName());
         getUserDto.setLastname(userEntity.getLastname());
@@ -209,7 +210,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setTelegram_id(userEntity.getTelegram_id());
 
         PlotUserEntity plotUserEntity = plotUserRepository.findByUser(userEntity);
-        if(plotUserEntity != null){
+        if (plotUserEntity != null) {
             getUserDto.setPlot_id(plotUserEntity.getPlotId());
         }
 
@@ -217,12 +218,12 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Metodo para mapear roles y contactos de un usuario a un GetUserDto
+     * Metodo para mapear roles y contactos de un usuario a un GetUserDto.
      *
      * @param userEntity un UserEntity.
      * @param getUserDto un GetUserDto.
      */
-    public void mapUserRolesAndContacts(UserEntity userEntity , GetUserDto getUserDto) {
+    public void mapUserRolesAndContacts(UserEntity userEntity, GetUserDto getUserDto) {
         List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
 
         // Convierto la lista de GetRoleDto a un arreglo de String[] (solo para ver los nombres)
@@ -235,22 +236,22 @@ public class UserServiceImpl implements UserService {
         // Buscamos los contactos del usuario y los asignamos
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
         for (GetContactDto contactDto : contactDtos) {
-            if(contactDto.getType_contact() == 1){ // Si el valor es 1, es un email
+            if (contactDto.getType_contact() == 1) { // Si el valor es 1, es un email
                 getUserDto.setEmail(contactDto.getValue().toLowerCase()); //Guardamos email en minuscula
-            }else{ // Si no, es un teléfono
+            } else { // Si no, es un teléfono
                 getUserDto.setPhone_number(contactDto.getValue()); //Guardamos el telefono
             }
         }
     }
 
     /**
-     * Metodo para mapear de un UserEntity y un RoleEntity a un UserRoleEntity
+     * Metodo para mapear de un UserEntity y un RoleEntity a un UserRoleEntity.
      *
      * @param userEntity un UserEntity.
      * @param roleEntity un RoleEntity.
      * @param userRoleEntity un UserRoleEntity
      */
-    public void mapUserRolEntity(UserRoleEntity userRoleEntity , UserEntity userEntity , RoleEntity roleEntity) {
+    public void mapUserRolEntity(UserRoleEntity userRoleEntity, UserEntity userEntity, RoleEntity roleEntity) {
         userRoleEntity.setUser(userEntity);  // Usuario recién guardado
         userRoleEntity.setRole(roleEntity);  // Rol encontrado
         userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
@@ -295,8 +296,8 @@ public class UserServiceImpl implements UserService {
         List<GetUserDto> getUserDtos = userEntities.stream()
                 .map(userEntity -> {
                     GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntityToGet(userEntity,getUserDto);
-                    mapUserRolesAndContacts(userEntity,getUserDto);
+                    mapUserEntityToGet(userEntity, getUserDto);
+                    mapUserRolesAndContacts(userEntity, getUserDto);
 
                     return getUserDto;
                 })
@@ -319,8 +320,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(userEntity,getUserDto);
-        mapUserRolesAndContacts(userEntity,getUserDto);
+        mapUserEntityToGet(userEntity, getUserDto);
+        mapUserRolesAndContacts(userEntity, getUserDto);
 
         return getUserDto;
     }
@@ -354,17 +355,19 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public GetUserDto updateUser(Integer userId,PutUserDto putUserDto) {
+    public GetUserDto updateUser(Integer userId, PutUserDto putUserDto) {
 
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
 
-        if(optionalUser.isEmpty()){
-            throw new EntityNotFoundException("User not found with id: " + userId);
+        if (optionalUser.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "User not found with id: " + userId
+            );
         }
 
         UserEntity user = optionalUser.get();
         //Utilizamos el metodo para mapear el user
-        mapPutUserToUserEntiy(putUserDto,user);
+        mapPutUserToUserEntiy(putUserDto, user);
         UserEntity userSaved = userRepository.save(user);
 
         //Borramos la relacion de la tabla intermedia entre Rol y User
@@ -378,7 +381,9 @@ public class UserServiceImpl implements UserService {
             // Buscar el rol por su descripción
             RoleEntity role = roleRepository.findByDescription(roleDesc);
             if (role == null) {
-                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
+                throw new EntityNotFoundException(
+                        "Role not found with description: " + roleDesc
+                );
             }
 
             // Crear una nueva relación en la tabla intermedia UserRoles
@@ -398,7 +403,6 @@ public class UserServiceImpl implements UserService {
             // Agregar la descripción del rol a la lista de roles asignados
             assignedRoles.add(roleDesc);
         }
-        
         // Actualizar los contactos del usuario
         restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
         restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
@@ -422,15 +426,15 @@ public class UserServiceImpl implements UserService {
      * @throws EntityNotFoundException si no se encuentra algún usuario con ese estado.
      */
     @Override
-    public List<GetUserDto> getUsersByStatus(boolean isActive){
+    public List<GetUserDto> getUsersByStatus(boolean isActive) {
         List<UserEntity> userEntities = userRepository.findByActive(isActive)
                 .orElseThrow(() -> new EntityNotFoundException("Users not found"));
 
         return userEntities.stream()
                 .map(userEntity -> {
                     GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntityToGet(userEntity,getUserDto);
-                    mapUserRolesAndContacts(userEntity,getUserDto);
+                    mapUserEntityToGet(userEntity, getUserDto);
+                    mapUserRolesAndContacts(userEntity, getUserDto);
 
                     return getUserDto;
                 }).collect(Collectors.toList());
@@ -445,7 +449,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public void deleteUser(Integer userId,Integer userUpdateId) {
+    public void deleteUser(Integer userId, Integer userUpdateId) {
         // Buscar el usuario por su ID
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
 
@@ -482,8 +486,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(userEntity,getUserDto);
-        mapUserRolesAndContacts(userEntity,getUserDto);
+        mapUserEntityToGet(userEntity, getUserDto);
+        mapUserRolesAndContacts(userEntity, getUserDto);
         return getUserDto;
     }
 
@@ -504,8 +508,8 @@ public class UserServiceImpl implements UserService {
 
         UserEntity user = userEntity.get();
         GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(user,getUserDto);
-        mapUserRolesAndContacts(user,getUserDto);
+        mapUserEntityToGet(user, getUserDto);
+        mapUserRolesAndContacts(user, getUserDto);
         return getUserDto;
     }
 
@@ -524,7 +528,7 @@ public class UserServiceImpl implements UserService {
 
         List<GetUserDto> usersDto = new ArrayList<>();
 
-        for (UserRoleEntity userRoleEntity : usersRole){
+        for (UserRoleEntity userRoleEntity : usersRole) {
             UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId()).get();
 
             GetUserDto userDto = modelMapper.map(userEntity, GetUserDto.class);

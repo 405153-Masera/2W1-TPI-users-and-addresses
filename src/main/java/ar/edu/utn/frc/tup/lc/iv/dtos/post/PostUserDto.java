@@ -86,7 +86,7 @@ public class PostUserDto {
      * Lista de los roles que tiene el usuario.
      */
     @NotNull(message = "Los roles no pueden ser nulos")
-    private String[] roles ;
+    private String[] roles;
 
     /**
      * Identificador del usuario que crea el rol.

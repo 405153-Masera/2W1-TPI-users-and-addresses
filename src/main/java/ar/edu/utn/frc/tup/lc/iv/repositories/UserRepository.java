@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     UserEntity findByUsername(String username);
 
     /**
-     * Busca un usuario por su id
+     * Busca un usuario por su id.
      *
      * @param userId el identificador de un usuario.
      * @return un {@link UserEntity}
@@ -41,18 +41,18 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     /**
      * Busca un usuario que tenga rol "Owner" y que coincida con el plotId
-     * pasado por parametro
+     * pasado por parametro.
      *
      * @param plotId el identificador de un lote.
      * @return un {@link UserEntity}
      */
-    @Query("SELECT u FROM UserEntity u " +
-            "JOIN UserRoleEntity ur ON ur.user.id = u.id " +
-            "JOIN RoleEntity r ON ur.role.id = r.id " +
-            "JOIN PlotUserEntity pu ON pu.user.id = u.id " +
-            "WHERE r.description = 'Owner' " +
-            "AND pu.plotId = :plotId " +
-            "AND u.active = true")
+    @Query("SELECT u FROM UserEntity u "
+            + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
+            + "JOIN RoleEntity r ON ur.role.id = r.id "
+            + "JOIN PlotUserEntity pu ON pu.user.id = u.id "
+            + "WHERE r.description = 'Owner' "
+            + "AND pu.plotId = :plotId "
+            + "AND u.active = true")
     Optional<UserEntity> findUsersByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
 
     /**

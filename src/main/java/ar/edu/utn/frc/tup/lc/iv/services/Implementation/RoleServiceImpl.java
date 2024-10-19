@@ -69,7 +69,7 @@ public class RoleServiceImpl implements RoleService {
      */
     public List<GetRoleDto> getRolesByUser(int userId) {
         List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
-        if(userRoles.isEmpty()){
+        if (userRoles.isEmpty()) {
             throw new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND);
         }
         List<GetRoleDto> roles = new ArrayList<>();
