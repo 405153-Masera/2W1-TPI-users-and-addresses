@@ -74,10 +74,12 @@ public class PutUserDto {
     /**
      * Identificador del usuario que crea el rol.
      */
+    @NotNull
     private Integer userUpdateId;
 
     /**
      * Identificador de la plataforma telegram utilizada en notificaciones.
      */
+    @NotNull
     private Integer telegram_id;
 }

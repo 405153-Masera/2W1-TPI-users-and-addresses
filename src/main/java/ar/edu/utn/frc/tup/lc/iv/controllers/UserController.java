@@ -49,7 +49,7 @@ public class UserController {
      * @param userId id del usuario a buscar.
      * @return el usuario encontrado.
      */
-    @GetMapping("get/{userId}")
+    @GetMapping("getById/{userId}")
     public ResponseEntity<GetUserDto> getUserById(@PathVariable Integer userId) {
         GetUserDto response = userService.getUserById(userId);
 
@@ -153,7 +153,7 @@ public class UserController {
      * @param email email del usuario a buscar.
      * @return el usuario encontrado.
      */
-    @GetMapping("/get/{email}")
+    @GetMapping("/getByEmail/{email}")
     public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
         GetUserDto result = userService.getUserByEmail(email);
 
