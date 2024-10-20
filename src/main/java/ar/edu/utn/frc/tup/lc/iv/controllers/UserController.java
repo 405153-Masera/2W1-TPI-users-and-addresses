@@ -1,7 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
@@ -154,7 +153,7 @@ public class UserController {
      * @param email email del usuario a buscar.
      * @return el usuario encontrado.
      */
-    @GetMapping("/getbyemail/{email}")
+    @GetMapping("/get/{email}")
     public ResponseEntity<GetUserDto> getUserByEmail(@PathVariable String email) {
         GetUserDto result = userService.getUserByEmail(email);
 
@@ -183,22 +182,14 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * Devuelve la confirmación de un inicio de sesión exitoso.
-     *
-     * @param postLoginDto credenciales del logueo.
-     * @return respuesta de confirmación de logueo.
-     */
-    @PostMapping("/login")
-    public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
-        boolean result = userService.verifyLogin(postLoginDto);
-
-        //Si no está registrado
-        if (!result) {
+        //Está registrado
+    @GetMapping("getall/{plotId}")
+    public ResponseEntity<List<GetUserDto>> getAllUsersByPlotId(@PathVariable Integer plotId) {
+        List<GetUserDto> result = userService.getAllUsersByPlotId(plotId);
+        if(result == null){
             return ResponseEntity.notFound().build();
         }
 
-        //Está registrado
         return ResponseEntity.ok(result);
     }
 

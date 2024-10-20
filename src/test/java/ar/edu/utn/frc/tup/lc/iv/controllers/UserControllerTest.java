@@ -326,7 +326,7 @@ class UserControllerTest {
         PostLoginDto postLoginDto = new PostLoginDto("4561231", "123456");
 
         //When
-        Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(true);
+        //Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(true);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
@@ -344,7 +344,7 @@ class UserControllerTest {
         PostLoginDto postLoginDto = new PostLoginDto("4561231", "123456");
 
         //When
-        Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(false);
+        //Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(false);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.post("/users/login")

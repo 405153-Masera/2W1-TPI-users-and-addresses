@@ -91,5 +91,7 @@ public interface UserService {
      * @param postLoginDto dto con informacion requerida para el metodo.
      * @return un booleano de confirmación.
      */
-    boolean verifyLogin(PostLoginDto postLoginDto);
+    GetUserDto verifyLogin(PostLoginDto postLoginDto);
+
+    List<GetUserDto> getAllUsersByPlotId(Integer plotId);
 }

@@ -9,6 +9,7 @@ import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.PlotUserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
@@ -74,6 +75,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RestContact restContact;
 
+    /** Servicio para encriptar y desencriptar contraseñas. */
+    @Autowired
+    private PasswordUtil passwordEncoder;
 
     /**
      * Crea un usuario.
@@ -90,6 +94,11 @@ public class UserServiceImpl implements UserService {
         // Validaciones por si el username o el email ya existen
         validateUsername(postUserDto.getUsername());
         validateEmail(postUserDto.getEmail());
+
+
+        // Encriptar la contraseña
+        String hashedPassword = passwordEncoder.hashPassword(postUserDto.getPassword());
+        postUserDto.setPassword(hashedPassword);
 
         // Crear un nuevo UserEntity y asignar los valores del DTO
         UserEntity userEntity = new UserEntity();
@@ -514,6 +523,24 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
+        Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotId(plotId);
+        if (userEntity.isEmpty()) {
+            throw new EntityNotFoundException("Users not found with plot id: " + plotId);
+        }
+
+        List<UserEntity> users = userEntity.get();
+        List<GetUserDto> usersDto = new ArrayList<>();
+        for (UserEntity user : users) {
+            GetUserDto userDto = new GetUserDto();
+            mapUserEntityToGet(user, userDto);
+            mapUserRolesAndContacts(user, userDto);
+            usersDto.add(userDto);
+        }
+        return usersDto;
+    }
+
     /**
      * Obtener un usuario por rpñ.
      * @param roleId identificador de rol.
@@ -547,13 +574,15 @@ public class UserServiceImpl implements UserService {
      * @return un booleano de confirmación.
      */
     @Override
-    public boolean verifyLogin(PostLoginDto postLoginDto) {
+    public GetUserDto verifyLogin(PostLoginDto postLoginDto) {
         GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());
         if (user == null) {
-            return false;
+            return null;
         }
-        return user.getPassword().equals(postLoginDto.getPassword());
-
+        if(passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())){
+            return user;
+        }
+        return null;
     }
 }
 

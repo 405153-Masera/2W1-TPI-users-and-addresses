@@ -60,6 +60,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      *
      * @return una lista de {@link UserEntity}
      */
+    @Query("SELECT u FROM UserEntity u " +
+            "JOIN UserRoleEntity ur ON ur.user.id = u.id " +
+            "JOIN RoleEntity r ON ur.role.id = r.id " +
+            "JOIN PlotUserEntity pu ON pu.user.id = u.id " +
+            "AND u.active = true")
+    Optional<List<UserEntity>> findUsersByPlotId(@Param("plotId") Integer plotId);
+
+
     @Query("SELECT o FROM UserEntity o WHERE o.active = true")
     List<UserEntity> findAllActives();
 }
