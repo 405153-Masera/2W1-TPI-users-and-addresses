@@ -9,6 +9,7 @@ import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.PlotUserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
@@ -53,6 +54,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RestContact restContact;
 
+    @Autowired
+    private PasswordUtil passwordEncoder;
+
+
     @Override
     @Transactional
     public GetUserDto createUser(PostUserDto postUserDto) {
@@ -60,6 +65,11 @@ public class UserServiceImpl implements UserService {
         // Validaciones por si el username o el email ya existen
         validateUsername(postUserDto.getUsername());
         validateEmail(postUserDto.getEmail());
+
+
+        // Encriptar la contraseña
+        String hashedPassword = passwordEncoder.hashPassword(postUserDto.getPassword());
+        postUserDto.setPassword(hashedPassword);
 
         // Crear un nuevo UserEntity y asignar los valores del DTO
         UserEntity userEntity = new UserEntity();
@@ -420,13 +430,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean verifyLogin(PostLoginDto postLoginDto) {
+    public GetUserDto verifyLogin(PostLoginDto postLoginDto) {
         GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());
         if (user == null) {
-            return false;
+            return null;
         }
-        return user.getPassword().equals(postLoginDto.getPassword());
-
+        if(passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())){
+            return user;
+        }
+        return null;
     }
 }
 

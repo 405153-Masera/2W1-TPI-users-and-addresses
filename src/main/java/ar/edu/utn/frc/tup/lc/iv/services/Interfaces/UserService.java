@@ -21,5 +21,5 @@ public interface UserService {
     GetUserDto getUserByPlotIdAndOwnerRole(Integer plotId);
     List<GetUserDto> getAllUsersByPlotId(Integer plotId);
     List<GetUserDto> getUsersByRole(Integer roleId);
-    boolean verifyLogin(PostLoginDto postLoginDto);
+    GetUserDto verifyLogin(PostLoginDto postLoginDto);
 }

@@ -140,18 +140,4 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-    // Se maneja en post x temas de seguridad
-    @PostMapping("/login")
-    public ResponseEntity<Boolean> login(@RequestBody PostLoginDto postLoginDto) {
-        boolean result = userService.verifyLogin(postLoginDto);
-
-        //Si no está registrado
-        if(!result){
-            return ResponseEntity.notFound().build();
-        }
-
-        //Está registrado
-        return ResponseEntity.ok(result);
-    }
-
 }
