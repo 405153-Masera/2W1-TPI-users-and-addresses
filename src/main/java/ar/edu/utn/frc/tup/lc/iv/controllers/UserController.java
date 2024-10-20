@@ -1,7 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
@@ -9,11 +8,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -131,7 +128,7 @@ public class UserController {
     }
 
     @GetMapping("all/plot/{plotId}")
-    public ResponseEntity<List<GetUserDto>> getAllUsersByPlotIdAndOwnerRole(@PathVariable Integer plotId) {
+    public ResponseEntity<List<GetUserDto>> getAllUsersByPlotId(@PathVariable Integer plotId) {
         List<GetUserDto> result = userService.getAllUsersByPlotId(plotId);
         if(result == null){
             return ResponseEntity.notFound().build();

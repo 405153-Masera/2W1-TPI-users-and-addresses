@@ -393,7 +393,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
-        Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotIdAndOwnerRole(plotId);
+        Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotId(plotId);
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("Users not found with plot id: " + plotId);
         }
