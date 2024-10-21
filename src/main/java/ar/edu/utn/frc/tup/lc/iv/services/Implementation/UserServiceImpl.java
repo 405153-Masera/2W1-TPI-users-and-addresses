@@ -20,6 +20,9 @@ import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,9 @@ import java.util.stream.Collectors;
  * contiene toda la lógica relacionada con usuarios.
  */
 @Service
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserServiceImpl implements UserService {
 
     /**
@@ -85,7 +92,7 @@ public class UserServiceImpl implements UserService {
      * @param postUserDto
      * @return el usuario creado.
      * @throws EntityNotFoundException sí no encuentra un rol con la descripción asignada.
-     * @throws RuntimeException si falla el intento de guardar contactos.
+     * @throws IllegalStateException si falla el intento de guardar contactos.
      */
     @Override
     @Transactional
@@ -115,14 +122,17 @@ public class UserServiceImpl implements UserService {
         // Lista para almacenar los roles encontrados
         List<String> assignedRoles = new ArrayList<>();
 
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        RoleEntity roleEntity = new RoleEntity();
+        userRoleEntity = new UserRoleEntity();
+
         // Asociar roles al usuario
         for (String roleDesc : roleDescriptions) {
             // Buscar el rol por su descripción
-            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
+            roleEntity = roleRepository.findByDescription(roleDesc);
 
             if (roleEntity != null) {
                 // Crear una nueva relación en la tabla intermedia UserRoles
-                UserRoleEntity userRoleEntity = new UserRoleEntity();
                 mapUserRolEntity(userRoleEntity, savedUser, roleEntity);
                 userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
                 userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
@@ -146,7 +156,7 @@ public class UserServiceImpl implements UserService {
         boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
 
         if (!emailSaved && !phoneSaved) {
-            throw new RuntimeException("Failed to save contact information.");
+            throw new IllegalStateException("Failed to save contact information.");
         }
 
         // Mapear el UserEntity guardado a GetUserDto
@@ -246,7 +256,7 @@ public class UserServiceImpl implements UserService {
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
         for (GetContactDto contactDto : contactDtos) {
             if (contactDto.getType_contact() == 1) { // Si el valor es 1, es un email
-                getUserDto.setEmail(contactDto.getValue().toLowerCase()); //Guardamos email en minuscula
+                getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES"))); //Guardamos email en minuscula
             } else { // Si no, es un teléfono
                 getUserDto.setPhone_number(contactDto.getValue()); //Guardamos el telefono
             }
@@ -299,20 +309,16 @@ public class UserServiceImpl implements UserService {
      *
      * @return una lista con todos los usuarios.
      */
+    @Override
     public List<GetUserDto> getAllUsers() {
-        List<UserEntity> userEntities = userRepository.findAllActives();
-
-        List<GetUserDto> getUserDtos = userEntities.stream()
+        return userRepository.findAllActives().stream()
                 .map(userEntity -> {
                     GetUserDto getUserDto = new GetUserDto();
                     mapUserEntityToGet(userEntity, getUserDto);
                     mapUserRolesAndContacts(userEntity, getUserDto);
-
                     return getUserDto;
                 })
                 .collect(Collectors.toList());
-
-        return getUserDtos;
     }
 
     /**
@@ -386,6 +392,7 @@ public class UserServiceImpl implements UserService {
 
         // Asignar los nuevos roles al usuario
         List<String> assignedRoles = new ArrayList<>();
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
         for (String roleDesc : roles) {
             // Buscar el rol por su descripción
             RoleEntity role = roleRepository.findByDescription(roleDesc);
@@ -394,9 +401,6 @@ public class UserServiceImpl implements UserService {
                         "Role not found with description: " + roleDesc
                 );
             }
-
-            // Crear una nueva relación en la tabla intermedia UserRoles
-            UserRoleEntity userRoleEntity = new UserRoleEntity();
 
             //Mapeamos la entidad UserRoleEntity
             userRoleEntity.setUser(user);
@@ -522,10 +526,17 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
-
+    /**
+     * Obtener una lista de usuarios activos por lote.
+     *
+     * @param plotId identificador de un lote.
+     * @throws EntityNotFoundException si no encuentra usuarios asignado al lote.
+     * @return lista de GetUserDto.
+     */
     @Override
     public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
         Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotId(plotId);
+        GetUserDto userDto = new GetUserDto();
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("Users not found with plot id: " + plotId);
         }
@@ -533,7 +544,6 @@ public class UserServiceImpl implements UserService {
         List<UserEntity> users = userEntity.get();
         List<GetUserDto> usersDto = new ArrayList<>();
         for (UserEntity user : users) {
-            GetUserDto userDto = new GetUserDto();
             mapUserEntityToGet(user, userDto);
             mapUserRolesAndContacts(user, userDto);
             usersDto.add(userDto);
@@ -579,12 +589,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             return null;
         }
-        if(passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())){
+        if (passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())) {
             return user;
         }
         return null;
     }
 }
-
-
-

@@ -73,6 +73,10 @@ public class SpringDocConfig {
         return new ModelResolver(objectMapper);
     }
 
+    /**
+     * PasswordUtil method.
+     * @return a PasswordUtil
+     */
     @Bean
     public PasswordUtil passwordUtil() {
         return new PasswordUtil();
