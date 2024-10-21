@@ -96,7 +96,6 @@ public class PostUserDto {
     /**
      * Identificador del lote asignado al usuario.
      */
-    @NotNull(message = "El id de lote no puede ser nulo")
     private Integer plot_id;
 
     /**
