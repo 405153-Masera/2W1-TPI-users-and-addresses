@@ -23,7 +23,3 @@ diagrama corresponde a un microservicio, y se representa mediante:
 
 <img width="2080" alt="Base de datos" src="https://github.com/user-attachments/assets/90f5b93b-efde-4939-8d28-58a76b3245f3">
 
-
-
-
-

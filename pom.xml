@@ -12,8 +12,8 @@
     <groupId>ar.edu.utn.frc.tup.lc.iv</groupId>
     <artifactId>tpi-scaffolding</artifactId>
     <version>0.0.1-SNAPSHOT</version> <!-- Change the artifact version every time you release a new version-->
-    <name>tpi-scaffolding</name> <!-- TODO: Change the project name -->
-    <description>TPI Initial Scaffolding</description> <!-- TODO: Change the project description -->
+    <name>tpi_users_and_addresses</name>
+    <description>TPI user and addresses microservice</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
@@ -64,7 +64,16 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
         <!--    H2 Data Base dependency    -->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -78,6 +87,33 @@
             <artifactId>modelmapper</artifactId>
             <version>${modelmapper.version}</version>
         </dependency>
+
+        <!--    Login   -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+
 
     </dependencies>
 
@@ -137,7 +173,6 @@
                 <version>3.6.0</version>
                 <configuration>
                     <source>17</source>
-                    <target>17</target>
                     <reportOutputDirectory>./docs/java_doc</reportOutputDirectory>
                 </configuration>
             </plugin>
@@ -188,7 +223,6 @@
                 <version>3.6.0</version>
                 <configuration>
                     <source>17</source>
-                    <target>17</target>
                     <reportOutputDirectory>./docs/java_doc</reportOutputDirectory>
                 </configuration>
             </plugin>
