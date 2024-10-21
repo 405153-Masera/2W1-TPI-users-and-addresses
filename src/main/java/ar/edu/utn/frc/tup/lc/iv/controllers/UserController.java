@@ -182,11 +182,16 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
-        //Está registrado
+    /**
+     * Obtiene una lista de usuario de rol "Owner" perteneciente a un lote específico.
+     *
+     * @param plotId del lote perteneciente al usuario a buscar.
+     * @return lista de usuarios encontrado.
+     */
     @GetMapping("getall/{plotId}")
     public ResponseEntity<List<GetUserDto>> getAllUsersByPlotId(@PathVariable Integer plotId) {
         List<GetUserDto> result = userService.getAllUsersByPlotId(plotId);
-        if(result == null){
+        if (result == null) {
             return ResponseEntity.notFound().build();
         }
 

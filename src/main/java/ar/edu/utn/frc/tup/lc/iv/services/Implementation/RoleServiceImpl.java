@@ -8,6 +8,9 @@ import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,9 @@ import java.util.stream.Collectors;
  * Implementacion de {@link RoleService},
  * contiene toda la lógica relacionada con roles.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class RoleServiceImpl implements RoleService {
 
@@ -48,6 +54,7 @@ public class RoleServiceImpl implements RoleService {
      *
      * @return una lista con todos los roles.
      */
+    @Override
     public List<GetRoleDto> getAllRoles() {
         List<RoleEntity> roleEntities = roleRepository.findAll();
 
@@ -67,20 +74,20 @@ public class RoleServiceImpl implements RoleService {
      * @return una lista con todos los roles coincidentes al usuario.
      * @throws RoleUserException si el usuario no tiene roles asignados o no existe.
      */
+    @Override
     public List<GetRoleDto> getRolesByUser(int userId) {
         List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
+        List<GetRoleDto> roles = new ArrayList<>();
+        GetRoleDto getRoleDto = new GetRoleDto();
         if (userRoles.isEmpty()) {
             throw new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND);
         }
-        List<GetRoleDto> roles = new ArrayList<>();
-
+        RoleEntity role = new RoleEntity();
         for (UserRoleEntity userRole : userRoles) {
 
-            RoleEntity role = roleRepository.findById(userRole.getRole().getId()).orElse(null);
+            role = roleRepository.findById(userRole.getRole().getId()).orElse(null);
 
             if (role != null) {
-                // Mapear RoleEntity a GetRoleDto
-                GetRoleDto getRoleDto = new GetRoleDto();
                 getRoleDto.setId(role.getId());
                 getRoleDto.setDescription(role.getDescription());
 

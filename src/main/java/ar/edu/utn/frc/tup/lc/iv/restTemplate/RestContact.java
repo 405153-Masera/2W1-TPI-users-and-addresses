@@ -51,6 +51,8 @@ public class RestContact {
 
         List<GetContactDto> contacts = new ArrayList<>();
 
+        GetContactDto contact = new GetContactDto();
+
         // Si hay algo, mapeamos y lo ponemos en la lista
         if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
@@ -58,8 +60,6 @@ public class RestContact {
                 String typeContact = node.get("contactType").get("id").asText();
                 String value = node.get("value").asText();
 
-                // Creamos el dto
-                GetContactDto contact = new GetContactDto();
                 contact.setType_contact(Integer.parseInt(typeContact));
                 contact.setValue(value);
 
@@ -85,7 +85,8 @@ public class RestContact {
                 String typeContact = node.get("contactType").get("id").asText();
                 String value = node.get("value").asText();
 
-                if (typeContact.equals("1")) {
+                // Coloca la literal primero en la comparación
+                if ("1".equals(typeContact)) {
                     emails.add(value);
                 }
             }
@@ -107,7 +108,8 @@ public class RestContact {
                 String contactValue = node.get("value").asText();
                 String contactType = node.get("contactType").get("id").asText();
 
-                if (contactType.equals("1") && contactValue.equals(email)) {
+                // Coloca la literal primero en las comparaciones
+                if ("1".equals(contactType) && email.equals(contactValue)) {
                     return node.get("userId").asInt();
                 }
             }
@@ -124,7 +126,6 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no guardar el contacto.
      */
     public boolean saveContact(Integer userId, String value, int contactType) {
-
         ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
         contact.setValue(value);
@@ -133,12 +134,13 @@ public class RestContact {
         try {
             ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
             return response.getStatusCode().is2xxSuccessful();
-
         } catch (HttpClientErrorException e) {
-            throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+            // Lanzar la excepción con la excepción original
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
+            // Lanzar la excepción con la excepción original
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Server error while creating the user" + e.getMessage());
+                    "Server error while creating the user: " + e.getMessage(), e);
         }
     }
 
@@ -162,10 +164,12 @@ public class RestContact {
             restTemplate.put(updateUrl, contact);
             return true;  // si no lanza excepciones, devolvemos true indicando éxito
         } catch (HttpClientErrorException e) {
-            throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+            // Lanzar la excepción con la excepción original
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
+            // Lanzar la excepción con la excepción original
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Server error while creating the user" + e.getMessage());
+                    "Server error while updating the contact: " + e.getMessage(), e);
         }
     }
 }

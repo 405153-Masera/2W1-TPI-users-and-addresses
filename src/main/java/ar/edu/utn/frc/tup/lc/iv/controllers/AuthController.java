@@ -5,8 +5,6 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.jwt.JwtUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,12 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
+/**
+ * Controlador REST para manejar operaciones de Autenticación.
+ *
+ * Expone Enpoints para gestionar un inicio de sesión utilizando JWT.
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
+    /** Servicio para manejar la lógica de usuarios. */
     @Autowired
     private UserService userService;
 
@@ -27,7 +30,8 @@ public class AuthController {
     /**
      * Devuelve la confirmación de un inicio de sesión exitoso.
      *
-     * @param postLoginDto credenciales del logueo.
+     * @param credentials credenciales del logueo.
+     * @throws IllegalArgumentException excepción credenciales invalidas.
      * @return respuesta de confirmación de logueo.
      */
     @PostMapping("/login")
@@ -59,7 +63,7 @@ public class AuthController {
             response.put("token", token);
             return response;
         } else {
-            throw new RuntimeException("Credenciales inválidas");
+            throw new IllegalArgumentException("Credenciales inválidas");
         }
     }
 

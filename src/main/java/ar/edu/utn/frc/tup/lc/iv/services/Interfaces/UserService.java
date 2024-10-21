@@ -93,5 +93,11 @@ public interface UserService {
      */
     GetUserDto verifyLogin(PostLoginDto postLoginDto);
 
+    /**
+     * Obtener una lista de usuarios activos por lote.
+     *
+     * @param plotId identificador de un lote.
+     * @return lista de GetUserDto.
+     */
     List<GetUserDto> getAllUsersByPlotId(Integer plotId);
 }
