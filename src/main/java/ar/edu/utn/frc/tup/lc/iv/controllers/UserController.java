@@ -102,18 +102,19 @@ public class UserController {
      * @param isActive estado de los usuarios a buscar.
      * @return una lista de usuarios.
      */
-    @GetMapping("/getall/status")
+    @GetMapping("/getall/status/{isActive}")
     public ResponseEntity<List<GetUserDto>> getUsersByStatus(@PathVariable boolean isActive) {
         List<GetUserDto> result = userService.getUsersByStatus(isActive);
 
-        //Si no trae la lista
+        // Si no trae la lista
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        //Si trae la lista
+        // Si trae la lista
         return ResponseEntity.ok(result);
     }
+
 
     /**
      * Retorna una lista de todos los usuarios por rol.
@@ -121,18 +122,19 @@ public class UserController {
      * @param roleId identificador del rol.
      * @return una lista de usuarios coincidentes con el rol.
      */
-    @GetMapping("/getall/role")
+    @GetMapping("/getall/role/{roleId}")
     public ResponseEntity<List<GetUserDto>> getUsersByRole(@PathVariable Integer roleId) {
         List<GetUserDto> result = userService.getUsersByRole(roleId);
 
-        //Si no trae la lista
+        // Si no trae la lista
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        //Si trae la lista
+        // Si trae la lista
         return ResponseEntity.ok(result);
     }
+
 
     /**
      * Baja logica de un usuario.

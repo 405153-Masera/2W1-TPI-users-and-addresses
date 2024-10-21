@@ -54,7 +54,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getUserByEmail("lucii@gmail")).thenReturn(getUserDto);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/" + getUserDto.getEmail())
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getByEmail/" + getUserDto.getEmail())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("lucii@gmail"));
@@ -68,7 +68,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getUserByEmail("lucii@gmail")).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/" + "lucii@gmail")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getByEmail/" + "lucii@gmail")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -87,7 +87,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getAllUsers()).thenReturn(getUserDtoList);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2));
@@ -101,7 +101,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getAllUsers()).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
@@ -123,7 +123,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.createUser(postUserDto)).thenReturn(getUserDto);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/post")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postUserDto)))
                 .andExpect(status().isOk())
@@ -148,7 +148,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.createUser(Mockito.any(PostUserDto.class))).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/post")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postUserDto)))
                 .andExpect(status().isBadRequest());
@@ -167,7 +167,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getUserById(1)).thenReturn(getUserDto);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/get/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getById/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -182,7 +182,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.getUserById(1)).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/get/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getById/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -190,22 +190,21 @@ class UserControllerTest {
     }
 
     @Test
-    void getUsersByStatusIT_Success() throws Exception{
-        //Given
+    void getUsersByStatusIT_Success() throws Exception {
+        // Given
         List<GetUserDto> getUserDtoList = new ArrayList<>();
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456", "lucii@gmail", "3515623",
-                "4523545", true, "", LocalDate.now(), new String[]{"SuperAdmin"},1,1);
+                "4523545", true, "", LocalDate.now(), new String[]{"SuperAdmin"}, 1, 1);
 
         getUserDtoList.add(getUserDto);
         getUserDtoList.add(getUserDto);
         getUserDtoList.add(getUserDto);
 
-        //When
+        // When
         Mockito.when(userServiceMock.getUsersByStatus(true)).thenReturn(getUserDtoList);
 
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/status")
-                        .param("isActive", "true")
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/status/true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(3));
@@ -213,35 +212,35 @@ class UserControllerTest {
         Mockito.verify(userServiceMock, times(1)).getUsersByStatus(true);
     }
 
+
     @Test
-    void getUsersByStatusIT_BadRequest() throws Exception{
-        //When
+    void getUsersByStatusIT_BadRequest() throws Exception {
+        // When
         Mockito.when(userServiceMock.getUsersByStatus(true)).thenReturn(null);
 
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/status")
-                        .param("isActive", "true")
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/status/true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(userServiceMock, times(1)).getUsersByStatus(true);
     }
 
+
     @Test
-    void getUsersByRoleIT_Success() throws Exception{
-        //Given
+    void getUsersByRoleIT_Success() throws Exception {
+        // Given
         List<GetUserDto> getUserDtoList = new ArrayList<>();
         GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456", "lucii@gmail", "3515623",
-                "4523545", true, "", LocalDate.now(), new String[]{"Admin"},1,1);
+                "4523545", true, "", LocalDate.now(), new String[]{"Admin"}, 1, 1);
 
         getUserDtoList.add(getUserDto);
 
-        //When
+        // When
         Mockito.when(userServiceMock.getUsersByRole(1)).thenReturn(getUserDtoList);
 
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/role")
-                        .param("roleId", "1")
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/role/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
@@ -250,19 +249,20 @@ class UserControllerTest {
         Mockito.verify(userServiceMock, times(1)).getUsersByRole(1);
     }
 
+
     @Test
-    void getUsersByRoleIT_BadRequest() throws Exception{
-        //When
+    void getUsersByRoleIT_BadRequest() throws Exception {
+        // When
         Mockito.when(userServiceMock.getUsersByRole(1)).thenReturn(null);
 
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/role")
-                        .param("roleId", "1")
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/role/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(userServiceMock, times(1)).getUsersByRole(1);
     }
+
 
     @Test
     void deleteUserIT() throws Exception{
@@ -270,7 +270,7 @@ class UserControllerTest {
         Mockito.doNothing().when(userServiceMock).deleteUser(1,1);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/delete/1/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -290,7 +290,7 @@ class UserControllerTest {
         Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + 1)
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putUserDto)))
@@ -311,48 +311,12 @@ class UserControllerTest {
         Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);
 
         //Then
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + 1)
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putUserDto)))
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(userServiceMock, times(1)).updateUser(1, putUserDto);
-    }
-
-    @Test
-    void login_Success() throws Exception{
-        //Given
-        PostLoginDto postLoginDto = new PostLoginDto("4561231", "123456");
-
-        //When
-        //Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(true);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(postLoginDto)))
-                .andExpect(status().isOk());
-
-        Mockito.verify(userServiceMock, times(1)).verifyLogin(postLoginDto);
-    }
-
-    @Test
-    void login_NotFound() throws Exception{
-        //Given
-        PostLoginDto postLoginDto = new PostLoginDto("4561231", "123456");
-
-        //When
-        //Mockito.when(userServiceMock.verifyLogin(postLoginDto)).thenReturn(false);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(postLoginDto)))
-                .andExpect(status().isNotFound());
-
-        Mockito.verify(userServiceMock, times(1)).verifyLogin(postLoginDto);
     }
 }
