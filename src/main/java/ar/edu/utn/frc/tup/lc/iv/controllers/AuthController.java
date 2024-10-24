@@ -67,5 +67,17 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/validateToken")
+    public Map<String, String> validateToken(@RequestBody String token) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            JwtUtil.validateToken(token);
+            response.put("message", "Token válido");
+        } catch (IllegalArgumentException e) {
+            response.put("message", "Token inválido");
+        }
+        return response;
+    }
+
 }
 

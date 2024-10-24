@@ -3,6 +3,8 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,10 @@ public class UserController {
     /** Servicio para manejar la lógica de usuarios. */
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RestAccess restAccess;
+
 
     /**
      * Guarda un nuevo usuario.
@@ -198,6 +204,13 @@ public class UserController {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/access")
+    public ResponseEntity<Void> postAccess(@RequestBody AccessPost accessPost) {
+        List<AccessPost> lst = List.of(accessPost);
+        restAccess.postAccess(lst);
+        return ResponseEntity.noContent().build();
     }
 
 }
