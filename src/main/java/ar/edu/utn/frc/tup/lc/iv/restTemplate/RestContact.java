@@ -51,11 +51,14 @@ public class RestContact {
 
         List<GetContactDto> contacts = new ArrayList<>();
 
-        GetContactDto contact = new GetContactDto();
+        GetContactDto contact = null;
 
         // Si hay algo, mapeamos y lo ponemos en la lista
         if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
+
+                contact = new GetContactDto();
+
                 // tomamos los valores
                 String typeContact = node.get("contactType").get("id").asText();
                 String value = node.get("value").asText();

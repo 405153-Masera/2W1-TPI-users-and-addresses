@@ -254,6 +254,7 @@ public class UserServiceImpl implements UserService {
 
         // Buscamos los contactos del usuario y los asignamos
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
+        System.out.println("Contactos:" + contactDtos);
         for (GetContactDto contactDto : contactDtos) {
             if (contactDto.getType_contact() == 1) { // Si el valor es 1, es un email
                 getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES"))); //Guardamos email en minuscula
