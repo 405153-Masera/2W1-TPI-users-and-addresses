@@ -219,5 +219,15 @@ public class UserController {
         restAccess.deleteAccess(accessPut.getDocument());
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/byOwner/{ownerId}")
+    public ResponseEntity<List<GetUserDto>> getUsersByOwner(@PathVariable Integer ownerId) {
+        List<GetUserDto> users = userService.getUsersByOwner(ownerId);
+        // Verifica si la lista está vacía
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay usuarios
+        } else {
+            return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
+        }
+    }
 
 }

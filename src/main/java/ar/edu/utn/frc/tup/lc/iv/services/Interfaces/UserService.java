@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Interfaces;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
@@ -100,4 +101,7 @@ public interface UserService {
      * @return lista de GetUserDto.
      */
     List<GetUserDto> getAllUsersByPlotId(Integer plotId);
+
+    List<GetPlotUserDto> getAllPlotUsers();
+    List<GetUserDto> getUsersByOwner(Integer ownerId);
 }
