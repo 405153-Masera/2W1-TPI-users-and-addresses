@@ -1,13 +1,13 @@
-CREATE DATABASE IF NOT EXISTS contacts;
+--CREATE DATABASE IF NOT EXISTS contacts;
 
-CREATE USER IF NOT EXISTS 'contact_user'@'%' IDENTIFIED BY 'contact_password';
-GRANT ALL PRIVILEGES ON contacts.* TO 'contact_user'@'%';
-FLUSH PRIVILEGES;
+--CREATE USER IF NOT EXISTS 'contact_user'@'%' IDENTIFIED BY 'contact_password';
+--GRANT ALL PRIVILEGES ON contacts.* TO 'contact_user'@'%';
+--FLUSH PRIVILEGES;
 
-USE contacts;
+--USE contacts;
 
 -- Tabla PersonType
-CREATE TABLE IF NOT EXISTS person_type (
+CREATE TABLE person_type (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(255),
     created_datetime DATETIME,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS person_type (
     );
 
 -- Tabla ContactType
-CREATE TABLE IF NOT EXISTS contact_type (
+CREATE TABLE contact_type (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type VARCHAR(255),
     created_datetime DATETIME,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS contact_type (
     );
 
 -- Tabla Contact
-CREATE TABLE IF NOT EXISTS contact (
+CREATE TABLE contact (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     person_type_id INT,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS contact (
     );
 
 -- Tablas de auditoría
-CREATE TABLE IF NOT EXISTS person_type_audit (
+CREATE TABLE person_type_audit (
     id VARCHAR(255) PRIMARY KEY,
     person_type_id INT,
     version INT,
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS person_type_audit (
     last_updated_user INT
     );
 
-CREATE TABLE IF NOT EXISTS contact_type_audit (
-                                                  id VARCHAR(255) PRIMARY KEY,
+CREATE TABLE contact_type_audit (
+    id VARCHAR(255) PRIMARY KEY,
     contact_type_id INT,
     version INT,
     type VARCHAR(255),
@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS contact_type_audit (
     last_updated_user INT
     );
 
-CREATE TABLE IF NOT EXISTS contact_audit (
-                                             id VARCHAR(255) PRIMARY KEY,
+CREATE TABLE contact_audit (
+    id VARCHAR(255) PRIMARY KEY,
     contact_id INT,
     version INT,
     user_id INT,

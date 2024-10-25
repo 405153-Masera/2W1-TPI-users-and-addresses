@@ -27,4 +27,10 @@ public class ContactPutRequest {
      */
     @NotBlank(message = "El valor no puede estar vacío")
     private String value;
+
+    /**
+     * ID del editor que creó el contacto.
+     */
+    @NotNull(message = "El ID del editor no puede estar vacío")
+    private Integer editorId;
 }

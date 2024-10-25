@@ -163,8 +163,8 @@ public class UserServiceImpl implements UserService {
         plotUserRepository.save(plotUserEntity);
 
         //guardar contactos
-        boolean emailSaved = restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1);
-        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2);
+        boolean emailSaved = restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1, savedUser.getCreatedUser());
+        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2, savedUser.getCreatedUser());
 
         if (!emailSaved && !phoneSaved) {
             throw new IllegalStateException("Failed to save contact information.");
@@ -508,8 +508,8 @@ public class UserServiceImpl implements UserService {
             assignedRoles.add(roleDesc);
         }
         // Actualizar los contactos del usuario
-        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1);
-        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2);
+        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1,putUserDto.getUserUpdateId());
+        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2,putUserDto.getUserUpdateId());
 
         // Mapear el usuario actualizado a GetUserDto
         GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);

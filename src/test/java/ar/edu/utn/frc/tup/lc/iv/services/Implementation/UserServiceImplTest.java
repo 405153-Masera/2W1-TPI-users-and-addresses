@@ -161,8 +161,8 @@ class UserServiceImplTest {
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userEntity);
         when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
         when(userRoleRepositoryMock.save(any(UserRoleEntity.class))).thenReturn(userRoleEntity);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1)).thenReturn(true);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2)).thenReturn(true);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1,1)).thenReturn(true);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2,1)).thenReturn(true);
         when(plotUserRepositoryMock.save(any(PlotUserEntity.class))).thenReturn(plotUserEntity);
 
         // Then

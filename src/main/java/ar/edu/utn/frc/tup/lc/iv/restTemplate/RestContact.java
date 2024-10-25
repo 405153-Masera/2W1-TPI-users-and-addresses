@@ -36,7 +36,7 @@ public class RestContact {
     /**
      * Direccion url donde se levanta el microservicio de contactos.
      */
-    private String url = "http://localhost:8083/contact/search";
+    private String url = "http://localhost:8010/contact/search";
 
     /**
      * Metodo para obtener una lista de contactos según una id de usuario.
@@ -126,13 +126,15 @@ public class RestContact {
      * @param userId identificador de un usuario.
      * @param value valor del contacto a guardar.
      * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
+     * @param editorId identificador del usuario que guarda el contacto.
      * @return un booleano indicando si se pudo o no guardar el contacto.
      */
-    public boolean saveContact(Integer userId, String value, int contactType) {
+    public boolean saveContact(Integer userId, String value, int contactType , int editorId) {
         ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
         contact.setValue(value);
         contact.setContactTypeId(contactType);
+        contact.setEditorId(editorId);
 
         try {
             ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
@@ -155,12 +157,13 @@ public class RestContact {
      * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
      * @return un booleano indicando si se pudo o no modificar el contacto.
      */
-    public boolean updateContact(Integer userId, String value, int contactType) {
+    public boolean updateContact(Integer userId, String value, int contactType, int editorId) {
         String updateUrl = "http://localhost:8083/contact/owner/" + userId;
 
         ContactPutRequest contact = new ContactPutRequest();
         contact.setValue(value);
         contact.setContactTypeId(contactType);
+        contact.setEditorId(editorId);
 
         try {
             // Hacemos un PUT al microservicio de contactos

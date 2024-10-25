@@ -83,7 +83,7 @@ class RestContactTest {
         when(restTemplate.postForEntity(anyString(), any(ContactRequest.class), eq(Void.class)))
                 .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
-        boolean result = restContact.saveContact(userId, value, contactType);
+        boolean result = restContact.saveContact(userId, value, contactType,1);
 
         assertTrue(result);
     }
