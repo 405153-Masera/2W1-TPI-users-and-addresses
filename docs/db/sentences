@@ -10,6 +10,7 @@ CREATE TABLE users (
                        lastname VARCHAR(255),
                        username VARCHAR(255),
                        password VARCHAR(255),
+                       dni VARCHAR(255),
                        dni_type_id INT,
                        active TINYINT(1),
                        avatar_url VARCHAR(255),
@@ -76,7 +77,8 @@ CREATE TABLE users_audit (
                              lastname VARCHAR(255),
                              username VARCHAR(255),
                              password VARCHAR(255),
-                             dni INT,
+                             dni VARCHAR(255),
+                             dni_type_id INT,
                              active TINYINT(1),
                              avatar_url VARCHAR(255),
                              birth_date DATE,
@@ -142,8 +144,8 @@ CREATE TRIGGER trg_users_insert
     AFTER INSERT ON users
     FOR EACH ROW
 BEGIN
-    INSERT INTO users_audit (id, version, name, lastname, username, password, dni, active, avatar_url, birth_date, telegram_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
-    VALUES (NEW.id, 1, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni_type_id, NEW.active, NEW.avatar_url, NEW.birth_date, NEW.telegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+    INSERT INTO users_audit (id, version, name, lastname, username, password, dni_type_id, dni, active, avatar_url, birth_date, telegram_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, 1, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni_type_id,NEW.dni , NEW.active, NEW.avatar_url, NEW.birth_date, NEW.telegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
 END $$
 
 -- Trigger para actualizar en la auditoría de Users
@@ -155,8 +157,8 @@ BEGIN
     SELECT MAX(version) INTO latest_version FROM users_audit WHERE id = NEW.id;
     SET latest_version = IFNULL(latest_version, 0) + 1;
 
-    INSERT INTO users_audit (id, version, name, lastname, username, password, dni, active, avatar_url, birth_date, telegram_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
-    VALUES (NEW.id, latest_version, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni_type_id, NEW.active, NEW.avatar_url, NEW.birth_date, NEW.telegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
+    INSERT INTO users_audit (id, version, name, lastname, username, password, dni_type_id, dni, active, avatar_url, birth_date, telegram_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
+    VALUES (NEW.id, latest_version, NEW.name, NEW.lastname, NEW.username, NEW.password, NEW.dni_type_id, NEW.dni, NEW.active, NEW.avatar_url, NEW.birth_date, NEW.telegram_id, NEW.created_datetime, NEW.last_updated_datetime, NEW.created_user, NEW.last_updated_user);
 END $$
 
 -- Trigger para insertar en la auditoría de PlotUsers
