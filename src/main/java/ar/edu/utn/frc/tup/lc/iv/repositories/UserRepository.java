@@ -76,4 +76,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      */
     @Query("SELECT o FROM UserEntity o WHERE o.active = true")
     List<UserEntity> findAllActives();
+
+    /**
+     * Busca un usuario por su dni.
+     *
+     * @param dni numero de dni.
+     * @return un {@link UserEntity}
+     */
+    UserEntity findByDni(String dni);
 }

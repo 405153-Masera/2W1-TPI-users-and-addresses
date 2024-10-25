@@ -59,6 +59,11 @@ public class GetUserDto {
     private String dni;
 
     /**
+     * Tipo de DNI del usuario.
+     */
+    private String dni_type;
+
+    /**
      * Representa sí el usuario está activo o no.
      */
     private Boolean active;

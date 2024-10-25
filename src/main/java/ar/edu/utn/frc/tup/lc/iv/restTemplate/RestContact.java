@@ -137,7 +137,7 @@ public class RestContact {
         contact.setEditorId(editorId);
 
         try {
-            ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8083/contact/owner", contact, Void.class);
+            ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8010/contact/owner", contact, Void.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e) {
             // Lanzar la excepción con la excepción original
@@ -158,9 +158,11 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no modificar el contacto.
      */
     public boolean updateContact(Integer userId, String value, int contactType, int editorId) {
-        String updateUrl = "http://localhost:8083/contact/owner/" + userId;
+        String updateUrl = "http://localhost:8010/contact/update?userId="+userId+"&personTypeId=3&contactTypeId="+contactType;
 
         ContactPutRequest contact = new ContactPutRequest();
+        contact.setUserId(userId);
+        contact.setPersonTypeId(3);
         contact.setValue(value);
         contact.setContactTypeId(contactType);
         contact.setEditorId(editorId);

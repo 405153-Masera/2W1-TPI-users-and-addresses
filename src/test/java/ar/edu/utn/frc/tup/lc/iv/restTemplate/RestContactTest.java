@@ -96,7 +96,7 @@ class RestContactTest {
 
         doNothing().when(restTemplate).put(anyString(), any(ContactRequest.class));
 
-        boolean result = restContact.updateContact(userId, value, contactType);
+        boolean result = restContact.updateContact(userId, value, contactType,1);
         assertTrue(result);
     }
 }

@@ -52,10 +52,17 @@ public class UserEntity {
     private String password;
 
     /**
-     * Número de DNI del usuario.
+     * Valor del dni del usuario.
      */
     @Column
     private String dni;
+
+    /**
+     * Identificador de tipo de dni del usuario.
+     */
+    @ManyToOne
+    @JoinColumn(name = "dni_type_id")
+    private DniTypeEntity dniType;
 
     /**
      * Representa sí el usuario está activo o no.

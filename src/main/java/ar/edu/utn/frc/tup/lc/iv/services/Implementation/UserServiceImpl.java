@@ -12,10 +12,7 @@ import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
-import ar.edu.utn.frc.tup.lc.iv.repositories.PlotUserRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
+import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessDocumentType;
@@ -69,6 +66,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private DniTypeRepository dniTypeRepository;
+
     /**
      * Repositorio para manejar UserRole entities.
      */
@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
         // Validaciones por si el username o el email ya existen
         validateUsername(postUserDto.getUsername());
         validateEmail(postUserDto.getEmail());
+        validateDni(postUserDto.getDni());
 
 
         // Encriptar la contraseña
@@ -176,6 +177,8 @@ public class UserServiceImpl implements UserService {
         getUserDto.setEmail(postUserDto.getEmail());
         getUserDto.setPhone_number(postUserDto.getPhone_number());
         getUserDto.setPlot_id(postUserDto.getPlot_id());
+        getUserDto.setDni(postUserDto.getDni());
+        getUserDto.setDni_type(dniTypeRepository.findById(postUserDto.getDni_type_id()).get().getDescription());
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
 //        AccessPost accessPost = new AccessPost();
@@ -288,6 +291,8 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastname(postUserDto.getLastname());
         userEntity.setUsername(postUserDto.getUsername());
         userEntity.setPassword(postUserDto.getPassword());
+        userEntity.setDniType(dniTypeRepository.findById(postUserDto.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")));
         userEntity.setDni(postUserDto.getDni());
         userEntity.setActive(postUserDto.getActive());
         userEntity.setAvatar_url(postUserDto.getAvatar_url());
@@ -313,6 +318,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setUsername(userEntity.getUsername());
         getUserDto.setPassword(userEntity.getPassword());
         getUserDto.setDni(userEntity.getDni());
+        getUserDto.setDni_type(dniTypeRepository.findById(userEntity.getDniType().getId()).get().getDescription());
         getUserDto.setActive(userEntity.getActive());
         getUserDto.setAvatar_url(userEntity.getAvatar_url());
         getUserDto.setDatebirth(userEntity.getDatebirth());
@@ -381,6 +387,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    public void validateDni(String dni){
+        if (userRepository.findByDni(dni) != null) {
+            throw new IllegalArgumentException("Error creating user: dni already in use.");
+        }
+    }
+
     /**
      * Metodo para validar si existe un email igual guardado en la
      * base de datos.
@@ -442,6 +454,8 @@ public class UserServiceImpl implements UserService {
         userEntity.setName(putUserDto.getName());
         userEntity.setLastname(putUserDto.getLastName());
         userEntity.setDni(putUserDto.getDni());
+        userEntity.setDniType(dniTypeRepository.findById(putUserDto.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")));
         userEntity.setAvatar_url(putUserDto.getAvatar_url());
         userEntity.setDatebirth(putUserDto.getDatebirth());
         userEntity.setLastUpdatedDate(LocalDateTime.now());

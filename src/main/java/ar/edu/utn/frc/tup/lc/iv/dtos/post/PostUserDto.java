@@ -61,6 +61,12 @@ public class PostUserDto {
     /**
      * Numero de DNI del usuario.
      */
+    @NotNull(message = "El tipo de DNI no puede ser nulo")
+    private Integer dni_type_id;
+
+    /**
+     * Numero de DNI del usuario.
+     */
     @NotNull(message = "El DNI no puede ser nulo")
     @Size(min = 1, max = 11, message = "El DNI debe ser valido")
     private String dni;

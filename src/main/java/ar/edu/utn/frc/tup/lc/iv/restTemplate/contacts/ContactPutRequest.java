@@ -14,12 +14,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ContactPutRequest {
 
+    @NotNull(message = "El id del ususario no puede ser nula")
+    private Integer userId;
+
     /**
      * ID del tipo de contacto (ejemplo: email, teléfono).
      * No puede ser nulo.
      */
     @NotNull(message = "El tipo de contacto no puede ser nulo")
     private Integer contactTypeId;
+
+    /**
+     * ID del tipo de contacto (ejemplo: email, teléfono).
+     * No puede ser nulo.
+     */
+    @NotNull(message = "El tipo de contacto no puede ser nulo")
+    private Integer personTypeId;
 
     /**
      * Valor del contacto (ejemplo: dirección de email o número de teléfono).
