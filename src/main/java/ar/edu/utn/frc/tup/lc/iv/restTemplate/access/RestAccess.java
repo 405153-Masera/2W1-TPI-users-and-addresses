@@ -33,11 +33,11 @@ public class RestAccess {
 
 
     public void postAccess(List<AccessPost> accessPost) {
-        restTemplate.postForEntity(url + "/register", accessPost, AccessPost.class);
+        restTemplate.postForEntity(url + "/register", accessPost, Void.class);
     }
 
-    public void deleteAccess(Integer dni) {
-        restTemplate.postForEntity(url + "/unsubscribe/" + dni, null, Integer.class);
+    public void deleteAccess(String document) {
+        restTemplate.put("http://localhost:8090/owner-tenant" + "/unsubscribe/" + document, null, Void.class);
     }
 
 

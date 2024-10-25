@@ -16,6 +16,10 @@ import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessDocumentType;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessUserAllowedType;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,10 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +82,10 @@ public class UserServiceImpl implements UserService {
     /** Servicio para manejar el restTemplate de contactos. */
     @Autowired
     private RestContact restContact;
+
+    /** Servicio para manejar el restTemplate de accesos. */
+    @Autowired
+    private RestAccess restAccess;
 
     /** Servicio para encriptar y desencriptar contraseñas. */
     @Autowired
@@ -165,6 +170,31 @@ public class UserServiceImpl implements UserService {
         getUserDto.setEmail(postUserDto.getEmail());
         getUserDto.setPhone_number(postUserDto.getPhone_number());
         getUserDto.setPlot_id(postUserDto.getPlot_id());
+
+        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
+//        AccessPost accessPost = new AccessPost();
+//        accessPost.setDocument(postUserDto.getDni());
+//        accessPost.setName(postUserDto.getName());
+//        accessPost.setLast_name(postUserDto.getLastname());
+//        AccessDocumentType accessDocumentType = new AccessDocumentType();
+//        accessDocumentType.setDescription("DNI");
+//        accessPost.setDocumentType(accessDocumentType);
+//        AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
+//
+//        for(String role : postUserDto.getRoles()){
+//            if(role.equals("Owner")){
+//                accessUserAllowedType.setDescription("Owner");
+//            }
+//        }
+//        if(accessUserAllowedType.getDescription() == null){
+//            accessUserAllowedType.setDescription("Tenant");
+//        }
+//        accessPost.setUser_allowed_Type(accessUserAllowedType);
+//        accessPost.setEmail(postUserDto.getEmail());
+//
+//        List<AccessPost> accessPosts = new ArrayList<>();
+//        accessPosts.add(accessPost);
+//        restAccess.postAccess(accessPosts);
 
         return getUserDto;
     }
@@ -480,6 +510,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastUpdatedUser(userUpdateId);
         // Guardar los cambios en la base de datos
         userRepository.save(userEntity);
+        //restAccess.deleteAccess(userEntity.getDni()); todo: Descomentar cuando se necesite postear a accesso
     }
 
     /**

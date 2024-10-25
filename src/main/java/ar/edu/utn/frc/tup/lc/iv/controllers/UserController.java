@@ -4,6 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.validation.Valid;
@@ -210,6 +211,12 @@ public class UserController {
     public ResponseEntity<Void> postAccess(@RequestBody AccessPost accessPost) {
         List<AccessPost> lst = List.of(accessPost);
         restAccess.postAccess(lst);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/access/delete")
+    public ResponseEntity<Void> putAccess(@RequestBody AccessPut accessPut) {
+        restAccess.deleteAccess(accessPut.getDocument());
         return ResponseEntity.noContent().build();
     }
 
