@@ -80,6 +80,12 @@ public class GetUserDto {
     private LocalDate datebirth;
 
     /**
+     * Fecha de creacion del usuario.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDate create_date;
+
+    /**
      * Lista de los roles que tiene el usuario.
      */
     private String[] roles;

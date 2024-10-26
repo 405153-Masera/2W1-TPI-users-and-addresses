@@ -320,6 +320,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setAvatar_url(userEntity.getAvatar_url());
         getUserDto.setDatebirth(userEntity.getDatebirth());
         getUserDto.setTelegram_id(userEntity.getTelegram_id());
+        getUserDto.setCreate_date(userEntity.getCreatedDate().toLocalDate());
 
         PlotUserEntity plotUserEntity = plotUserRepository.findByUser(userEntity);
         if (plotUserEntity != null) {
