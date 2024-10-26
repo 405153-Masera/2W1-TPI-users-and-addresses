@@ -28,6 +28,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private RestPlotOwner restPlotOwner;
 
@@ -114,7 +117,6 @@ public class UserServiceImpl implements UserService {
         validateEmail(postUserDto.getEmail());
         validateDni(postUserDto.getDni());
 
-
         // Encriptar la contraseña
         String hashedPassword = passwordEncoder.hashPassword(postUserDto.getPassword());
         postUserDto.setPassword(hashedPassword);
@@ -123,10 +125,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = new UserEntity();
         //Mapeamos con el metodo
         mapUserPostToUserEntity(userEntity, postUserDto);
-        System.out.println(userEntity);
         // Guardar el usuario en la base de datos
         UserEntity savedUser = userRepository.save(userEntity);
-        System.out.println(savedUser);
 
         // Obtener los roles del PostUserDto
         String[] roleDescriptions = postUserDto.getRoles();
@@ -134,18 +134,15 @@ public class UserServiceImpl implements UserService {
         // Lista para almacenar los roles encontrados
         List<String> assignedRoles = new ArrayList<>();
 
-        UserRoleEntity userRoleEntity = new UserRoleEntity();
-        RoleEntity roleEntity = new RoleEntity();
-        userRoleEntity = new UserRoleEntity();
-
         // Asociar roles al usuario
         for (String roleDesc : roleDescriptions) {
             // Buscar el rol por su descripción
-            roleEntity = roleRepository.findByDescription(roleDesc);
+            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
 
             if (roleEntity != null) {
                 // Crear una nueva relación en la tabla intermedia UserRoles
-                mapUserRolEntity(userRoleEntity, savedUser, roleEntity);
+                UserRoleEntity userRoleEntity = new UserRoleEntity();
+                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
                 userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
                 userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
                 // Guardar la relación en la tabla intermedia
@@ -350,7 +347,6 @@ public class UserServiceImpl implements UserService {
 
         // Buscamos los contactos del usuario y los asignamos
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
-        System.out.println("Contactos:" + contactDtos);
         for (GetContactDto contactDto : contactDtos) {
             if (contactDto.getType_contact() == 1) { // Si el valor es 1, es un email
                 getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES"))); //Guardamos email en minuscula
