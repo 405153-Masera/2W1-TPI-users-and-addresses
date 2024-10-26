@@ -3,6 +3,16 @@
 
 --USE users;
 
+-- Tabla dni_type
+CREATE TABLE dni_type (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          description VARCHAR(255),
+                          created_datetime DATETIME,
+                          last_updated_datetime DATETIME,
+                          created_user INT,
+                          last_updated_user INT
+);
+
 -- Tabla users
 CREATE TABLE users (
                        id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,16 +31,6 @@ CREATE TABLE users (
                        created_user INT,
                        last_updated_user INT,
                        FOREIGN KEY (dni_type_id) REFERENCES dni_type(id)
-);
-
--- Tabla dni_type
-CREATE TABLE dni_type (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          description VARCHAR(255),
-                          created_datetime DATETIME,
-                          last_updated_datetime DATETIME,
-                          created_user INT,
-                          last_updated_user INT
 );
 
 -- Tabla plotusers
