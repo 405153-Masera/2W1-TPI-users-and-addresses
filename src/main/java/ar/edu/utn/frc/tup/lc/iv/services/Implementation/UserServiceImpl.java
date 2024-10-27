@@ -639,7 +639,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<GetUserDto> getAllUsersByPlotId(Integer plotId) {
         Optional<List<UserEntity>> userEntity = userRepository.findUsersByPlotId(plotId);
-        GetUserDto userDto = new GetUserDto();
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("Users not found with plot id: " + plotId);
         }
@@ -647,6 +646,7 @@ public class UserServiceImpl implements UserService {
         List<UserEntity> users = userEntity.get();
         List<GetUserDto> usersDto = new ArrayList<>();
         for (UserEntity user : users) {
+            GetUserDto userDto = new GetUserDto();
             mapUserEntityToGet(user, userDto);
             mapUserRolesAndContacts(user, userDto);
             usersDto.add(userDto);
