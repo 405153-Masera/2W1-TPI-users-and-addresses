@@ -494,7 +494,6 @@ public class UserServiceImpl implements UserService {
 
         // Asignar los nuevos roles al usuario
         List<String> assignedRoles = new ArrayList<>();
-        UserRoleEntity userRoleEntity = new UserRoleEntity();
         for (String roleDesc : roles) {
             // Buscar el rol por su descripción
             RoleEntity role = roleRepository.findByDescription(roleDesc);
@@ -503,6 +502,8 @@ public class UserServiceImpl implements UserService {
                         "Role not found with description: " + roleDesc
                 );
             }
+
+            UserRoleEntity userRoleEntity = new UserRoleEntity();
 
             //Mapeamos la entidad UserRoleEntity
             userRoleEntity.setUser(user);
