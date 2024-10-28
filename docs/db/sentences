@@ -258,10 +258,11 @@ DELIMITER ;
 -- Insertar roles
 INSERT INTO roles (description, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES
-    ('Admin', NOW(), NOW(), 1, 1),
-    ('Owner', NOW(), NOW(), 1, 1),
-    ('Family Member', NOW(), NOW(), 1, 1),
-    ('Minor Member', NOW(), NOW(), 1, 1);
+    ('SuperAdmin', NOW(), NOW(), 1, 1),
+    ('Gerente', NOW(), NOW(), 1, 1),
+    ('Propietario', NOW(), NOW(), 1, 1),
+    ('Familiar mayor', NOW(), NOW(), 1, 1),
+    ('Familiar menor', NOW(), NOW(), 1, 1);
 
 -- Insertar tipos de DNI
 INSERT INTO dni_type (description, created_datetime, last_updated_datetime, created_user, last_updated_user)
