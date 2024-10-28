@@ -10,4 +10,5 @@ public class AccessPost {
     private AccessDocumentType documentType;
     private AccessUserAllowedType user_allowed_Type;
     private String email;
+    private Integer userId;
 }
