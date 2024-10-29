@@ -1,6 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
@@ -40,6 +42,25 @@ public class UserController {
     @PostMapping("/post")
     public ResponseEntity<GetUserDto> createUser(@Valid @RequestBody PostUserDto postUserDto) {
         GetUserDto result = userService.createUser(postUserDto);
+
+        //Si falla el service
+        if (result == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Crea el usuario
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Guarda un nuevo usuario.
+     *
+     * @param postUserDto body del usuario a guardar.
+     * @return el usuario creado.
+     */
+    @PostMapping("/post/owner")
+    public ResponseEntity<GetOwnerUserDto> createOwnerUser(@Valid @RequestBody PostOwnerUserDto postUserDto) {
+        GetOwnerUserDto result = userService.createOwnerUser(postUserDto);
 
         //Si falla el service
         if (result == null) {

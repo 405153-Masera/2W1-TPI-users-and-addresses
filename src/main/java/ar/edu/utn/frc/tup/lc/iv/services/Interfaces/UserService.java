@@ -1,8 +1,10 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Interfaces;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,14 @@ public interface UserService {
      * @return el usuario creado.
      */
     GetUserDto createUser(PostUserDto postUserDto);
+
+    /**
+     * Crea un usuario.
+     *
+     * @param postOwnerUserDto
+     * @return el usuario creado.
+     */
+    GetOwnerUserDto createOwnerUser(PostOwnerUserDto postOwnerUserDto);
 
     /**
      * Obtener todos los usuarios.

@@ -9,13 +9,12 @@ import java.time.LocalDate;
 
 /**
  * DTO que representa una respuesta que contiene la infromación de
- * un usuario.
+ * un usuario de tipo owner.
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetUserDto {
-
+public class GetOwnerUserDto {
     /**
      * Identificador único del usuario.
      */

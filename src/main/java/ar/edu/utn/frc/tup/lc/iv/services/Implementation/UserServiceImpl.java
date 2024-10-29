@@ -1,10 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotOwnerDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
@@ -33,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -173,7 +172,10 @@ public class UserServiceImpl implements UserService {
         getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
         getUserDto.setEmail(postUserDto.getEmail());
         getUserDto.setPhone_number(postUserDto.getPhone_number());
-        getUserDto.setPlot_id(postUserDto.getPlot_id());
+
+        List<Integer> plot = new ArrayList<>();
+
+        getUserDto.setPlot_id(plot.toArray(new Integer[postUserDto.getPlot_id()]));
         getUserDto.setDni(postUserDto.getDni());
         getUserDto.setDni_type(dniTypeRepository.findById(postUserDto.getDni_type_id()).get().getDescription());
 
@@ -188,12 +190,12 @@ public class UserServiceImpl implements UserService {
 //        AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
 //
 //        for(String role : postUserDto.getRoles()){
-//            if(role.equals("Owner")){
-//                accessUserAllowedType.setDescription("Owner");
+//            if(role.equals("Propieatrio")){
+//                accessUserAllowedType.setDescription("Propietario");
 //            }
 //        }
 //        if(accessUserAllowedType.getDescription() == null){
-//            accessUserAllowedType.setDescription("Tenant");
+//            accessUserAllowedType.setDescription("Inquilino");
 //        }
 //        accessPost.setUser_allowed_Type(accessUserAllowedType);
 //        accessPost.setEmail(postUserDto.getEmail());
@@ -204,6 +206,116 @@ public class UserServiceImpl implements UserService {
 
         return getUserDto;
     }
+
+    /**
+     * Crea un usuario de tipo owner.
+     *
+     * @param postOwnerUserDto
+     * @return el usuario creado.
+     * @throws EntityNotFoundException sí no encuentra un rol con la descripción asignada.
+     * @throws IllegalStateException si falla el intento de guardar contactos.
+     */
+    @Override
+    @Transactional
+    public GetOwnerUserDto createOwnerUser(PostOwnerUserDto postOwnerUserDto) {
+
+        // Validaciones por si el username o el email ya existen
+        validateUsername(postOwnerUserDto.getUsername());
+        validateEmail(postOwnerUserDto.getEmail());
+        validateDni(postOwnerUserDto.getDni());
+
+        // Encriptar la contraseña
+        String hashedPassword = passwordEncoder.hashPassword(postOwnerUserDto.getPassword());
+        postOwnerUserDto.setPassword(hashedPassword);
+
+        // Crear un nuevo UserEntity y asignar los valores del DTO
+        UserEntity userEntity = new UserEntity();
+        //Mapeamos con el metodo
+        mapOwnerUserPostToUserEntity(userEntity, postOwnerUserDto);
+        // Guardar el usuario en la base de datos
+        UserEntity savedUser = userRepository.save(userEntity);
+
+        // Obtener los roles del PostUserDto
+        String[] roleDescriptions = postOwnerUserDto.getRoles();
+
+        // Lista para almacenar los roles encontrados
+        List<String> assignedRoles = new ArrayList<>();
+
+        // Asociar roles al usuario
+        for (String roleDesc : roleDescriptions) {
+            // Buscar el rol por su descripción
+            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
+
+            if (roleEntity != null) {
+                // Crear una nueva relación en la tabla intermedia UserRoles
+                UserRoleEntity userRoleEntity = new UserRoleEntity();
+                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
+                userRoleEntity.setLastUpdatedUser(postOwnerUserDto.getUserUpdateId());
+                userRoleEntity.setCreatedUser(postOwnerUserDto.getUserUpdateId());
+                // Guardar la relación en la tabla intermedia
+                userRoleRepository.save(userRoleEntity);
+                // Agregar la descripción del rol a la lista de roles asignados
+                assignedRoles.add(roleDesc);
+            } else {
+                // Si no se encuentra el rol, lanzar una excepción
+                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
+            }
+        }
+
+        // Guardar relacion plotUser
+        Integer[] plots = postOwnerUserDto.getPlot_id();
+        for (Integer plot : plots) {
+            PlotUserEntity plotUserEntity = new PlotUserEntity();
+            mapPostOwnerToPlotUserEntity(plotUserEntity, postOwnerUserDto, savedUser, plot);
+            plotUserRepository.save(plotUserEntity);
+        }
+
+
+        //guardar contactos
+        boolean emailSaved = restContact.saveContact(savedUser.getId(), postOwnerUserDto.getEmail(), 1, savedUser.getCreatedUser());
+        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postOwnerUserDto.getPhone_number(), 2, savedUser.getCreatedUser());
+
+        if (!emailSaved && !phoneSaved) {
+            throw new IllegalStateException("Failed to save contact information.");
+        }
+
+        // Mapear el UserEntity guardado a GetUserDto
+        GetOwnerUserDto getUserDto = modelMapper.map(savedUser, GetOwnerUserDto.class);
+        getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
+        getUserDto.setEmail(postOwnerUserDto.getEmail());
+        getUserDto.setPhone_number(postOwnerUserDto.getPhone_number());
+        getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
+        getUserDto.setDni(postOwnerUserDto.getDni());
+        getUserDto.setDni_type(dniTypeRepository.findById(postOwnerUserDto.getDni_type_id()).get().getDescription());
+
+        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
+//        AccessPost accessPost = new AccessPost();
+//        accessPost.setDocument(postUserDto.getDni());
+//        accessPost.setName(postUserDto.getName());
+//        accessPost.setLast_name(postUserDto.getLastname());
+//        AccessDocumentType accessDocumentType = new AccessDocumentType();
+//        accessDocumentType.setDescription("DNI");
+//        accessPost.setDocumentType(accessDocumentType);
+//        AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
+//
+//        for(String role : postUserDto.getRoles()){
+//            if(role.equals("Propietario")){
+//                accessUserAllowedType.setDescription("Propietario");
+//            }
+//        }
+//        if(accessUserAllowedType.getDescription() == null){
+//            accessUserAllowedType.setDescription("Inquilino");
+//        }
+//        accessPost.setUser_allowed_Type(accessUserAllowedType);
+//        accessPost.setEmail(postUserDto.getEmail());
+//
+//        List<AccessPost> accessPosts = new ArrayList<>();
+//        accessPosts.add(accessPost);
+//        restAccess.postAccess(accessPosts);
+
+        return getUserDto;
+    }
+
     @Override
     public List<GetPlotUserDto> getAllPlotUsers() {
         List<PlotUserEntity> plotUserEntities = plotUserRepository.findAll();
@@ -277,6 +389,23 @@ public class UserServiceImpl implements UserService {
     };
 
     /**
+     * Metodo para mapear de un PostOwnerUserDto y un UserEntity
+     * a un PlotUserEntity.
+     *
+     * @param plotUserEntity un PlotUserEntity.
+     * @param postUserDto un PostUserDto.
+     * @param savedUser un UserEntity.
+     */
+    public void mapPostOwnerToPlotUserEntity(PlotUserEntity plotUserEntity, PostOwnerUserDto postUserDto, UserEntity savedUser, Integer plot) {
+        plotUserEntity.setPlotId(plot);
+        plotUserEntity.setUser(savedUser);
+        plotUserEntity.setCreatedDate(LocalDateTime.now());
+        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
+        plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
+        plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+    };
+
+    /**
      * Metodo para mapear de un PostUserDto a un UserEntity.
      *
      * @param userEntity un UserEntity.
@@ -302,6 +431,31 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Metodo para mapear de un PostOwnerUserDto a un UserEntity.
+     *
+     * @param userEntity un UserEntity.
+     * @param postUserDto un PostUserDto.
+     */
+    public void mapOwnerUserPostToUserEntity(UserEntity userEntity, PostOwnerUserDto postUserDto) {
+
+        userEntity.setName(postUserDto.getName());
+        userEntity.setLastname(postUserDto.getLastname());
+        userEntity.setUsername(postUserDto.getUsername());
+        userEntity.setPassword(postUserDto.getPassword());
+        userEntity.setDniType(dniTypeRepository.findById(postUserDto.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")));
+        userEntity.setDni(postUserDto.getDni());
+        userEntity.setActive(postUserDto.getActive());
+        userEntity.setAvatar_url(postUserDto.getAvatar_url());
+        userEntity.setDatebirth(postUserDto.getDatebirth());
+        userEntity.setCreatedDate(LocalDateTime.now());
+        userEntity.setCreatedUser(postUserDto.getUserUpdateId());
+        userEntity.setLastUpdatedDate(LocalDateTime.now());
+        userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        userEntity.setTelegram_id(postUserDto.getTelegram_id());
+    }
+
+    /**
      * Metodo para mapear de un UserEntity a un GetUserDto.
      *
      * @param userEntity un UserEntity.
@@ -322,10 +476,18 @@ public class UserServiceImpl implements UserService {
         getUserDto.setTelegram_id(userEntity.getTelegram_id());
         getUserDto.setCreate_date(userEntity.getCreatedDate().toLocalDate());
 
-        PlotUserEntity plotUserEntity = plotUserRepository.findByUser(userEntity);
-        if (plotUserEntity != null) {
-            getUserDto.setPlot_id(plotUserEntity.getPlotId());
+        List<PlotUserEntity> plotUserEntity = plotUserRepository.findByUser(userEntity);
+
+        List<Integer> plotUserEntities = new ArrayList<>();
+
+
+        for (PlotUserEntity plotUser : plotUserEntity) {
+
+            plotUserEntities.add(plotUser.getPlotId());
+
         }
+
+        getUserDto.setPlot_id(plotUserEntities.toArray(new Integer[plotUserEntities.size()]));
 
         return getUserDto;
     }
