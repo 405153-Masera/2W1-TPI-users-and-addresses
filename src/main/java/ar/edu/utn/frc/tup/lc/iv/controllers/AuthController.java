@@ -2,7 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
-import ar.edu.utn.frc.tup.lc.iv.jwt.JwtUtil;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.JwtUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,6 +75,7 @@ public class AuthController {
             response.put("message", "Token válido");
         } catch (IllegalArgumentException e) {
             response.put("message", "Token inválido");
+            System.out.println(e.getMessage());
         }
         return response;
     }

@@ -1,6 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.configs;
 
-import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;

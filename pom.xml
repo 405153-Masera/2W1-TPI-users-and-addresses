@@ -88,11 +88,11 @@
             <version>${modelmapper.version}</version>
         </dependency>
 
-        <!--    Login
+        <!--    Login -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>

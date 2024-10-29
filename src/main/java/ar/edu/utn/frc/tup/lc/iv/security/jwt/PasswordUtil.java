@@ -1,4 +1,4 @@
-package ar.edu.utn.frc.tup.lc.iv.jwt;
+package ar.edu.utn.frc.tup.lc.iv.security.jwt;
 
 import org.mindrot.jbcrypt.BCrypt;
 

@@ -1,4 +1,4 @@
-package ar.edu.utn.frc.tup.lc.iv.jwt;
+package ar.edu.utn.frc.tup.lc.iv.security.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,7 +14,7 @@ public class JwtUtil {
     /** Tiempo de expiración, es 1 dia. */
     public static final long EXPIRATION_TIME  = 86_400_000;
     /** Clave secreta. */
-    private static final String SECRET_KEY = "GZ0Vj+wF6h3Q5p9c6P2pD72X8F2Fj6WjB6Y6g2Nh7D8=";  // Mantén esta clave segura
+    private static final String SECRET_KEY = "GZ0Vj+wF6h3Q5p9c6P2pD72X8F2Fj6WjB6Y6g2Nh7D8=";
 
     /**
      * Metodo para generar un token JWT.
