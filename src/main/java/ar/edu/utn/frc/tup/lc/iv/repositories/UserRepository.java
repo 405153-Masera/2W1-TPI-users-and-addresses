@@ -84,4 +84,21 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      * @return un {@link UserEntity}
      */
     UserEntity findByDni(String dni);
+
+    /**
+     * Verifica si existe un usuario con nombre de usuario
+     * igual al pasado por parametro.
+     *
+     * @param username nombre de usuario.
+     * @return true si existe, false si no.
+     */
+    boolean existsByUsername(String username);
+
+    /**
+     * Verifica si existe un usuario con dni igual al pasado por parametro.
+     *
+     * @param dni numero de dni.
+     * @return true si existe, false si no.
+     */
+    boolean existsByDni(String dni);
 }
