@@ -8,12 +8,10 @@ import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
-import lombok.AllArgsConstructor;
+import ar.edu.utn.frc.tup.lc.iv.services.validator.Validator;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,28 +24,29 @@ import java.util.stream.Collectors;
  * contiene toda la lógica relacionada con roles.
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class RoleServiceImpl implements RoleService {
 
     /**
      * Repositorio para manejar Role entities.
      */
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     /**
      * Repositorio para manejar UserRole entities.
      */
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
 
     /**
      * ModelMapper para convertir entre entidades y dtos.
      */
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+
+    /**
+     *  Validator para validar UserRoles
+     */
+    private final Validator validator;
 
     /**
      * Obtener todos los roles.
@@ -77,17 +76,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<GetRoleDto> getRolesByUser(int userId) {
         List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
-
+        validator.validateUserByRoles(userRoles);
         List<GetRoleDto> roles = new ArrayList<>();
-        if (userRoles.isEmpty()) {
-            throw new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND);
-        }
         for (UserRoleEntity userRole : userRoles) {
             RoleEntity role = roleRepository.findById(userRole.getRole().getId()).orElse(null);
             if (role != null) {
-                GetRoleDto getRoleDto = new GetRoleDto();
-                getRoleDto.setId(role.getId());
-                getRoleDto.setDescription(role.getDescription());
+                GetRoleDto getRoleDto = setIdAndDescriptionOnGetRoleDTO(role);
                 roles.add(getRoleDto);
             }
         }
@@ -108,13 +102,23 @@ public class RoleServiceImpl implements RoleService {
         roleEntity.setCreatedDate(LocalDateTime.now());
         roleEntity.setLastUpdatedDate(LocalDateTime.now());
         roleEntity.setLastUpdatedUser(postRoleDto.getUserUpdateId());
-
         roleEntity = roleRepository.save(roleEntity);
 
-        GetRoleDto getRoleDto = new GetRoleDto();
+        return mapToGetRoleDTO(roleEntity);
 
-        modelMapper.map(roleEntity, getRoleDto);
+    }
+
+    public GetRoleDto mapToGetRoleDTO(RoleEntity roleEntity) {
+        return modelMapper.map(roleEntity, GetRoleDto.class);
+    }
+
+    public GetRoleDto setIdAndDescriptionOnGetRoleDTO(RoleEntity role) {
+        GetRoleDto getRoleDto = new GetRoleDto();
+        getRoleDto.setId(role.getId());
+        getRoleDto.setDescription(role.getDescription());
 
         return getRoleDto;
     }
+
+
 }
