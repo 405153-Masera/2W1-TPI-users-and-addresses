@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,6 +179,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setPlot_id(plot.toArray(new Integer[postUserDto.getPlot_id()]));
         getUserDto.setDni(postUserDto.getDni());
         getUserDto.setDni_type(dniTypeRepository.findById(postUserDto.getDni_type_id()).get().getDescription());
+        getUserDto.setCreate_date(LocalDate.now());
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
 //        AccessPost accessPost = new AccessPost();
@@ -316,6 +318,12 @@ public class UserServiceImpl implements UserService {
         return getUserDto;
     }
 
+    /**
+     * Busca todos los usuarios asociados a un lote,
+     * incluido el propietario
+     *
+     * @return la lista de usuarios por lote.
+     */
     @Override
     public List<GetPlotUserDto> getAllPlotUsers() {
         List<PlotUserEntity> plotUserEntities = plotUserRepository.findAll();
@@ -327,50 +335,44 @@ public class UserServiceImpl implements UserService {
                     return plotUserDto;
                 })
                 .collect(Collectors.toList());
-        //TODO: Testear
     }
+
+    /**
+     * Busca todos los usuarios (familaires) asociados a un propietario,
+     * incluido el propietario
+     *
+     * @param ownerId
+     * @return la lista de usuarios por propietario.
+     */
     @Override
     public List<GetUserDto> getUsersByOwner(Integer ownerId) {
-        // recupero con restTemplate la tabla PlotOwners
         List<GetPlotOwnerDto> plotOwnerDtoList = restPlotOwner.getAllPlotOwner();
-        // recupero los PlotUser
         List<GetPlotUserDto> plotUserDtoList = this.getAllPlotUsers();
-        //recupero los getUserDto para obtener los datos de todos los usuarios
         List<GetUserDto> userDtos = this.getAllUsers();
-        //lista que almacena los id de aquellos plots relacionados al owner consultado por parametro
         List<Integer> plotsByOwner = new ArrayList<>();
-        // por cada PlotOwner pregunto si es igual el ownerId que el que consultado por paramtro
         for(GetPlotOwnerDto PO : plotOwnerDtoList){
-            //si coincide almaceno el plot_id en la lista de plotsByOwner
             if(PO.getOwner_id().equals(ownerId)){
                 plotsByOwner.add(PO.getPlot_id());
             }
         }
-        //almaceno aquellos plotUsers en los que el plot_id coincida con los plot_id del owner
         List<GetPlotUserDto> usersByPlots = new ArrayList<>();
-        // creo una lista para almacenar aquellos usuarios que pertenezcan al mismo plot que el owner
         List<GetUserDto> userDtoByOwner = new ArrayList<>();
-        //por cda PU (tiene id del plot y del user)
-        // verificamos si hay plotsByOwner
         if (!plotsByOwner.isEmpty()) {
-            //por cada PlotUser
             for (GetPlotUserDto PU : plotUserDtoList) {
-                // si el plot_id de PU está contenido en la lista de plotsByOwner
                 if (plotsByOwner.contains(PU.getPlot_id())) {
-                    // Busco el usuario correspondiente en userDtos
                     for (GetUserDto userDto : userDtos) {
-                        // si el user está asociado a este plot
                         if (userDto.getId().equals(PU.getUser_id())) {
                             userDtoByOwner.add(userDto);
-                            break; // salimos del bucle interno para evitar duplicados
+                            break;
                         }
                     }
                 }
             }
         }
-        return userDtoByOwner; // Devolvemos la lista de usuarios que pertenecen a los plots del owner
+        return userDtoByOwner;
 
     }
+
     /**
      * Metodo para mapear de un PostUserDto y un UserEntity
      * a un PlotUserEntity.
