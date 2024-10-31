@@ -262,7 +262,7 @@ VALUES
     ('Gerente', NOW(), NOW(), 1, 1),
     ('Propietario', NOW(), NOW(), 1, 1),
     ('Familiar mayor', NOW(), NOW(), 1, 1),
-    ('Familiar menor', NOW(), NOW(), 1, 1);
+    ('Familiar menor', NOW(), NOW(), 1, 1),
     ('Inquilino', NOW(), NOW(), 1, 1);
 
 -- Insertar tipos de DNI
