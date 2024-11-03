@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 /**
  * La clase {@code DniTypeEntity} representa un tipo de dni y
- * hace referencia a la tabla de dni_type
+ * hace referencia a la tabla de dni_type.
  */
 @Entity
 @Table(name = "dni_type")

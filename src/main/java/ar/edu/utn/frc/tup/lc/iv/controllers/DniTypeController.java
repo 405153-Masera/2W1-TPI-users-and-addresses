@@ -10,6 +10,7 @@ import java.util.List;
 @RequestMapping("/dniType")
 public class DniTypeController {
 
+    /** Servicio para manejar la lógica de usuarios. */
     private final DniTypeService dniTypeService;
 
     public DniTypeController(DniTypeService dniTypeService){

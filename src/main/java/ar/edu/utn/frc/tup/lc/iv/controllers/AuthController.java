@@ -4,7 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.jwt.JwtUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,23 +15,22 @@ import java.util.Map;
 
 /**
  * Controlador REST para manejar operaciones de Autenticación.
- *
- * Expone Enpoints para gestionar un inicio de sesión utilizando JWT.
+ * Expone Endpoints para gestionar un inicio de sesión utilizando JWT.
  */
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     /** Servicio para manejar la lógica de usuarios. */
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
 
     /**
      * Devuelve la confirmación de un inicio de sesión exitoso.
      *
      * @param credentials credenciales del logueo.
-     * @throws IllegalArgumentException excepción credenciales invalidas.
+     * @throws IllegalArgumentException excepción credenciales inválidas.
      * @return respuesta de confirmación de logueo.
      */
     @PostMapping("/login")
@@ -67,6 +66,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Valida un token JWT.
+     *
+     * @param token token a validar.
+     * @return responde indicando si el token es válido o no.
+     */
     @PostMapping("/validateToken")
     public Map<String, String> validateToken(@RequestBody String token) {
         Map<String, String> response = new HashMap<>();

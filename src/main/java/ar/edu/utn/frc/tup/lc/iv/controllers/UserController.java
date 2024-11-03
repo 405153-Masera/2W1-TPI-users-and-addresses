@@ -10,7 +10,7 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -23,14 +23,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     /** Servicio para manejar la lógica de usuarios. */
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private RestAccess restAccess;
+    /** Servicio para manejar el restTemplate de accesos. */
+    private final RestAccess restAccess;
 
 
     /**
@@ -114,13 +114,9 @@ public class UserController {
     @PutMapping("/put/{userId}")
     public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId, @RequestBody PutUserDto putUserDto) {
         GetUserDto result = userService.updateUser(userId, putUserDto);
-
-        //Si falla el service
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        //Si hace la modificación
         return ResponseEntity.ok(result);
     }
 
@@ -153,13 +149,9 @@ public class UserController {
     @GetMapping("/getall/role/{roleId}")
     public ResponseEntity<List<GetUserDto>> getUsersByRole(@PathVariable Integer roleId) {
         List<GetUserDto> result = userService.getUsersByRole(roleId);
-
-        // Si no trae la lista
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        // Si trae la lista
         return ResponseEntity.ok(result);
     }
 
@@ -213,7 +205,7 @@ public class UserController {
     }
 
     /**
-     * Obtiene una lista de usuario de rol "Owner" perteneciente a un lote específico.
+     * Obtiene una lista de usuarios de rol "Owner" perteneciente a un lote específico.
      *
      * @param plotId del lote perteneciente al usuario a buscar.
      * @return lista de usuarios encontrado.
@@ -228,6 +220,12 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Permite registrar un nuevo acceso para el usuario asociado a un lote específico.
+     *
+     * @param accessPost Objeto que contiene los datos necesarios para registrar el acceso.
+     * @return `ResponseEntity<Void>` con estado 204 (sin contenido) si la operación es exitosa.
+     */
     @PostMapping("/access")
     public ResponseEntity<Void> postAccess(@RequestBody AccessPost accessPost) {
         List<AccessPost> lst = List.of(accessPost);
@@ -235,11 +233,24 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Permite eliminar el acceso asociado a un documento específico.
+     *
+     * @param accessPut Objeto que contiene el documento del acceso que se desea eliminar.
+     * @return `ResponseEntity<Void>` con estado 204 (sin contenido) si la operación es exitosa.
+     */
     @PutMapping("/access/delete")
     public ResponseEntity<Void> putAccess(@RequestBody AccessPut accessPut) {
         restAccess.deleteAccess(accessPut.getDocument());
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Obtiene una lista de usuarios asociados a un propietario específico.
+     *
+     * @param ownerId ID del propietario para el cual se desean obtener los usuarios.
+     * @return `ResponseEntity<List<GetUserDto>>` con estado 204 si no se encuentran usuarios, o estado 200 con la lista de usuarios.
+     */
     @GetMapping("/byOwner/{ownerId}")
     public ResponseEntity<List<GetUserDto>> getUsersByOwner(@PathVariable Integer ownerId) {
         List<GetUserDto> users = userService.getUsersByOwner(ownerId);
@@ -250,5 +261,4 @@ public class UserController {
             return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
         }
     }
-
 }

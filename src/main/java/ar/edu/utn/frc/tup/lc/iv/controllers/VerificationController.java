@@ -16,8 +16,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VerificationController {
 
+    /**
+     * Servicio de verificación de datos unicos.
+     */
     private final VerificationService verificationService;
 
+    /**
+     * Verifica si el nombre de usuario es único.
+     *
+     * @param username Nombre de usuario a verificar.
+     * @return Respuesta con el resultado de la verificación.
+     */
     @GetMapping("/username")
     public ResponseEntity<Map<String, Boolean>> isUsernameUnique(@RequestParam String username) {
         boolean isUnique = verificationService.isUsernameUnique(username);
@@ -26,6 +35,12 @@ public class VerificationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Verifica si el correo electrónico es único.
+     *
+     * @param email Correo electrónico a verificar.
+     * @return Respuesta con el resultado de la verificación.
+     */
     @GetMapping("/email")
     public ResponseEntity<Map<String, Boolean>> isEmailUnique(@RequestParam String email) {
         boolean isUnique = verificationService.isEmailUnique(email);
@@ -34,6 +49,12 @@ public class VerificationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Verifica si el número de DNI es único.
+     *
+     * @param dni Número de DNI a verificar.
+     * @return Respuesta con el resultado de la verificación.
+     */
     @GetMapping("/dni")
     public ResponseEntity<Map<String, Boolean>> isDniUnique(@RequestParam String dni) {
         boolean isUnique = verificationService.isDniUnique(dni);

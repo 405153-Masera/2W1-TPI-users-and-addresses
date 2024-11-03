@@ -1,6 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.BasePostUser;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
@@ -13,314 +14,141 @@ import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessDocumentType;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessUserAllowedType;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Implementacion de {@link UserService},
+ * Implementación de {@link UserService},
  * contiene toda la lógica relacionada con usuarios.
  */
 @Service
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
-    @Autowired
-    private RestPlotOwner restPlotOwner;
+    /** Logger para la clase. */
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    /**
+     * Servicio para manejar el restTemplate de lotes de propietarios.
+     */
+    private final RestPlotOwner restPlotOwner;
 
     /**
      * ModelMapper para convertir entre entidades y dtos.
      */
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     /**
      * Repositorio para manejar User entities.
      */
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * Repositorio para manejar Role entities.
      */
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private DniTypeRepository dniTypeRepository;
+    /**
+     * Repositorio para manejar DniType entities.
+     */
+    private final DniTypeRepository dniTypeRepository;
 
     /**
      * Repositorio para manejar UserRole entities.
      */
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
 
     /**
      * Repositorio para manejar PlotUser entities.
      */
-    @Autowired
-    private PlotUserRepository plotUserRepository;
+    private final PlotUserRepository plotUserRepository;
 
     /** Servicio para manejar la lógica de roles. */
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     /** Servicio para manejar el restTemplate de contactos. */
-    @Autowired
-    private RestContact restContact;
+    private final RestContact restContact;
 
     /** Servicio para manejar el restTemplate de accesos. */
-    @Autowired
-    private RestAccess restAccess;
+    private final RestAccess restAccess;
 
     /** Servicio para encriptar y desencriptar contraseñas. */
-    @Autowired
-    private PasswordUtil passwordEncoder;
+    private final PasswordUtil passwordEncoder;
 
     /**
      * Crea un usuario.
      *
-     * @param postUserDto
+     * @param postUserDto dto que contiene la información del usuario.
      * @return el usuario creado.
-     * @throws EntityNotFoundException sí no encuentra un rol con la descripción asignada.
-     * @throws IllegalStateException si falla el intento de guardar contactos.
      */
     @Override
     @Transactional
     public GetUserDto createUser(PostUserDto postUserDto) {
 
-        // Validaciones por si el username o el email ya existen
-        validateUsername(postUserDto.getUsername());
-        validateEmail(postUserDto.getEmail());
-        validateDni(postUserDto.getDni());
-
-        // Encriptar la contraseña
+        validateUser(postUserDto);
         String hashedPassword = passwordEncoder.hashPassword(postUserDto.getPassword());
         postUserDto.setPassword(hashedPassword);
 
-        // Crear un nuevo UserEntity y asignar los valores del DTO
-        UserEntity userEntity = new UserEntity();
-        //Mapeamos con el metodo
-        mapUserPostToUserEntity(userEntity, postUserDto);
-        // Guardar el usuario en la base de datos
-        UserEntity savedUser = userRepository.save(userEntity);
+        UserEntity userSaved = saveUserEntity(postUserDto);
+        assignRolesToUser(userSaved, postUserDto.getRoles(), postUserDto.getUserUpdateId());
+        savePlotUser(postUserDto, userSaved);
+        saveContact(userSaved, postUserDto.getEmail(), postUserDto.getPhone_number());
 
-        // Obtener los roles del PostUserDto
-        String[] roleDescriptions = postUserDto.getRoles();
-
-        // Lista para almacenar los roles encontrados
-        List<String> assignedRoles = new ArrayList<>();
-
-        // Asociar roles al usuario
-        for (String roleDesc : roleDescriptions) {
-            // Buscar el rol por su descripción
-            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
-
-            if (roleEntity != null) {
-                // Crear una nueva relación en la tabla intermedia UserRoles
-                UserRoleEntity userRoleEntity = new UserRoleEntity();
-                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
-                userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
-                userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
-                // Guardar la relación en la tabla intermedia
-                userRoleRepository.save(userRoleEntity);
-                // Agregar la descripción del rol a la lista de roles asignados
-                assignedRoles.add(roleDesc);
-            } else {
-                // Si no se encuentra el rol, lanzar una excepción
-                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
-            }
-        }
-
-        // Guardar relacion plotUser
-        PlotUserEntity plotUserEntity = new PlotUserEntity();
-        mapPostToPlotUserEntity(plotUserEntity, postUserDto, savedUser);
-        plotUserRepository.save(plotUserEntity);
-
-        //guardar contactos
-        boolean emailSaved = restContact.saveContact(savedUser.getId(), postUserDto.getEmail(), 1, savedUser.getCreatedUser());
-        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postUserDto.getPhone_number(), 2, savedUser.getCreatedUser());
-
-        if (!emailSaved && !phoneSaved) {
-            throw new IllegalStateException("Failed to save contact information.");
-        }
-
-        // Mapear el UserEntity guardado a GetUserDto
-        GetUserDto getUserDto = modelMapper.map(savedUser, GetUserDto.class);
-        getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
-        getUserDto.setEmail(postUserDto.getEmail());
-        getUserDto.setPhone_number(postUserDto.getPhone_number());
-
+        GetUserDto getUserDto = mapToGetUserDto(userSaved, postUserDto);
         List<Integer> plot = new ArrayList<>();
+        plot.add(postUserDto.getPlot_id());
+        getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
-        getUserDto.setPlot_id(plot.toArray(new Integer[postUserDto.getPlot_id()]));
-        getUserDto.setDni(postUserDto.getDni());
-        getUserDto.setDni_type(dniTypeRepository.findById(postUserDto.getDni_type_id()).get().getDescription());
-        getUserDto.setCreate_date(LocalDate.now());
-
-        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
-//        AccessPost accessPost = new AccessPost();
-//        accessPost.setDocument(postUserDto.getDni());
-//        accessPost.setName(postUserDto.getName());
-//        accessPost.setLast_name(postUserDto.getLastname());
-//        AccessDocumentType accessDocumentType = new AccessDocumentType();
-//        accessDocumentType.setDescription("DNI");
-//        accessPost.setDocumentType(accessDocumentType);
-//        AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
-//
-//        for(String role : postUserDto.getRoles()){
-//            if(role.equals("Propieatrio")){
-//                accessUserAllowedType.setDescription("Propietario");
-//            }
-//        }
-//        if(accessUserAllowedType.getDescription() == null){
-//            accessUserAllowedType.setDescription("Inquilino");
-//        }
-//        accessPost.setUser_allowed_Type(accessUserAllowedType);
-//        accessPost.setEmail(postUserDto.getEmail());
-//
-//        List<AccessPost> accessPosts = new ArrayList<>();
-//        accessPosts.add(accessPost);
-//        restAccess.postAccess(accessPosts);
-
+        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
+        //restAccess.registerUserAccess(postUserDto);
         return getUserDto;
     }
 
     /**
      * Crea un usuario de tipo owner.
      *
-     * @param postOwnerUserDto
+     * @param postOwnerUserDto dto que contiene la información del usuario.
      * @return el usuario creado.
-     * @throws EntityNotFoundException sí no encuentra un rol con la descripción asignada.
-     * @throws IllegalStateException si falla el intento de guardar contactos.
      */
     @Override
     @Transactional
     public GetOwnerUserDto createOwnerUser(PostOwnerUserDto postOwnerUserDto) {
 
-        // Validaciones por si el username o el email ya existen
-        validateUsername(postOwnerUserDto.getUsername());
-        validateEmail(postOwnerUserDto.getEmail());
-        validateDni(postOwnerUserDto.getDni());
-
-        // Encriptar la contraseña
+        validateUser(postOwnerUserDto);
         String hashedPassword = passwordEncoder.hashPassword(postOwnerUserDto.getPassword());
         postOwnerUserDto.setPassword(hashedPassword);
 
-        // Crear un nuevo UserEntity y asignar los valores del DTO
-        UserEntity userEntity = new UserEntity();
-        //Mapeamos con el metodo
-        mapOwnerUserPostToUserEntity(userEntity, postOwnerUserDto);
-        // Guardar el usuario en la base de datos
-        UserEntity savedUser = userRepository.save(userEntity);
+        UserEntity userSaved = saveUserEntity(postOwnerUserDto);
+        assignRolesToUser(userSaved, postOwnerUserDto.getRoles(), postOwnerUserDto.getUserUpdateId());
+        savePlotsUser(postOwnerUserDto, userSaved);
+        saveContact(userSaved, postOwnerUserDto.getEmail(), postOwnerUserDto.getPhone_number());
 
-        // Obtener los roles del PostUserDto
-        String[] roleDescriptions = postOwnerUserDto.getRoles();
-
-        // Lista para almacenar los roles encontrados
-        List<String> assignedRoles = new ArrayList<>();
-
-        // Asociar roles al usuario
-        for (String roleDesc : roleDescriptions) {
-            // Buscar el rol por su descripción
-            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
-
-            if (roleEntity != null) {
-                // Crear una nueva relación en la tabla intermedia UserRoles
-                UserRoleEntity userRoleEntity = new UserRoleEntity();
-                mapUserRolEntity (userRoleEntity,savedUser,roleEntity);
-                userRoleEntity.setLastUpdatedUser(postOwnerUserDto.getUserUpdateId());
-                userRoleEntity.setCreatedUser(postOwnerUserDto.getUserUpdateId());
-                // Guardar la relación en la tabla intermedia
-                userRoleRepository.save(userRoleEntity);
-                // Agregar la descripción del rol a la lista de roles asignados
-                assignedRoles.add(roleDesc);
-            } else {
-                // Si no se encuentra el rol, lanzar una excepción
-                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
-            }
-        }
-
-        // Guardar relacion plotUser
-        Integer[] plots = postOwnerUserDto.getPlot_id();
-        for (Integer plot : plots) {
-            PlotUserEntity plotUserEntity = new PlotUserEntity();
-            mapPostOwnerToPlotUserEntity(plotUserEntity, postOwnerUserDto, savedUser, plot);
-            plotUserRepository.save(plotUserEntity);
-        }
-
-
-        //guardar contactos
-        boolean emailSaved = restContact.saveContact(savedUser.getId(), postOwnerUserDto.getEmail(), 1, savedUser.getCreatedUser());
-        boolean phoneSaved = restContact.saveContact(savedUser.getId(), postOwnerUserDto.getPhone_number(), 2, savedUser.getCreatedUser());
-
-        if (!emailSaved && !phoneSaved) {
-            throw new IllegalStateException("Failed to save contact information.");
-        }
-
-        // Mapear el UserEntity guardado a GetUserDto
-        GetOwnerUserDto getUserDto = modelMapper.map(savedUser, GetOwnerUserDto.class);
-        getUserDto.setRoles(assignedRoles.toArray(new String[0]));  // Asignar los roles encontrados al DTO
-        getUserDto.setEmail(postOwnerUserDto.getEmail());
-        getUserDto.setPhone_number(postOwnerUserDto.getPhone_number());
+        GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
-        getUserDto.setDni(postOwnerUserDto.getDni());
-        getUserDto.setDni_type(dniTypeRepository.findById(postOwnerUserDto.getDni_type_id()).get().getDescription());
-
-        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a accesso
-//        AccessPost accessPost = new AccessPost();
-//        accessPost.setDocument(postUserDto.getDni());
-//        accessPost.setName(postUserDto.getName());
-//        accessPost.setLast_name(postUserDto.getLastname());
-//        AccessDocumentType accessDocumentType = new AccessDocumentType();
-//        accessDocumentType.setDescription("DNI");
-//        accessPost.setDocumentType(accessDocumentType);
-//        AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
-//
-//        for(String role : postUserDto.getRoles()){
-//            if(role.equals("Propietario")){
-//                accessUserAllowedType.setDescription("Propietario");
-//            }
-//        }
-//        if(accessUserAllowedType.getDescription() == null){
-//            accessUserAllowedType.setDescription("Inquilino");
-//        }
-//        accessPost.setUser_allowed_Type(accessUserAllowedType);
-//        accessPost.setEmail(postUserDto.getEmail());
-//
-//        List<AccessPost> accessPosts = new ArrayList<>();
-//        accessPosts.add(accessPost);
-//        restAccess.postAccess(accessPosts);
-
+        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
+        //restAccess.registerUserAccess(postOwnerUserDto);
         return getUserDto;
     }
 
     /**
      * Busca todos los usuarios asociados a un lote,
-     * incluido el propietario
+     * incluido el propietario.
      *
      * @return la lista de usuarios por lote.
      */
@@ -338,10 +166,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Busca todos los usuarios (familaires) asociados a un propietario,
-     * incluido el propietario
+     * Busca todos los usuarios (familiares) asociados a un propietario,
+     * incluido el propietario.
      *
-     * @param ownerId
+     * @param ownerId id del propietario.
      * @return la lista de usuarios por propietario.
      */
     @Override
@@ -350,18 +178,18 @@ public class UserServiceImpl implements UserService {
         List<GetPlotUserDto> plotUserDtoList = this.getAllPlotUsers();
         List<GetUserDto> userDtos = this.getAllUsers();
         List<Integer> plotsByOwner = new ArrayList<>();
-        for(GetPlotOwnerDto PO : plotOwnerDtoList){
-            if(PO.getOwner_id().equals(ownerId)){
-                plotsByOwner.add(PO.getPlot_id());
+        for (GetPlotOwnerDto getPlotOwnerDto : plotOwnerDtoList) {
+            if (getPlotOwnerDto.getOwner_id().equals(ownerId)) {
+                plotsByOwner.add(getPlotOwnerDto.getPlot_id());
             }
         }
         List<GetPlotUserDto> usersByPlots = new ArrayList<>();
         List<GetUserDto> userDtoByOwner = new ArrayList<>();
         if (!plotsByOwner.isEmpty()) {
-            for (GetPlotUserDto PU : plotUserDtoList) {
-                if (plotsByOwner.contains(PU.getPlot_id())) {
+            for (GetPlotUserDto getPlotUserDto : plotUserDtoList) {
+                if (plotsByOwner.contains(getPlotUserDto.getPlot_id())) {
                     for (GetUserDto userDto : userDtos) {
-                        if (userDto.getId().equals(PU.getUser_id())) {
+                        if (userDto.getId().equals(getPlotUserDto.getUser_id())) {
                             userDtoByOwner.add(userDto);
                             break;
                         }
@@ -374,149 +202,243 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Guarda al usuario en la base de datos.
+     *
+     * @param user dto que contiene la información del usuario.
+     * @return el usuario guardado.
+     */
+    public UserEntity saveUserEntity(BasePostUser user) {
+        UserEntity userEntity = new UserEntity();
+        mapUserPostToUserEntity(userEntity, user);
+        return userRepository.save(userEntity);
+    }
+
+    /**
+     * Metodo para asignar roles a un usuario.
+     *
+     * @param userSaved usuario guardado.
+     * @param roleDescriptions descripciones de los roles a asignar.
+     * @param userId id del usuario que realiza la operación.
+     * @throws EntityNotFoundException si no encuentra un rol con la descripción asignada.
+     */
+    public void assignRolesToUser(UserEntity userSaved, String[] roleDescriptions, Integer userId) {
+        for (String roleDesc : roleDescriptions) {
+            RoleEntity roleEntity = roleRepository.findByDescription(roleDesc);
+            if (roleEntity != null) {
+                saveUserRole(userSaved, roleEntity, userId);
+            } else {
+                throw new EntityNotFoundException("Role not found with description: " + roleDesc);
+            }
+        }
+    }
+
+    /**
+     * Metodo para guardar el rol de un usuario.
+     *
+     * @param userSaved usuario guardado.
+     * @param roleEntity rol del usuario.
+     * @param userId id del usuario que realiza la operación.
+     */
+    public void saveUserRole(UserEntity userSaved, RoleEntity roleEntity, Integer userId) {
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        mapUserRolEntity(userRoleEntity, userSaved, roleEntity);
+        userRoleEntity.setCreatedUser(userId);
+        userRoleEntity.setLastUpdatedUser(userId);
+        userRoleRepository.save(userRoleEntity);
+    }
+
+    /**
+     * Metodo para guardar el lote de un usuario.
+     *
+     * @param postUserDto dto que contiene la información del usuario.
+     * @param userSaved usuario guardado.
+     */
+    public void savePlotUser(PostUserDto postUserDto, UserEntity userSaved) {
+        PlotUserEntity plotUserEntity = new PlotUserEntity();
+        mapPostToPlotUserEntity(plotUserEntity, postUserDto, userSaved);
+        plotUserRepository.save(plotUserEntity);
+    }
+
+    /**
+     * Metodo para guardar los lotes de un usuario de tipo propietario.
+     *
+     * @param postOwnerUserDto dto que contiene la información del usuario propietario.
+     * @param userSaved usuario guardado.
+     */
+    public void savePlotsUser(PostOwnerUserDto postOwnerUserDto, UserEntity userSaved) {
+        for (Integer plot : postOwnerUserDto.getPlot_id()) {
+            PlotUserEntity plotUserEntity = new PlotUserEntity();
+            mapPostOwnerToPlotUserEntity(plotUserEntity, postOwnerUserDto, userSaved, plot);
+            plotUserRepository.save(plotUserEntity);
+        }
+    }
+
+    /**
+     * Metodo para guardar la información de contacto de un usuario.
+     *
+     * @param userSaved usuario guardado.
+     * @param email email del usuario.
+     * @param phone teléfono del usuario.
+     * @throws IllegalStateException si falla el intento de guardar contactos.
+     */
+    public void saveContact(UserEntity userSaved, String email, String phone) {
+        boolean emailSaved = restContact.saveContact(userSaved.getId(), email, 1, userSaved.getCreatedUser());
+        boolean phoneSaved = restContact.saveContact(userSaved.getId(), phone, 2, userSaved.getCreatedUser());
+        if (!emailSaved && !phoneSaved) {
+            throw new IllegalStateException("Failed to save contact information.");
+        }
+    }
+
+    /**
+     * Metodo para crear un GetUserDto a partir de un UserEntity.
+     *
+     * @param userSaved usuario guardado.
+     * @param user dto que contiene la información del usuario.
+     * @return un getUserDto con la información del usuario.
+     * @throws EntityNotFoundException si no encuentra un dniType con el id asignado.
+     */
+    public GetUserDto mapToGetUserDto(UserEntity userSaved, BasePostUser user) {
+        GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);
+        getUserDto.setRoles(user.getRoles());
+        getUserDto.setEmail(user.getEmail());
+        getUserDto.setPhone_number(user.getPhone_number());
+        getUserDto.setDni(user.getDni());
+        getUserDto.setDni_type(dniTypeRepository.findById(user.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")).getDescription());
+        getUserDto.setCreate_date(LocalDate.now());
+        return getUserDto;
+    }
+
+    /**
+     * Metodo para crear un GetOwnerUserDto a partir de un UserEntity.
+     *
+     * @param userSaved usuario guardado.
+     * @param user dto que contiene la información del usuario.
+     * @return un getUserDto con la información del usuario.
+     * @throws EntityNotFoundException si no encuentra un dniType con el id asignado.
+     */
+    public GetOwnerUserDto mapToGetOwnerUserDto(UserEntity userSaved, BasePostUser user) {
+        GetOwnerUserDto getUserDto = modelMapper.map(userSaved, GetOwnerUserDto.class);
+        getUserDto.setRoles(user.getRoles());
+        getUserDto.setEmail(user.getEmail());
+        getUserDto.setPhone_number(user.getPhone_number());
+        getUserDto.setDni(user.getDni());
+        getUserDto.setDni_type(dniTypeRepository.findById(user.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")).getDescription());
+        getUserDto.setCreate_date(LocalDate.now());
+        return getUserDto;
+    }
+
+    /**
      * Metodo para mapear de un PostUserDto y un UserEntity
      * a un PlotUserEntity.
      *
-     * @param plotUserEntity un PlotUserEntity.
-     * @param postUserDto un PostUserDto.
-     * @param savedUser un UserEntity.
+     * @param plotUserEntity representa la relación entre un usuario y un lote.
+     * @param postUserDto dto que contiene la información del usuario.
+     * @param userSaved representa al usuario guardado.
      */
-    public void mapPostToPlotUserEntity(PlotUserEntity plotUserEntity, PostUserDto postUserDto, UserEntity savedUser) {
+    public void mapPostToPlotUserEntity(PlotUserEntity plotUserEntity, PostUserDto postUserDto, UserEntity userSaved) {
         plotUserEntity.setPlotId(postUserDto.getPlot_id());
-        plotUserEntity.setUser(savedUser);
+        plotUserEntity.setUser(userSaved);
         plotUserEntity.setCreatedDate(LocalDateTime.now());
         plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
         plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
         plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
-    };
+    }
 
     /**
      * Metodo para mapear de un PostOwnerUserDto y un UserEntity
      * a un PlotUserEntity.
      *
-     * @param plotUserEntity un PlotUserEntity.
-     * @param postUserDto un PostUserDto.
-     * @param savedUser un UserEntity.
+     * @param plotUserEntity representa la relación entre un usuario y un lote.
+     * @param postUserDto un dto que contiene la información del usuario.
+     * @param userSaved un UserEntity que representa al usuario guardado.
+     * @param plot representa el ID del lote.
      */
-    public void mapPostOwnerToPlotUserEntity(PlotUserEntity plotUserEntity, PostOwnerUserDto postUserDto, UserEntity savedUser, Integer plot) {
+    public void mapPostOwnerToPlotUserEntity(PlotUserEntity plotUserEntity, PostOwnerUserDto postUserDto,
+                                             UserEntity userSaved, Integer plot) {
         plotUserEntity.setPlotId(plot);
-        plotUserEntity.setUser(savedUser);
+        plotUserEntity.setUser(userSaved);
         plotUserEntity.setCreatedDate(LocalDateTime.now());
         plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
         plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
         plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
-    };
+    }
 
     /**
      * Metodo para mapear de un PostUserDto a un UserEntity.
      *
-     * @param userEntity un UserEntity.
-     * @param postUserDto un PostUserDto.
+     * @param userEntity representa la entidad de un usuario.
+     * @param user un dto que contiene la información del usuario.
+     * @throws EntityNotFoundException si no encuentra un dniType con el id asignado.
      */
-    public void mapUserPostToUserEntity(UserEntity userEntity, PostUserDto postUserDto) {
+    public void mapUserPostToUserEntity(UserEntity userEntity, BasePostUser user) {
 
-        userEntity.setName(postUserDto.getName());
-        userEntity.setLastname(postUserDto.getLastname());
-        userEntity.setUsername(postUserDto.getUsername());
-        userEntity.setPassword(postUserDto.getPassword());
-        userEntity.setDniType(dniTypeRepository.findById(postUserDto.getDni_type_id())
+        userEntity.setName(user.getName());
+        userEntity.setLastname(user.getLastname());
+        userEntity.setUsername(user.getUsername());
+        userEntity.setPassword(user.getPassword());
+        userEntity.setDniType(dniTypeRepository.findById(user.getDni_type_id())
                 .orElseThrow(() -> new EntityNotFoundException("DniType not found")));
-        userEntity.setDni(postUserDto.getDni());
-        userEntity.setActive(postUserDto.getActive());
-        userEntity.setAvatar_url(postUserDto.getAvatar_url());
-        userEntity.setDatebirth(postUserDto.getDatebirth());
+        userEntity.setDni(user.getDni());
+        userEntity.setActive(user.getActive());
+        userEntity.setAvatar_url(user.getAvatar_url());
+        userEntity.setDatebirth(user.getDatebirth());
         userEntity.setCreatedDate(LocalDateTime.now());
-        userEntity.setCreatedUser(postUserDto.getUserUpdateId());  // ID del usuario creador
+        userEntity.setCreatedUser(user.getUserUpdateId());
         userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());  // ID del usuario que realiza la actualización
-        userEntity.setTelegram_id(postUserDto.getTelegram_id());
-    }
-
-    /**
-     * Metodo para mapear de un PostOwnerUserDto a un UserEntity.
-     *
-     * @param userEntity un UserEntity.
-     * @param postUserDto un PostUserDto.
-     */
-    public void mapOwnerUserPostToUserEntity(UserEntity userEntity, PostOwnerUserDto postUserDto) {
-
-        userEntity.setName(postUserDto.getName());
-        userEntity.setLastname(postUserDto.getLastname());
-        userEntity.setUsername(postUserDto.getUsername());
-        userEntity.setPassword(postUserDto.getPassword());
-        userEntity.setDniType(dniTypeRepository.findById(postUserDto.getDni_type_id())
-                .orElseThrow(() -> new EntityNotFoundException("DniType not found")));
-        userEntity.setDni(postUserDto.getDni());
-        userEntity.setActive(postUserDto.getActive());
-        userEntity.setAvatar_url(postUserDto.getAvatar_url());
-        userEntity.setDatebirth(postUserDto.getDatebirth());
-        userEntity.setCreatedDate(LocalDateTime.now());
-        userEntity.setCreatedUser(postUserDto.getUserUpdateId());
-        userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
-        userEntity.setTelegram_id(postUserDto.getTelegram_id());
+        userEntity.setLastUpdatedUser(user.getUserUpdateId());
+        userEntity.setTelegram_id(user.getTelegram_id());
     }
 
     /**
      * Metodo para mapear de un UserEntity a un GetUserDto.
      *
-     * @param userEntity un UserEntity.
-     * @param getUserDto un GetUserDto.
-     * @return un GetUserDto del usuario mapeado.
+     * @param userEntity representa la entidad de un usuario.
+     * @param getUserDto dto que contiene la información del usuario.
+     * @throws EntityNotFoundException si no encuentra el tipo de dni.
      */
-    public GetUserDto mapUserEntityToGet(UserEntity userEntity, GetUserDto getUserDto) {
+    public void mapUserEntityToGet(UserEntity userEntity, GetUserDto getUserDto) {
         getUserDto.setId(userEntity.getId());
         getUserDto.setName(userEntity.getName());
         getUserDto.setLastname(userEntity.getLastname());
         getUserDto.setUsername(userEntity.getUsername());
         getUserDto.setPassword(userEntity.getPassword());
         getUserDto.setDni(userEntity.getDni());
-        getUserDto.setDni_type(dniTypeRepository.findById(userEntity.getDniType().getId()).get().getDescription());
+        getUserDto.setDni_type(dniTypeRepository.findById(userEntity.getDniType().getId())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")).getDescription());
         getUserDto.setActive(userEntity.getActive());
         getUserDto.setAvatar_url(userEntity.getAvatar_url());
         getUserDto.setDatebirth(userEntity.getDatebirth());
         getUserDto.setTelegram_id(userEntity.getTelegram_id());
         getUserDto.setCreate_date(userEntity.getCreatedDate().toLocalDate());
 
-        List<PlotUserEntity> plotUserEntity = plotUserRepository.findByUser(userEntity);
+        List<Integer> plotIds = plotUserRepository.findByUser(userEntity).stream()
+                .map(PlotUserEntity::getPlotId)
+                .toList();
 
-        List<Integer> plotUserEntities = new ArrayList<>();
-
-
-        for (PlotUserEntity plotUser : plotUserEntity) {
-
-            plotUserEntities.add(plotUser.getPlotId());
-
-        }
-
-        getUserDto.setPlot_id(plotUserEntities.toArray(new Integer[plotUserEntities.size()]));
-
-        return getUserDto;
+        getUserDto.setPlot_id(plotIds.toArray(new Integer[0]));
     }
 
     /**
      * Metodo para mapear roles y contactos de un usuario a un GetUserDto.
      *
-     * @param userEntity un UserEntity.
-     * @param getUserDto un GetUserDto.
+     * @param userEntity representa la entidad de un usuario.
+     * @param getUserDto dto que contiene la información del usuario.
      */
     public void mapUserRolesAndContacts(UserEntity userEntity, GetUserDto getUserDto) {
         List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
-
-        // Convierto la lista de GetRoleDto a un arreglo de String[] (solo para ver los nombres)
         String[] roles = roleDtos.stream()
-                .map(GetRoleDto::getDescription) // Mapeamos cada GetRoleDto a su descripción
-                .toArray(String[]::new); // Convertimos el Stream a un arreglo de String
+                .map(GetRoleDto::getDescription)
+                .toArray(String[]::new);
 
-        getUserDto.setRoles(roles);  // Asignar los roles como String[] al DTO
-
-        // Buscamos los contactos del usuario y los asignamos
+        getUserDto.setRoles(roles);
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
         for (GetContactDto contactDto : contactDtos) {
-            if (contactDto.getType_contact() == 1) { // Si el valor es 1, es un email
-                getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES"))); //Guardamos email en minuscula
-            } else { // Si no, es un teléfono
-                getUserDto.setPhone_number(contactDto.getValue()); //Guardamos el telefono
+            if (contactDto.getType_contact() == 1) {
+                getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES")));
+            } else {
+                getUserDto.setPhone_number(contactDto.getValue());
             }
         }
     }
@@ -524,15 +446,26 @@ public class UserServiceImpl implements UserService {
     /**
      * Metodo para mapear de un UserEntity y un RoleEntity a un UserRoleEntity.
      *
-     * @param userEntity un UserEntity.
-     * @param roleEntity un RoleEntity.
-     * @param userRoleEntity un UserRoleEntity
+     * @param userEntity representa la entidad de un usuario.
+     * @param roleEntity representa la entidad de un rol.
+     * @param userRoleEntity representa la relación entre un usuario y un rol.
      */
     public void mapUserRolEntity(UserRoleEntity userRoleEntity, UserEntity userEntity, RoleEntity roleEntity) {
-        userRoleEntity.setUser(userEntity);  // Usuario recién guardado
-        userRoleEntity.setRole(roleEntity);  // Rol encontrado
-        userRoleEntity.setCreatedDate(LocalDateTime.now()); //Pongo la fecha de ahora
+        userRoleEntity.setUser(userEntity);
+        userRoleEntity.setRole(roleEntity);
+        userRoleEntity.setCreatedDate(LocalDateTime.now());
         userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
+    }
+
+    /**
+     * Metodo que contiene las validaciones necesarias para crear un usuario.
+     *
+     * @param user datos del usuario a crear.
+     */
+    public void validateUser(BasePostUser user) {
+        validateUsername(user.getUsername());
+        validateEmail(user.getEmail());
+        validateDni(user.getDni());
     }
 
     /**
@@ -548,7 +481,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void validateDni(String dni){
+    /**
+     * Metodo para validar si existe un dni igual guardado en la
+     * base de datos.
+     *
+     * @param dni un string que contiene el dni a buscar.
+     * @throws IllegalArgumentException si existe un dni igual en la base de datos.
+     */
+    public void validateDni(String dni) {
         if (userRepository.findByDni(dni) != null) {
             throw new IllegalArgumentException("Error creating user: dni already in use.");
         }
@@ -576,12 +516,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<GetUserDto> getAllUsers() {
         return userRepository.findAllActives().stream()
-                .map(userEntity -> {
-                    GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntityToGet(userEntity, getUserDto);
-                    mapUserRolesAndContacts(userEntity, getUserDto);
-                    return getUserDto;
-                })
+                .map(this::convertToUserDto)
                 .collect(Collectors.toList());
     }
 
@@ -589,7 +524,7 @@ public class UserServiceImpl implements UserService {
      * Obtener un usuario por medio de un userId.
      *
      * @param userId identificador de un usuario.
-     * @return un usuario que coincida con la id proporcionada.
+     * @return un usuario que coincida con el ID proporcionado.
      * @throws EntityNotFoundException si no encuentra un usuario con la misma id en la base de datos.
      */
     @Override
@@ -597,21 +532,30 @@ public class UserServiceImpl implements UserService {
 
         UserEntity  userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return convertToUserDto(userEntity);
+    }
 
-        GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(userEntity, getUserDto);
-        mapUserRolesAndContacts(userEntity, getUserDto);
-
-        return getUserDto;
+    /**
+     * Metodo para convertir un UserEntity a un GetUserDto.
+     *
+     * @param user representa la entidad de un usuario.
+     * @return un GetUserDto con la información del usuario.
+     */
+    public GetUserDto convertToUserDto(UserEntity user) {
+        GetUserDto userDto = new GetUserDto();
+        mapUserEntityToGet(user, userDto);
+        mapUserRolesAndContacts(user, userDto);
+        return userDto;
     }
 
     /**
      * Metodo para mapear de un PutUserDto a un UserEntity.
      *
-     * @param userEntity un UserEntity.
-     * @param putUserDto un PutUserDto.
+     * @param userEntity representa la entidad de un usuario.
+     * @param putUserDto dto que contiene la información del usuario.
+     * @throws EntityNotFoundException si no encuentra un dniType con el id asignado.
      */
-    public void mapPutUserToUserEntiy(PutUserDto putUserDto, UserEntity userEntity) {
+    public void mapPutUserToUserEntity(PutUserDto putUserDto, UserEntity userEntity) {
         userEntity.setName(putUserDto.getName());
         userEntity.setLastname(putUserDto.getLastName());
         userEntity.setDni(putUserDto.getDni());
@@ -627,75 +571,61 @@ public class UserServiceImpl implements UserService {
     /**
      * Actualiza un usuario.
      *
-     * @param userId la id del usuario a actualizar.
+     * @param userId el ID del usuario a actualizar.
      * @param putUserDto el dto con la información necesaria para actualizar un usuario.
-     * @throws EntityNotFoundException si no se encuentra un usuario con la id proporcionada como parametro
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID proporcionado como parámetro
      * en la base de datos.
-     * @throws EntityNotFoundException si no se encuentra un rol con la misma descripción en la base de datos.
      * @return el usuario actualizado.
      */
     @Override
     @Transactional
     public GetUserDto updateUser(Integer userId, PutUserDto putUserDto) {
 
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        if (optionalUser.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "User not found with id: " + userId
-            );
-        }
+        updateUserFields(user, putUserDto);
+        updateUserRoles(user, putUserDto);
+        updateUserContacts(user, putUserDto);
 
-        UserEntity user = optionalUser.get();
-        //Utilizamos el metodo para mapear el user
-        mapPutUserToUserEntiy(putUserDto, user);
-        UserEntity userSaved = userRepository.save(user);
-
-        //Borramos la relacion de la tabla intermedia entre Rol y User
-        userRoleRepository.deleteByUser(user);
-
-        String[] roles = putUserDto.getRoles();
-
-        // Asignar los nuevos roles al usuario
-        List<String> assignedRoles = new ArrayList<>();
-        for (String roleDesc : roles) {
-            // Buscar el rol por su descripción
-            RoleEntity role = roleRepository.findByDescription(roleDesc);
-            if (role == null) {
-                throw new EntityNotFoundException(
-                        "Role not found with description: " + roleDesc
-                );
-            }
-
-            UserRoleEntity userRoleEntity = new UserRoleEntity();
-
-            //Mapeamos la entidad UserRoleEntity
-            userRoleEntity.setUser(user);
-            userRoleEntity.setRole(role);
-            userRoleEntity.setCreatedDate(LocalDateTime.now());
-            userRoleEntity.setCreatedUser(putUserDto.getUserUpdateId());
-            userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
-            userRoleEntity.setLastUpdatedUser(putUserDto.getUserUpdateId());
-
-            // Guardar la relación en la tabla intermedia
-            userRoleRepository.save(userRoleEntity);
-
-            // Agregar la descripción del rol a la lista de roles asignados
-            assignedRoles.add(roleDesc);
-        }
-        // Actualizar los contactos del usuario
-        restContact.updateContact(userSaved.getId(), putUserDto.getEmail(), 1,putUserDto.getUserUpdateId());
-        restContact.updateContact(userSaved.getId(), putUserDto.getPhoneNumber(), 2,putUserDto.getUserUpdateId());
-
-        // Mapear el usuario actualizado a GetUserDto
-        GetUserDto getUserDto = modelMapper.map(userSaved, GetUserDto.class);
-        getUserDto.setRoles(assignedRoles.toArray(new String[0])); // Asignar los roles al DTO
-
-        // Asignar los contactos actualizados
+        GetUserDto getUserDto = modelMapper.map(user, GetUserDto.class);
+        getUserDto.setRoles(putUserDto.getRoles());
         getUserDto.setEmail(putUserDto.getEmail());
         getUserDto.setPhone_number(putUserDto.getPhoneNumber());
-
         return getUserDto;
+    }
+
+    /**
+     * Actualiza los campos de un usuario.
+     *
+     * @param user usuario a actualizar.
+     * @param putUserDto con la información necesaria para actualizar un usuario.
+     */
+    public void updateUserFields(UserEntity user, PutUserDto putUserDto) {
+        mapPutUserToUserEntity(putUserDto, user);
+        userRepository.save(user);
+    }
+
+    /**
+     * Actualiza los roles de un usuario.
+     *
+     * @param user usuario a actualizar los roles.
+     * @param putUserDto con la información necesaria para actualizar los roles del usuario.
+     */
+    public void updateUserRoles(UserEntity user, PutUserDto putUserDto) {
+        userRoleRepository.deleteByUser(user);
+        assignRolesToUser(user, putUserDto.getRoles(), putUserDto.getUserUpdateId());
+    }
+
+    /**
+     * Actualiza los contactos de un usuario.
+     *
+     * @param user usuario para actualizar los contactos.
+     * @param putUserDto con la información necesaria para actualizar los contactos del usuario.
+     */
+    public void updateUserContacts(UserEntity user, PutUserDto putUserDto) {
+        restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+        restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
     }
 
     /**
@@ -711,13 +641,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("Users not found"));
 
         return userEntities.stream()
-                .map(userEntity -> {
-                    GetUserDto getUserDto = new GetUserDto();
-                    mapUserEntityToGet(userEntity, getUserDto);
-                    mapUserRolesAndContacts(userEntity, getUserDto);
-
-                    return getUserDto;
-                }).collect(Collectors.toList());
+                .map(this::convertToUserDto).
+                collect(Collectors.toList());
     }
 
     /**
@@ -725,35 +650,25 @@ public class UserServiceImpl implements UserService {
      *
      * @param userId id del usuario a borrar.
      * @param userUpdateId id del usuario que realiza la acción.
-     * @throws EntityNotFoundException si no encuentra un usuario asignado a la id pasada por parametro.
+     * @throws EntityNotFoundException si no encuentra un usuario asignado al ID pasado por parámetro.
      */
     @Override
     @Transactional
     public void deleteUser(Integer userId, Integer userUpdateId) {
-        // Buscar el usuario por su ID
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-
-        // Si no se encuentra el usuario, lanzar una excepción
-        if (optionalUser.isEmpty()) {
-            throw new EntityNotFoundException("Usuario no encontrado con la id: " + userId);
-        }
-        // Obtener el usuario
-        UserEntity userEntity = optionalUser.get();
-        // Realizar la baja lógica: marcar el usuario como inactivo
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         userEntity.setActive(false);
-        // Actualizar la fecha y usuario que realiza la baja
         userEntity.setLastUpdatedDate(LocalDateTime.now());
         userEntity.setLastUpdatedUser(userUpdateId);
-        // Guardar los cambios en la base de datos
         userRepository.save(userEntity);
-        //restAccess.deleteAccess(userEntity.getDni()); todo: Descomentar cuando se necesite postear a accesso
+        //restAccess.deleteAccess(userEntity.getDni()); todo: Descomentar cuando se necesite postear a acceso
     }
 
     /**
      * Obtener un usuario por email.
-     * @param email correo electronico de un usuario
-     * @throws EntityNotFoundException si no se encuentra un usuario con el email proporcionado por parametro.
-     * @throws EntityNotFoundException si no se encuentra un usuario con el id coincidente al email.
+     * @param email correo electrónico de un usuario.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el email proporcionado por parámetro.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID coincidente al email.
      * @return un usuario si existe.
      */
     @Override
@@ -763,21 +678,15 @@ public class UserServiceImpl implements UserService {
         if (userId == null) {
             throw new EntityNotFoundException("User not found with email: " + email);
         }
-
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(userEntity, getUserDto);
-        mapUserRolesAndContacts(userEntity, getUserDto);
-        return getUserDto;
+        return getUserById(userId);
     }
 
     /**
      * Obtener un usuario de rol "Owner" con un plotId especifíco.
      *
      * @param plotId identificador de un lote.
-     * @throws EntityNotFoundException si no encuentra a un usuario asignado al lote según la id de
-     * lote proporcionada por parametro.
+     * @throws EntityNotFoundException si no encuentra a un usuario asignado al lote según el ID del
+     * lote proporcionado por parámetro.
      * @return un usuario si existe.
      */
     @Override
@@ -786,19 +695,15 @@ public class UserServiceImpl implements UserService {
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("User not found with plot id: " + plotId);
         }
-
         UserEntity user = userEntity.get();
-        GetUserDto getUserDto = new GetUserDto();
-        mapUserEntityToGet(user, getUserDto);
-        mapUserRolesAndContacts(user, getUserDto);
-        return getUserDto;
+        return convertToUserDto(user);
     }
 
     /**
      * Obtener una lista de usuarios activos por lote.
      *
      * @param plotId identificador de un lote.
-     * @throws EntityNotFoundException si no encuentra usuarios asignado al lote.
+     * @throws EntityNotFoundException si no encuentra usuarios asignados al lote.
      * @return lista de GetUserDto.
      */
     @Override
@@ -807,22 +712,16 @@ public class UserServiceImpl implements UserService {
         if (userEntity.isEmpty()) {
             throw new EntityNotFoundException("Users not found with plot id: " + plotId);
         }
-
         List<UserEntity> users = userEntity.get();
-        List<GetUserDto> usersDto = new ArrayList<>();
-        for (UserEntity user : users) {
-            GetUserDto userDto = new GetUserDto();
-            mapUserEntityToGet(user, userDto);
-            mapUserRolesAndContacts(user, userDto);
-            usersDto.add(userDto);
-        }
-        return usersDto;
+        return users.stream()
+                .map(this::convertToUserDto)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Obtener un usuario por rpñ.
+     * Obtener un usuario por rol.
      * @param roleId identificador de rol.
-     * @throws EntityNotFoundException si no se encuentra un usuario con el rol proporcionado por parametro.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el rol proporcionado por parámetro.
      * @return un usuario si existe.
      */
     @Override
@@ -834,7 +733,8 @@ public class UserServiceImpl implements UserService {
         List<GetUserDto> usersDto = new ArrayList<>();
 
         for (UserRoleEntity userRoleEntity : usersRole) {
-            UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId()).get();
+            UserEntity userEntity = userRepository.findById(userRoleEntity.getUser().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userRoleEntity.getUser().getId()));
 
             GetUserDto userDto = modelMapper.map(userEntity, GetUserDto.class);
             mapUserEntityToGet(userEntity, userDto);
@@ -848,7 +748,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Verifica un inicio de sesión.
      *
-     * @param postLoginDto dto con informacion requerida para el metodo.
+     * @param postLoginDto dto con información requerida para verificar un inicio de sesión.
      * @return un booleano de confirmación.
      */
     @Override

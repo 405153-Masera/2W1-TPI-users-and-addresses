@@ -66,7 +66,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
             + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
             + "JOIN RoleEntity r ON ur.role.id = r.id "
             + "JOIN PlotUserEntity pu ON pu.user.id = u.id "
-            + "AND u.active = true")
+            + "WHERE u.active = true AND pu.plotId = :plotId")
     Optional<List<UserEntity>> findUsersByPlotId(@Param("plotId") Integer plotId);
 
     /**

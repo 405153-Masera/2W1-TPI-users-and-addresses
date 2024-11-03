@@ -5,7 +5,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Configuración de Cors.
- *
  * Esta clase se encarga de la configuración de Cors para evitar conflictos
  * con consultas HTTP.
  */
