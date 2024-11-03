@@ -114,4 +114,7 @@ public interface UserService {
 
     List<GetPlotUserDto> getAllPlotUsers();
     List<GetUserDto> getUsersByOwner(Integer ownerId);
+
+    List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId);
+
 }

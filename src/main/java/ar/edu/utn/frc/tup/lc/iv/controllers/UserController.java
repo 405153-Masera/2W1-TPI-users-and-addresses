@@ -261,4 +261,15 @@ public class UserController {
             return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
         }
     }
+
+    @GetMapping("/byOwner/{ownerId}/WithoutTheOwner")
+    public ResponseEntity<List<GetUserDto>> getUsersByOwnerV2(@PathVariable Integer ownerId) {
+        List<GetUserDto> users = userService.getUsersByOwnerWithoutOwner(ownerId);
+        // Verifica si la lista está vacía
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay usuarios
+        } else {
+            return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
+        }
+    }
 }
