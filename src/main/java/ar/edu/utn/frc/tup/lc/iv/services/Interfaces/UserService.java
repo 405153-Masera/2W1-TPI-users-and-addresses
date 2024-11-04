@@ -128,4 +128,7 @@ public interface UserService {
      * @return la lista de usuarios por propietario.
      */
     List<GetUserDto> getUsersByOwner(Integer ownerId);
+
+    List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId);
+
 }

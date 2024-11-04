@@ -202,6 +202,46 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Busca todos los usuarios (familaires) asociados a un propietario,
+     * SIN INCLUIR el propietario
+     *
+     * @param ownerId
+     * @return la lista de usuarios por propietario.
+     */
+    @Override
+    public List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId) {
+        List<GetPlotOwnerDto> plotOwnerDtoList = restPlotOwner.getAllPlotOwner();
+        List<GetPlotUserDto> plotUserDtoList = this.getAllPlotUsers();
+        List<GetUserDto> userDtos = this.getAllUsers();
+        List<Integer> plotsByOwner = new ArrayList<>();
+
+        // Obtiene los lotes asociados al propietario
+        for (GetPlotOwnerDto PO : plotOwnerDtoList) {
+            if (PO.getOwner_id().equals(ownerId)) {
+                plotsByOwner.add(PO.getPlot_id());
+            }
+        }
+
+        List<GetUserDto> userDtoByOwner = new ArrayList<>();
+        if (!plotsByOwner.isEmpty()) {
+            for (GetPlotUserDto PU : plotUserDtoList) {
+                if (plotsByOwner.contains(PU.getPlot_id())) {
+                    for (GetUserDto userDto : userDtos) {
+                        if (userDto.getId().equals(PU.getUser_id())) {
+                            // Filtra para no incluir al propietario
+                            if (!Arrays.asList(userDto.getRoles()).contains("Propietario")) {
+                                userDtoByOwner.add(userDto);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return userDtoByOwner;
+    }
+
+    /**
      * Guarda al usuario en la base de datos.
      *
      * @param user dto que contiene la información del usuario.
