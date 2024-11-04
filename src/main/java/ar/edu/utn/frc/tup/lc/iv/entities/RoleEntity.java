@@ -35,13 +35,13 @@ public class RoleEntity {
     private String description;
 
     /**
-     * Fecha que reprenta cuando se creó el rol.
+     * Fecha que representa cuando se creó el rol.
      */
     @Column(name = "created_datetime")
     private LocalDateTime createdDate;
 
     /**
-     * Fecha que reprenta cuando fué la última vez que se modificó la entidad.
+     * Fecha que representa cuando fue la última vez que se modificó la entidad.
      */
     @Column(name = "last_updated_datetime")
     private LocalDateTime lastUpdatedDate;
@@ -53,14 +53,14 @@ public class RoleEntity {
     private Integer createdUser;
 
     /**
-     * Itentificador que representa el usuario que modificó por ultima vez
+     * Identificador que representa el usuario que modificó por última vez
      * la entidad.
      */
     @Column(name = "last_updated_user")
     private Integer lastUpdatedUser;
 
     /**
-     * Representa la relacion uno a muchos de la entidad user y role.
+     * Representa la relación uno a muchos de la entidad user y role.
      */
     @OneToMany(mappedBy = "role")
     private List<UserRoleEntity> userRoles;

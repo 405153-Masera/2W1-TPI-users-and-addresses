@@ -42,7 +42,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     /**
      * Busca un usuario que tenga rol "Owner" y que coincida con el plotId
-     * pasado por parametro.
+     * pasado por parámetro.
      *
      * @param plotId el identificador de un lote.
      * @return un {@link UserEntity}
@@ -87,7 +87,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     /**
      * Verifica si existe un usuario con nombre de usuario
-     * igual al pasado por parametro.
+     * igual al pasado por parámetro.
      *
      * @param username nombre de usuario.
      * @return true si existe, false si no.
@@ -95,7 +95,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     boolean existsByUsername(String username);
 
     /**
-     * Verifica si existe un usuario con dni igual al pasado por parametro.
+     * Verifica si existe un usuario con dni igual al pasado por parámetro.
      *
      * @param dni numero de dni.
      * @return true si existe, false si no.

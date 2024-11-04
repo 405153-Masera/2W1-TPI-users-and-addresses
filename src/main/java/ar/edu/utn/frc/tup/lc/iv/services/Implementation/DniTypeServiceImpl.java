@@ -4,6 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetDniTypeDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.DniTypeEntity;
 import ar.edu.utn.frc.tup.lc.iv.repositories.DniTypeRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.DniTypeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,19 +12,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de la interfaz {@link DniTypeService}
+ * contiene toda la lógica relacionada con los tipos de DNI.
+ */
 @Service
+@RequiredArgsConstructor
 public class DniTypeServiceImpl implements DniTypeService {
 
+    /**
+     * Repositorio para manejar los DNI types entities.
+     */
     private final DniTypeRepository dniTypeRepository;
-
-    public DniTypeServiceImpl(DniTypeRepository dniTypeRepository){
-        this.dniTypeRepository = dniTypeRepository;
-    }
 
     /**
      * Obtiene una lista de todos los tipos de DNI.
      *
-     * @return una lista de DTOs que representan los tipos de DNI.
+     * @return una lista de DTO que representan los tipos de DNI.
      */
     @Override
     public List<GetDniTypeDto> findAll() {
@@ -37,14 +42,14 @@ public class DniTypeServiceImpl implements DniTypeService {
         }
         return dniTypeDtos;
     }
-    
-/**
- * Obtiene un tipo de DNI por su ID.
- *
- * @param id el ID del tipo de DNI que se desea obtener.
- * @throws RuntimeException si no se encuentra el tipo de DNI.
- * @return el DTO que representa el tipo de DNI encontrado.
- */
+
+    /**
+     * Obtiene un tipo de DNI por su ID.
+     *
+     * @param id el ID del tipo de DNI que se desea obtener.
+     * @throws RuntimeException si no se encuentra el tipo de DNI.
+     * @return el DTO que representa el tipo de DNI encontrado.
+     */
     @Override
     public GetDniTypeDto findById(Integer id) {
         Optional<DniTypeEntity> optionalEntity = dniTypeRepository.findById(id);
@@ -96,5 +101,4 @@ public class DniTypeServiceImpl implements DniTypeService {
 
         return new GetDniTypeDto(updatedEntity.getDescription());
     }
-
 }

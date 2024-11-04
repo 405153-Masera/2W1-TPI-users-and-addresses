@@ -37,7 +37,7 @@ public class ContactRequest {
     private String value;
 
     /**
-     * ID del editor que creó el contacto.
+     * Id del editor que creó el contacto.
      */
     @NotNull(message = "El ID del editor no puede estar vacío")
     private Integer editorId;

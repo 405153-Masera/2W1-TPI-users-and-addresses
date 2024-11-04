@@ -7,6 +7,7 @@ import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import ar.edu.utn.frc.tup.lc.iv.helpers.RoleTestHelper;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
+import ar.edu.utn.frc.tup.lc.iv.services.validator.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,9 @@ class RoleServiceImplTest {
 
     @Mock
     private UserRoleRepository userRoleRepository;
+
+    @Mock
+    private Validator validator;
 
     @Spy
     private ModelMapper modelMapper;
@@ -86,15 +90,18 @@ class RoleServiceImplTest {
     void getRolesByUserWithException(){
         List<UserRoleEntity> listaVacia = new ArrayList<>();
         when(userRoleRepository.findByUserId(879)).thenReturn(listaVacia);
+        doThrow(new RoleUserException("The user has no assigned roles or does not exist", HttpStatus.NOT_FOUND))
+                .when(validator).validateUserByRoles(listaVacia);
 
+        // Act & Assert
         RoleUserException exception = assertThrows(RoleUserException.class, () -> {
             roleService.getRolesByUser(879);
         });
 
+        // Assert
         assertEquals("The user has no assigned roles or does not exist", exception.getMessage());
         verify(userRoleRepository).findByUserId(879);
-
-        // Se verifica que el roleRepository nunca se llamó
+        verify(validator).validateUserByRoles(listaVacia);
         verifyNoInteractions(roleRepository);
     }
 

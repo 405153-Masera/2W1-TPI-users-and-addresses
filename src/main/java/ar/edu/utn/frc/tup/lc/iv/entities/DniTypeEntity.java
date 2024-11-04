@@ -29,13 +29,13 @@ public class DniTypeEntity {
     private String description;
 
     /**
-     * Fecha que reprenta cuando se creó la entidad.
+     * Fecha que representa cuando se creó la entidad.
      */
     @Column(name = "created_datetime", nullable = false)
     private LocalDateTime createdDatetime;
 
     /**
-     * Fecha que reprenta cuando fué la última vez que se modificó la entidad.
+     * Fecha que representa cuando fue la última vez que se modificó la entidad.
      */
     @Column(name = "last_updated_datetime", nullable = false)
     private LocalDateTime lastUpdatedDatetime;
@@ -47,7 +47,7 @@ public class DniTypeEntity {
     private Integer createdUser;
 
     /**
-     * Itentificador que representa el usuario que modificó por ultima vez
+     * Identificador que representa el usuario que modificó por última vez
      * la entidad.
      */
     @Column(name = "last_updated_user", nullable = false)

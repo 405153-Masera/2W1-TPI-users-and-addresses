@@ -18,8 +18,7 @@ import java.util.List;
 
 /**
  * Controlador REST para manejar operaciones de Usuarios.
- *
- * Expone Enpoints para agregar , borrar , actualizar y obtener usuarios.
+ * Expone Endpoints para agregar, borrar, actualizar y obtener usuarios.
  */
 @RestController
 @RequestMapping("/users")
@@ -72,7 +71,7 @@ public class UserController {
     }
 
     /**
-     * Obtiene un usuario determinado por id.
+     * Obtiene un usuario determinado por el ID.
      *
      * @param userId id del usuario a buscar.
      * @return el usuario encontrado.
@@ -105,11 +104,11 @@ public class UserController {
     }
 
     /**
-     * Modifica un usuario buscado por id.
+     * Modifica un usuario buscado por el ID.
      *
      * @return el usuario modificado con campos actualizados.
      * @param userId identificador de un usuario.
-     * @param putUserDto dto con inforamción necesaria para modificar un usuario.
+     * @param putUserDto dto con información necesaria para modificar un usuario.
      */
     @PutMapping("/put/{userId}")
     public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId, @RequestBody PutUserDto putUserDto) {
@@ -157,11 +156,11 @@ public class UserController {
 
 
     /**
-     * Baja logica de un usuario.
+     * Baja lógica de un usuario.
      *
      * @param userId identificador del usuario.
-     * @param userIdUpdate identificador de la persona que realiza la baja logica.
-     * @return una confirmacion de la baja lógica.
+     * @param userIdUpdate identificador de la persona que realiza la baja lógica.
+     * @return una confirmación de la baja lógica.
      */
     @DeleteMapping("/delete/{userId}/{userIdUpdate}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer userId, @PathVariable Integer userIdUpdate) {
@@ -248,7 +247,7 @@ public class UserController {
     /**
      * Obtiene una lista de usuarios asociados a un propietario específico.
      *
-     * @param ownerId ID del propietario para el cual se desean obtener los usuarios.
+     * @param ownerId id del propietario para el cual se desean obtener los usuarios.
      * @return `ResponseEntity<List<GetUserDto>>` con estado 204 si no se encuentran usuarios, o estado 200 con la lista de usuarios.
      */
     @GetMapping("/byOwner/{ownerId}")

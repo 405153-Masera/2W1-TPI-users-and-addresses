@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador Rest para la verificación de datos únicos.
+ * Se encarga de verificar si los datos ingresados son únicos en la base de datos.
+ */
 @RestController
 @RequestMapping("/verification")
 @RequiredArgsConstructor

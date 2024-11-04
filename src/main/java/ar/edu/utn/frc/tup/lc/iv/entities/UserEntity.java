@@ -84,7 +84,7 @@ public class UserEntity {
     private LocalDate datebirth;
 
     /**
-     * Fecha que reprenta cuando se creó el usuario.
+     * Fecha que representa cuando se creó el usuario.
      */
     @Column(name = "created_datetime")
     private LocalDateTime createdDate;
@@ -96,13 +96,13 @@ public class UserEntity {
     private Integer createdUser;
 
     /**
-     * Fecha que reprenta cuando fué la última vez que se modificó la entidad.
+     * Fecha que representa cuando fue la última vez que se modificó la entidad.
      */
     @Column(name = "last_updated_datetime")
     private LocalDateTime lastUpdatedDate;
 
     /**
-     * Itentificador que representa el usuario que moodificó por ultima vez
+     * Identificador que representa el usuario que modificó por última vez
      * la entidad.
      */
     @Column(name = "last_updated_user")

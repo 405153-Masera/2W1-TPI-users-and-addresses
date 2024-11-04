@@ -3,10 +3,8 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,26 +18,23 @@ import java.util.List;
 /**
  * Clase asociada al restTemplate para consumir el microservicio de contactos.
  */
-
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class RestContact {
 
     /**
      * Instancia de restTemplate para utilizar dentro de la clase.
      */
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     /**
-     * Direccion url donde se levanta el microservicio de contactos.
+     * Dirección url donde se levanta el microservicio de contactos.
      */
     private String url = "http://localhost:8010/contact/search";
 
     /**
-     * Metodo para obtener una lista de contactos según una id de usuario.
+     * Metodo para obtener una lista de contactos según un ID de usuario.
      *
      * @param userId identificador de un usuario.
      * @return una lista de {@link GetContactDto}
@@ -51,7 +46,7 @@ public class RestContact {
 
         List<GetContactDto> contacts = new ArrayList<>();
 
-        GetContactDto contact = null;
+        GetContactDto contact;
 
         // Si hay algo, mapeamos y lo ponemos en la lista
         if (response.getBody().isArray()) {
@@ -99,9 +94,9 @@ public class RestContact {
     }
 
     /**
-     * Metodo para obtener una id de usuario por un parametro Email.
+     * Metodo para obtener un ID de usuario por un parámetro Email.
      *
-     * @param email correo electronico de un usuario.
+     * @param email correo electrónico de un usuario.
      * @return una id de usuario tipo {@link Integer}
      */
     public Integer getUserIdByEmail(String email) {
@@ -125,11 +120,11 @@ public class RestContact {
      *
      * @param userId identificador de un usuario.
      * @param value valor del contacto a guardar.
-     * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
+     * @param contactType tipo de contacto a guardar (1-email , 2-teléfono).
      * @param editorId identificador del usuario que guarda el contacto.
      * @return un booleano indicando si se pudo o no guardar el contacto.
      */
-    public boolean saveContact(Integer userId, String value, int contactType , int editorId) {
+    public boolean saveContact(Integer userId, String value, int contactType, int editorId) {
         ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
         contact.setValue(value);
@@ -154,11 +149,12 @@ public class RestContact {
      *
      * @param userId identificador de un usuario.
      * @param value valor del contacto a guardar.
-     * @param contactType tipo de contacto a guardar (1-email , 2-telefono).
+     * @param contactType tipo de contacto a guardar (1-email , 2-teléfono).
+     * @param editorId identificador del usuario que guarda el contacto.
      * @return un booleano indicando si se pudo o no modificar el contacto.
      */
     public boolean updateContact(Integer userId, String value, int contactType, int editorId) {
-        String updateUrl = "http://localhost:8010/contact/update?userId="+userId+"&personTypeId=3&contactTypeId="+contactType;
+        String updateUrl = "http://localhost:8010/contact/update?userId=" + userId + "&personTypeId=3&contactTypeId=" + contactType;
 
         ContactPutRequest contact = new ContactPutRequest();
         contact.setUserId(userId);

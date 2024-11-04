@@ -20,7 +20,7 @@ public interface UserService {
     /**
      * Crea un usuario.
      *
-     * @param postUserDto
+     * @param postUserDto dto con información requerida para el alta de un usuario.
      * @return el usuario creado.
      */
     GetUserDto createUser(PostUserDto postUserDto);
@@ -28,7 +28,7 @@ public interface UserService {
     /**
      * Crea un usuario.
      *
-     * @param postOwnerUserDto
+     * @param postOwnerUserDto dto con información requerida para el alta de un usuario.
      * @return el usuario creado.
      */
     GetOwnerUserDto createOwnerUser(PostOwnerUserDto postOwnerUserDto);
@@ -42,7 +42,7 @@ public interface UserService {
 
     /**
      * Obtener un usuario por id.
-     * @param userId
+     * @param userId id del usuario.
      * @return un usuario si existe.
      */
     GetUserDto getUserById(Integer userId);
@@ -50,7 +50,7 @@ public interface UserService {
     /**
      * Actualiza un usuario.
      *
-     * @param userId la id del usuario a actualizar.
+     * @param userId el ID del usuario a actualizar.
      * @param putUserDto el dto con la información necesaria para actualizar un usuario.
      * @return el usuario actualizado.
      */
@@ -75,7 +75,7 @@ public interface UserService {
     /**
      * Obtener un usuario por email.
      *
-     * @param email correo electronico de un usuario
+     * @param email correo electrónico de un usuario
      * @return un usuario si existe.
      */
     GetUserDto getUserByEmail(String email);
@@ -99,7 +99,7 @@ public interface UserService {
     /**
      * Verifica un inicio de sesión.
      *
-     * @param postLoginDto dto con informacion requerida para el metodo.
+     * @param postLoginDto dto con información requerida para el metodo.
      * @return un booleano de confirmación.
      */
     GetUserDto verifyLogin(PostLoginDto postLoginDto);
@@ -112,6 +112,20 @@ public interface UserService {
      */
     List<GetUserDto> getAllUsersByPlotId(Integer plotId);
 
+    /**
+     * Busca todos los usuarios asociados a un lote,
+     * incluido el propietario.
+     *
+     * @return la lista de usuarios por lote.
+     */
     List<GetPlotUserDto> getAllPlotUsers();
+
+    /**
+     * Busca todos los usuarios (familiares) asociados a un propietario,
+     * incluido el propietario.
+     *
+     * @param ownerId id del propietario.
+     * @return la lista de usuarios por propietario.
+     */
     List<GetUserDto> getUsersByOwner(Integer ownerId);
 }

@@ -39,7 +39,7 @@ public abstract class BasePostUser {
     private String password;
 
     /**
-     * Correo electronico del usuario utilizado en el login que se guarda en el microservicio
+     * Correo electrónico del usuario utilizado en el login y en el microservicio
      * de contactos.
      */
     @NotNull(message = "El correo electrónico no puede ser nulo")
@@ -47,20 +47,20 @@ public abstract class BasePostUser {
     private String email;
 
     /**
-     * Telefono del usuario que se guarda en el microservicio de contactos.
+     * Teléfono del usuario que se guarda en el microservicio de contactos.
      */
-    @NotNull(message = "El telefono no puede ser nulo")
-    @Size(min = 10, max = 20, message = "El numero de telefono debe tener un formato valido")
+    @NotNull(message = "El teléfono no puede ser nulo")
+    @Size(min = 10, max = 20, message = "El numero de teléfono debe tener un formato valido")
     private String phone_number;
 
     /**
-     * Numero de DNI del usuario.
+     * Número de DNI del usuario.
      */
     @NotNull(message = "El tipo de DNI no puede ser nulo")
     private Integer dni_type_id;
 
     /**
-     * Numero de DNI del usuario.
+     * Número de DNI del usuario.
      */
     @NotNull(message = "El DNI no puede ser nulo")
     @Size(min = 1, max = 11, message = "El DNI debe ser valido")

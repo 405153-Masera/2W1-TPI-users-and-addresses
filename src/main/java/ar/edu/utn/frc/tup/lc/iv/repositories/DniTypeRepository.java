@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
  * Conecta la aplicación con la base de datos para manejar la tabla DniType.
  */
 @Repository
-public interface DniTypeRepository extends JpaRepository<DniTypeEntity,Integer> {
+public interface DniTypeRepository extends JpaRepository<DniTypeEntity, Integer> {
 }

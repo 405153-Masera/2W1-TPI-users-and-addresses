@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class GetDniTypeDto {
 
     /**
-     * Nombre representativo del tipo de documento (pasaporte, dni, etcétera)
+     * Nombre representativo del tipo de documento (pasaporte, dni, etcétera).
      */
     private String description;
 }

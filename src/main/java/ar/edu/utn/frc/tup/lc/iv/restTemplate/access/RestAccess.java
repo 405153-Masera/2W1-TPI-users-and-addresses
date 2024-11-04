@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * Clase asociada al restTemplate para consumir el microservicio de accesos.
  */
-
 @Data
 @RequiredArgsConstructor
 @Service

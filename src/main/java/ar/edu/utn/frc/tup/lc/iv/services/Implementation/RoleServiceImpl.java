@@ -4,7 +4,6 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
-import ar.edu.utn.frc.tup.lc.iv.exceptions.RoleUserException;
 import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Implementacion de {@link RoleService},
+ * Implementación de {@link RoleService},
  * contiene toda la lógica relacionada con roles.
  */
 @Data
@@ -44,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
     private final ModelMapper modelMapper;
 
     /**
-     *  Validator para validar UserRoles
+     *  Validator para validar UserRoles.
      */
     private final Validator validator;
 
@@ -71,7 +70,6 @@ public class RoleServiceImpl implements RoleService {
      *
      * @param userId identificador de un usuario.
      * @return una lista con todos los roles coincidentes al usuario.
-     * @throws RoleUserException si el usuario no tiene roles asignados o no existe.
      */
     @Override
     public List<GetRoleDto> getRolesByUser(int userId) {
@@ -108,10 +106,22 @@ public class RoleServiceImpl implements RoleService {
 
     }
 
+    /**
+     * Mapea un RoleEntity a un GetRoleDto.
+     *
+     * @param roleEntity entidad a mapear.
+     * @return un GetRoleDto mapeado.
+     */
     public GetRoleDto mapToGetRoleDTO(RoleEntity roleEntity) {
         return modelMapper.map(roleEntity, GetRoleDto.class);
     }
 
+    /**
+     * Asigna el ID y la descripción de un RoleEntity en un GetRoleDto.
+     *
+     * @param role entidad a mapear.
+     * @return un GetRoleDto mapeado.
+     */
     public GetRoleDto setIdAndDescriptionOnGetRoleDTO(RoleEntity role) {
         GetRoleDto getRoleDto = new GetRoleDto();
         getRoleDto.setId(role.getId());
@@ -119,6 +129,4 @@ public class RoleServiceImpl implements RoleService {
 
         return getRoleDto;
     }
-
-
 }

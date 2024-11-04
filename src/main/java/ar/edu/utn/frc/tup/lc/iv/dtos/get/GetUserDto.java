@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
- * DTO que representa una respuesta que contiene la infromación de
+ * DTO que representa una respuesta que contiene la información de
  * un usuario.
  */
 @Data
@@ -48,7 +48,7 @@ public class GetUserDto {
     private String email;
 
     /**
-     * Número de telefono del usuario que se obtiene
+     * Número de teléfono del usuario que se obtiene
      * desde el microservicio de Contactos.
      */
     private String phone_number;
@@ -80,7 +80,7 @@ public class GetUserDto {
     private LocalDate datebirth;
 
     /**
-     * Fecha de creacion del usuario.
+     * Fecha de creación del usuario.
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate create_date;

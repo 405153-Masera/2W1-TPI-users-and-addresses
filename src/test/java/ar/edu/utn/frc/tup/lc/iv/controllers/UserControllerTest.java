@@ -2,6 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.helpers.UserTestHelper;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
@@ -15,10 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -42,7 +44,7 @@ class UserControllerTest {
         //Given
         GetUserDto getUserDto = UserTestHelper.createGetUserDto();
         //When
-        Mockito.when(userServiceMock.getUserByEmail("juapa@gmail.com")).thenReturn(getUserDto);
+        when(userServiceMock.getUserByEmail("juapa@gmail.com")).thenReturn(getUserDto);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getByEmail/" + getUserDto.getEmail())
@@ -50,20 +52,20 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("juapa@gmail.com"));
 
-        Mockito.verify(userServiceMock, times(1)).getUserByEmail("juapa@gmail.com");
+        verify(userServiceMock, times(1)).getUserByEmail("juapa@gmail.com");
     }
 
     @Test
     void getUserByEmailIT_NotFound() throws Exception{
         //When
-        Mockito.when(userServiceMock.getUserByEmail("lucii@gmail")).thenReturn(null);
+        when(userServiceMock.getUserByEmail("lucii@gmail")).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getByEmail/" + "lucii@gmail")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Mockito.verify(userServiceMock, times(1)).getUserByEmail("lucii@gmail");
+        verify(userServiceMock, times(1)).getUserByEmail("lucii@gmail");
     }
 
     @Test
@@ -75,7 +77,7 @@ class UserControllerTest {
         getUserDtoList.add(getUserDto);
 
         //When
-        Mockito.when(userServiceMock.getAllUsers()).thenReturn(getUserDtoList);
+        when(userServiceMock.getAllUsers()).thenReturn(getUserDtoList);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall")
@@ -83,20 +85,20 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2));
 
-        Mockito.verify(userServiceMock, Mockito.times(1)).getAllUsers();
+        verify(userServiceMock, Mockito.times(1)).getAllUsers();
     }
 
     @Test
     void getUsersIT_BadRequest() throws Exception{
         //When
-        Mockito.when(userServiceMock.getAllUsers()).thenReturn(null);
+        when(userServiceMock.getAllUsers()).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, Mockito.times(1)).getAllUsers();
+        verify(userServiceMock, Mockito.times(1)).getAllUsers();
     }
 
     @Test
@@ -109,7 +111,7 @@ class UserControllerTest {
         PostUserDto postUserDto = UserTestHelper.createPostUserDto();
 
         //When
-        Mockito.when(userServiceMock.createUser(postUserDto)).thenReturn(getUserDto);
+        when(userServiceMock.createUser(postUserDto)).thenReturn(getUserDto);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.post("/users/post")
@@ -119,7 +121,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.name").value(postUserDto.getName()));
 
-        Mockito.verify(userServiceMock, times(1)).createUser(Mockito.any(PostUserDto.class));
+        verify(userServiceMock, times(1)).createUser(Mockito.any(PostUserDto.class));
     }
 
     @Test
@@ -132,7 +134,7 @@ class UserControllerTest {
         PostUserDto postUserDto = UserTestHelper.createPostUserDto();
 
         //When
-        Mockito.when(userServiceMock.createUser(Mockito.any(PostUserDto.class))).thenReturn(null);
+        when(userServiceMock.createUser(Mockito.any(PostUserDto.class))).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.post("/users/post")
@@ -140,7 +142,95 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(postUserDto)))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, times(1)).createUser(Mockito.any(PostUserDto.class));
+        verify(userServiceMock, times(1)).createUser(Mockito.any(PostUserDto.class));
+    }
+
+    @Test
+    void getUserByPlotIdAndOwnerRole_Success() throws Exception {
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(1);
+        getUserDto.setName("Juan");
+        getUserDto.setLastname("Pepes");
+        getUserDto.setUsername("JuanP");
+        getUserDto.setEmail("juanP@email.com");
+        getUserDto.setPhone_number("123456789");
+        getUserDto.setDni("12345678");
+        getUserDto.setActive(true);
+        getUserDto.setAvatar_url("avatar_url");
+        getUserDto.setDatebirth(LocalDate.of(1997, 12, 1));
+        getUserDto.setRoles(new String[]{"Gerente"});
+        getUserDto.setPlot_id(new Integer[]{1});
+        getUserDto.setTelegram_id(1);
+        Integer plotId = 1;
+        when(userServiceMock.getUserByPlotIdAndOwnerRole(plotId)).thenReturn(getUserDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/get/owner/" + plotId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(getUserDto.getId()))
+                .andExpect(jsonPath("$.name").value(getUserDto.getName()));
+
+        verify(userServiceMock, times(1)).getUserByPlotIdAndOwnerRole(plotId);
+    }
+
+    @Test
+    void getUserByPlotIdAndOwnerRole_NotFound() throws Exception {
+        Integer plotId = 1;
+        when(userServiceMock.getUserByPlotIdAndOwnerRole(plotId)).thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/get/owner/" + plotId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(userServiceMock, times(1)).getUserByPlotIdAndOwnerRole(plotId);
+    }
+
+    @Test
+    void getAllUsersByPlotId_Success() throws Exception {
+
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(1);
+        getUserDto.setName("Juan");
+        getUserDto.setLastname("Pepes");
+        getUserDto.setUsername("JuanP");
+        getUserDto.setEmail("juanP@email.com");
+        getUserDto.setPhone_number("123456789");
+        getUserDto.setDni("12345678");
+        getUserDto.setActive(true);
+        getUserDto.setAvatar_url("avatar_url");
+        getUserDto.setDatebirth(LocalDate.of(1997, 12, 1));
+        getUserDto.setRoles(new String[]{"Gerente"});
+        getUserDto.setPlot_id(new Integer[]{1});
+        getUserDto.setTelegram_id(1);
+        Integer plotId = 1;
+        List<GetUserDto> getUserDtoList = new ArrayList<>();
+        getUserDtoList.add(getUserDto);
+
+        when(userServiceMock.getAllUsersByPlotId(plotId)).thenReturn(getUserDtoList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/" + plotId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(getUserDto.getId()))
+                .andExpect(jsonPath("$[0].name").value(getUserDto.getName()))
+                .andExpect(jsonPath("$[0].lastname").value(getUserDto.getLastname()));
+
+        verify(userServiceMock, times(1)).getAllUsersByPlotId(plotId);
+    }
+
+    @Test
+    void getAllUsersByPlotId_NotFound() throws Exception {
+        // Given
+        Integer plotId = 1;
+        when(userServiceMock.getAllUsersByPlotId(plotId)).thenReturn(null);
+
+        // When & Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/" + plotId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(userServiceMock, times(1)).getAllUsersByPlotId(plotId);
     }
 
     @Test
@@ -149,7 +239,7 @@ class UserControllerTest {
         GetUserDto getUserDto = UserTestHelper.createGetUserDto();
 
         //When
-        Mockito.when(userServiceMock.getUserById(1)).thenReturn(getUserDto);
+        when(userServiceMock.getUserById(1)).thenReturn(getUserDto);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getById/1")
@@ -158,20 +248,20 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Juan"));
 
-        Mockito.verify(userServiceMock, times(1)).getUserById(Mockito.anyInt());
+        verify(userServiceMock, times(1)).getUserById(Mockito.anyInt());
     }
 
     @Test
     void getUserByIdIT_NotFound() throws Exception{
         //When
-        Mockito.when(userServiceMock.getUserById(1)).thenReturn(null);
+        when(userServiceMock.getUserById(1)).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getById/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Mockito.verify(userServiceMock, times(1)).getUserById(Mockito.anyInt());
+        verify(userServiceMock, times(1)).getUserById(Mockito.anyInt());
     }
 
     @Test
@@ -185,7 +275,7 @@ class UserControllerTest {
         getUserDtoList.add(getUserDto);
 
         // When
-        Mockito.when(userServiceMock.getUsersByStatus(true)).thenReturn(getUserDtoList);
+        when(userServiceMock.getUsersByStatus(true)).thenReturn(getUserDtoList);
 
         // Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/status/true")
@@ -193,21 +283,21 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(3));
 
-        Mockito.verify(userServiceMock, times(1)).getUsersByStatus(true);
+        verify(userServiceMock, times(1)).getUsersByStatus(true);
     }
 
 
     @Test
     void getUsersByStatusIT_BadRequest() throws Exception {
         // When
-        Mockito.when(userServiceMock.getUsersByStatus(true)).thenReturn(null);
+        when(userServiceMock.getUsersByStatus(true)).thenReturn(null);
 
         // Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/status/true")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, times(1)).getUsersByStatus(true);
+        verify(userServiceMock, times(1)).getUsersByStatus(true);
     }
 
 
@@ -220,7 +310,7 @@ class UserControllerTest {
         getUserDtoList.add(getUserDto);
 
         // When
-        Mockito.when(userServiceMock.getUsersByRole(1)).thenReturn(getUserDtoList);
+        when(userServiceMock.getUsersByRole(1)).thenReturn(getUserDtoList);
 
         // Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/role/1")
@@ -231,21 +321,21 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].email").value("juapa@gmail.com"));
 
 
-        Mockito.verify(userServiceMock, times(1)).getUsersByRole(1);
+        verify(userServiceMock, times(1)).getUsersByRole(1);
     }
 
 
     @Test
     void getUsersByRoleIT_BadRequest() throws Exception {
         // When
-        Mockito.when(userServiceMock.getUsersByRole(1)).thenReturn(null);
+        when(userServiceMock.getUsersByRole(1)).thenReturn(null);
 
         // Then
         mockMvc.perform(MockMvcRequestBuilders.get("/users/getall/role/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, times(1)).getUsersByRole(1);
+        verify(userServiceMock, times(1)).getUsersByRole(1);
     }
 
 
@@ -259,20 +349,18 @@ class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(userServiceMock, times(1)).deleteUser(1,1);
+        verify(userServiceMock, times(1)).deleteUser(1,1);
     }
 
- /*   @Test
+    @Test
     void updateUserIT_Success() throws Exception{
         //Given
-        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"},1,1);
+        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", 1, "3515623", "509502349", "email@email.com",
+                "avatar", LocalDate.now(), new String[]{"Gerente"}, 1, 1);
 
-        GetUserDto getUserDto = new GetUserDto(1, "Lucía", "Fernanda", "Lucifer", "123456",
-                "lucii@gmail", "1111111", "4523545", true, "", LocalDate.now(), new String[]{"Security"},1,1);
-
+        GetUserDto getUserDto = UserTestHelper.createGetUserDto(putUserDto, 1);
         //When
-        Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
+        when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
@@ -280,20 +368,20 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putUserDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.phone_number").value("1111111"))
-                .andExpect(jsonPath("$.roles[0]").value("Security"));
+                .andExpect(jsonPath("$.phone_number").value("509502349"))
+                .andExpect(jsonPath("$.roles[0]").value("Gerente"));
 
-        Mockito.verify(userServiceMock, times(1)).updateUser(1, putUserDto);
+        verify(userServiceMock, times(1)).updateUser(1, putUserDto);
     }
 
     @Test
     void updateUserIT_BadRequest() throws Exception{
         //Given
-        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", "4523545", "3515623",
-                "lucii@gmail", "", LocalDate.now(), new String[]{"Admin"},1,1);
+        PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", 1, "3515623", "509502349", "email@email.com",
+                "avatar", LocalDate.now(), new String[]{"Admin"}, 1, 1);
 
         //When
-        Mockito.when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);
+        when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
@@ -302,6 +390,6 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(putUserDto)))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(userServiceMock, times(1)).updateUser(1, putUserDto);
-    }*/
+        verify(userServiceMock, times(1)).updateUser(1, putUserDto);
+    }
 }

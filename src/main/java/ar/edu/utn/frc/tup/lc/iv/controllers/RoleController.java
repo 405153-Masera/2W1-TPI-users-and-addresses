@@ -3,7 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,16 +11,15 @@ import java.util.List;
 
 /**
  * Controlador REST para manejar operaciones de Roles.
- *
- * Expone Enpoints para agregar y obetener Roles.
+ * Expone Endpoints para agregar y obtener Roles.
  */
 @RestController
 @RequestMapping("/roles")
+@RequiredArgsConstructor
 public class RoleController {
 
     /** Servicio para manejar la lógica de roles. */
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     /**
      * Retorna una lista de todos los roles.
@@ -41,7 +40,7 @@ public class RoleController {
      * Agrega un nuevo rol.
      *
      * @param postRoleDto El DTO con los datos del contacto.
-     * @return una respuesta indicando que la creacion fue correcta o un badRequest
+     * @return una respuesta indicando que la creación fue correcta o un badRequest
      * en caso de que no pueda crearse el rol.
      */
     @PostMapping()

@@ -4,6 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.BasePostUser;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
@@ -116,6 +117,20 @@ public class UserTestHelper {
         getUserDto.setRoles(new String[]{"Gerente"});
         getUserDto.setPlot_id(new Integer[]{2,3});
         getUserDto.setTelegram_id(4);
+        return getUserDto;
+    }
+
+    public static GetUserDto createGetUserDto(PutUserDto putUserDto, Integer userId) {
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(userId);
+        getUserDto.setName(putUserDto.getName());
+        getUserDto.setLastname(putUserDto.getLastName());
+        getUserDto.setEmail(putUserDto.getEmail());
+        getUserDto.setPhone_number(putUserDto.getPhoneNumber());
+        getUserDto.setDni(putUserDto.getDni());
+        getUserDto.setAvatar_url(putUserDto.getAvatar_url());
+        getUserDto.setDatebirth(putUserDto.getDatebirth());
+        getUserDto.setRoles(putUserDto.getRoles());
         return getUserDto;
     }
 

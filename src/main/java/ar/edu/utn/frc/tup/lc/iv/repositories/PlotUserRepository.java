@@ -14,7 +14,7 @@ import java.util.List;
 public interface PlotUserRepository extends JpaRepository<PlotUserEntity, Integer> {
 
     /**
-     * Busca por una lista de PlotUserEntity mediante un UserEntity pasado por parametro.
+     * Busca por una lista de PlotUserEntity mediante un UserEntity pasado por parámetro.
      *
      * @param userEntity un UserEntity.
      * @return una lista de {@link PlotUserEntity}
