@@ -1,10 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.BasePostUser;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.*;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
@@ -203,7 +200,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Busca todos los usuarios (familaires) asociados a un propietario,
-     * SIN INCLUIR el propietario
+     * SIN INCLUIR el propietario.
      *
      * @param ownerId
      * @return la lista de usuarios por propietario.
@@ -801,5 +798,27 @@ public class UserServiceImpl implements UserService {
             return user;
         }
         return null;
+    }
+
+    /**
+     * Cambia la contraseña de un usuario.
+     * @param changePasswordDto DTO con las contraseñas actual y nueva.
+     * @throws IllegalArgumentException si la contraseña actual es incorrecta.
+     */
+    @Transactional
+    public void changePassword(ChangePassword changePasswordDto) {
+        Integer userId = this.getUserByEmail(changePasswordDto.getEmail()).getId();
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+
+        if (!PasswordUtil.checkPassword(changePasswordDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        String hashedNewPassword = PasswordUtil.hashPassword(changePasswordDto.getNewPassword());
+        user.setPassword(hashedNewPassword);
+
+        userRepository.save(user);
     }
 }

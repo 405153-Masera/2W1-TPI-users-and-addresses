@@ -101,4 +101,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      * @return true si existe, false si no.
      */
     boolean existsByDni(String dni);
+
 }
