@@ -1,37 +1,34 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.jwt.JwtUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Controlador REST para manejar operaciones de Autenticación.
- *
- * Expone Enpoints para gestionar un inicio de sesión utilizando JWT.
+ * Expone Endpoints para gestionar un inicio de sesión utilizando JWT.
  */
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     /** Servicio para manejar la lógica de usuarios. */
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
 
     /**
      * Devuelve la confirmación de un inicio de sesión exitoso.
      *
      * @param credentials credenciales del logueo.
-     * @throws IllegalArgumentException excepción credenciales invalidas.
+     * @throws IllegalArgumentException excepción credenciales inválidas.
      * @return respuesta de confirmación de logueo.
      */
     @PostMapping("/login")
@@ -65,6 +62,37 @@ public class AuthController {
         } else {
             throw new IllegalArgumentException("Credenciales inválidas");
         }
+    }
+
+    /**
+     * Valida un token JWT.
+     *
+     * @param token token a validar.
+     * @return responde indicando si el token es válido o no.
+     */
+    @PostMapping("/validateToken")
+    public Map<String, String> validateToken(@RequestBody String token) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            JwtUtil.validateToken(token);
+            response.put("message", "Token válido");
+        } catch (IllegalArgumentException e) {
+            response.put("message", "Token inválido");
+        }
+        return response;
+    }
+
+    /**
+     * Endpoint para cambiar la contraseña de un usuario.
+     * @param changePasswordDto DTO con las contraseñas actual y nueva.
+     * @return respuesta de confirmación de cambio de contraseña.
+     */
+    @PutMapping("/changePassword")
+    public Map<String, String> changePassword(@RequestBody ChangePassword changePasswordDto) {
+        userService.changePassword(changePasswordDto);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Contraseña actualizada exitosamente");
+        return response;
     }
 
 }

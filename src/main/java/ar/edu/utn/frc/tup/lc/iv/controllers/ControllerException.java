@@ -17,10 +17,10 @@ import java.time.ZonedDateTime;
 public class ControllerException {
 
     /**
-     * Metodo para manejo de excepcion de clase INTERNAL_SERVER_ERROR.
+     * Metodo para manejo de excepción de clase INTERNAL_SERVER_ERROR.
      *
      * @return una respuesta de INTERNAL_SERVER_ERROR.
-     * @param e excepcion.
+     * @param e excepción.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorApi> handleError(Exception e) {

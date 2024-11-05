@@ -1,11 +1,16 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,16 +18,19 @@ import java.util.List;
 
 /**
  * Controlador REST para manejar operaciones de Usuarios.
- *
- * Expone Enpoints para agregar , borrar , actualizar y obtener usuarios.
+ * Expone Endpoints para agregar, borrar, actualizar y obtener usuarios.
  */
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     /** Servicio para manejar la lógica de usuarios. */
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    /** Servicio para manejar el restTemplate de accesos. */
+    private final RestAccess restAccess;
+
 
     /**
      * Guarda un nuevo usuario.
@@ -44,7 +52,26 @@ public class UserController {
     }
 
     /**
-     * Obtiene un usuario determinado por id.
+     * Guarda un nuevo usuario.
+     *
+     * @param postUserDto body del usuario a guardar.
+     * @return el usuario creado.
+     */
+    @PostMapping("/post/owner")
+    public ResponseEntity<GetOwnerUserDto> createOwnerUser(@Valid @RequestBody PostOwnerUserDto postUserDto) {
+        GetOwnerUserDto result = userService.createOwnerUser(postUserDto);
+
+        //Si falla el service
+        if (result == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        //Crea el usuario
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Obtiene un usuario determinado por el ID.
      *
      * @param userId id del usuario a buscar.
      * @return el usuario encontrado.
@@ -77,22 +104,18 @@ public class UserController {
     }
 
     /**
-     * Modifica un usuario buscado por id.
+     * Modifica un usuario buscado por el ID.
      *
      * @return el usuario modificado con campos actualizados.
      * @param userId identificador de un usuario.
-     * @param putUserDto dto con inforamción necesaria para modificar un usuario.
+     * @param putUserDto dto con información necesaria para modificar un usuario.
      */
     @PutMapping("/put/{userId}")
     public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId, @RequestBody PutUserDto putUserDto) {
         GetUserDto result = userService.updateUser(userId, putUserDto);
-
-        //Si falla el service
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        //Si hace la modificación
         return ResponseEntity.ok(result);
     }
 
@@ -102,18 +125,19 @@ public class UserController {
      * @param isActive estado de los usuarios a buscar.
      * @return una lista de usuarios.
      */
-    @GetMapping("/getall/status")
+    @GetMapping("/getall/status/{isActive}")
     public ResponseEntity<List<GetUserDto>> getUsersByStatus(@PathVariable boolean isActive) {
         List<GetUserDto> result = userService.getUsersByStatus(isActive);
 
-        //Si no trae la lista
+        // Si no trae la lista
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        //Si trae la lista
+        // Si trae la lista
         return ResponseEntity.ok(result);
     }
+
 
     /**
      * Retorna una lista de todos los usuarios por rol.
@@ -121,25 +145,22 @@ public class UserController {
      * @param roleId identificador del rol.
      * @return una lista de usuarios coincidentes con el rol.
      */
-    @GetMapping("/getall/role")
+    @GetMapping("/getall/role/{roleId}")
     public ResponseEntity<List<GetUserDto>> getUsersByRole(@PathVariable Integer roleId) {
         List<GetUserDto> result = userService.getUsersByRole(roleId);
-
-        //Si no trae la lista
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        //Si trae la lista
         return ResponseEntity.ok(result);
     }
 
+
     /**
-     * Baja logica de un usuario.
+     * Baja lógica de un usuario.
      *
      * @param userId identificador del usuario.
-     * @param userIdUpdate identificador de la persona que realiza la baja logica.
-     * @return una confirmacion de la baja lógica.
+     * @param userIdUpdate identificador de la persona que realiza la baja lógica.
+     * @return una confirmación de la baja lógica.
      */
     @DeleteMapping("/delete/{userId}/{userIdUpdate}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer userId, @PathVariable Integer userIdUpdate) {
@@ -183,7 +204,7 @@ public class UserController {
     }
 
     /**
-     * Obtiene una lista de usuario de rol "Owner" perteneciente a un lote específico.
+     * Obtiene una lista de usuarios de rol "Owner" perteneciente a un lote específico.
      *
      * @param plotId del lote perteneciente al usuario a buscar.
      * @return lista de usuarios encontrado.
@@ -198,4 +219,56 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Permite registrar un nuevo acceso para el usuario asociado a un lote específico.
+     *
+     * @param accessPost Objeto que contiene los datos necesarios para registrar el acceso.
+     * @return `ResponseEntity<Void>` con estado 204 (sin contenido) si la operación es exitosa.
+     */
+    @PostMapping("/access")
+    public ResponseEntity<Void> postAccess(@RequestBody AccessPost accessPost) {
+        List<AccessPost> lst = List.of(accessPost);
+        restAccess.postAccess(lst);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Permite eliminar el acceso asociado a un documento específico.
+     *
+     * @param accessPut Objeto que contiene el documento del acceso que se desea eliminar.
+     * @return `ResponseEntity<Void>` con estado 204 (sin contenido) si la operación es exitosa.
+     */
+    @PutMapping("/access/delete")
+    public ResponseEntity<Void> putAccess(@RequestBody AccessPut accessPut) {
+        restAccess.deleteAccess(accessPut.getDocument());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Obtiene una lista de usuarios asociados a un propietario específico.
+     *
+     * @param ownerId id del propietario para el cual se desean obtener los usuarios.
+     * @return `ResponseEntity<List<GetUserDto>>` con estado 204 si no se encuentran usuarios, o estado 200 con la lista de usuarios.
+     */
+    @GetMapping("/byOwner/{ownerId}")
+    public ResponseEntity<List<GetUserDto>> getUsersByOwner(@PathVariable Integer ownerId) {
+        List<GetUserDto> users = userService.getUsersByOwner(ownerId);
+        // Verifica si la lista está vacía
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay usuarios
+        } else {
+            return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
+        }
+    }
+
+    @GetMapping("/byOwner/{ownerId}/WithoutTheOwner")
+    public ResponseEntity<List<GetUserDto>> getUsersByOwnerV2(@PathVariable Integer ownerId) {
+        List<GetUserDto> users = userService.getUsersByOwnerWithoutOwner(ownerId);
+        // Verifica si la lista está vacía
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay usuarios
+        } else {
+            return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
+        }
+    }
 }

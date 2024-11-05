@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
     <groupId>ar.edu.utn.frc.tup.lc.iv</groupId>
-    <artifactId>tpi-scaffolding</artifactId>
+    <artifactId>tpi_users_and_addresses</artifactId>
     <version>0.0.1-SNAPSHOT</version> <!-- Change the artifact version every time you release a new version-->
     <name>tpi_users_and_addresses</name>
     <description>TPI user and addresses microservice</description>
@@ -70,8 +70,8 @@
             <version>3.1.0</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>8.0.33</version>
         </dependency>
         <!--    H2 Data Base dependency    -->
@@ -88,7 +88,11 @@
             <version>${modelmapper.version}</version>
         </dependency>
 
-        <!--    Login   -->
+        <!--    Login
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency> -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>

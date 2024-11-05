@@ -23,7 +23,7 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Intege
     List<UserRoleEntity> findByUserId(int userId);
 
     /**
-     * Borra una relación pasandole un usuario por parametro.
+     * Borra una relación pasándole un usuario por parámetro.
      *
      * @param user un UserEntity.
      */

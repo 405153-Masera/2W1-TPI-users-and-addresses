@@ -35,7 +35,7 @@ public class JwtUtil {
     /**
      * Metodo para validar token JWT.
      * @param token es el token a validar.
-     * @throws IllegalArgumentException si el toquen no es válido.
+     * @throws IllegalArgumentException si el token no es válido.
      * @return un JWT.
      */
     public static Claims validateToken(String token) {
@@ -47,13 +47,5 @@ public class JwtUtil {
         } catch (SignatureException e) {
             throw new IllegalArgumentException("Token no válido o manipulado.", e);
         }
-    }
-    /**
-     * Metodo para validar si un token expiró.
-     * @param claims información dentro del token.
-     * @return una fecha de expiración.
-     */
-    public static boolean isTokenExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
     }
 }

@@ -32,7 +32,7 @@ public class PlotUserEntity {
     private Integer plotId;
 
     /**
-     * Identificador único de un usuario , representa la relacion muchos a uno entre
+     * Identificador único de un usuario , representa la relación muchos a uno entre
      * la tabla plotusers y user.
      */
     @ManyToOne
@@ -40,13 +40,13 @@ public class PlotUserEntity {
     private UserEntity user;
 
     /**
-     * Fecha que reprenta cuando se creó la entidad.
+     * Fecha que representa cuando se creó la entidad.
      */
     @Column(name = "created_datetime")
     private LocalDateTime createdDate;
 
     /**
-     * Fecha que reprenta cuando fué la última vez que se modificó la entidad.
+     * Fecha que representa cuando fue la última vez que se modificó la entidad.
      */
     @Column(name = "last_updated_datetime")
     private LocalDateTime lastUpdatedDate;
@@ -58,7 +58,7 @@ public class PlotUserEntity {
     private Integer createdUser;
 
     /**
-     * Itentificador que representa el usuario que modificó por ultima vez
+     * Identificador que representa el usuario que modificó por última vez
      * la entidad.
      */
     @Column(name = "last_updated_user")

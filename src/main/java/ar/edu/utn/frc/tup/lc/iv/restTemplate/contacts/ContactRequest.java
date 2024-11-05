@@ -35,4 +35,10 @@ public class ContactRequest {
     @NotBlank(message = "El valor del contacto no puede estar en blanco")
     @NotNull(message = "El valor del contacto no puede ser nulo")
     private String value;
+
+    /**
+     * Id del editor que creó el contacto.
+     */
+    @NotNull(message = "El ID del editor no puede estar vacío")
+    private Integer editorId;
 }

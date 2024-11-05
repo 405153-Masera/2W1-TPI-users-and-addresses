@@ -42,7 +42,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     /**
      * Busca un usuario que tenga rol "Owner" y que coincida con el plotId
-     * pasado por parametro.
+     * pasado por parámetro.
      *
      * @param plotId el identificador de un lote.
      * @return un {@link UserEntity}
@@ -51,7 +51,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
             + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
             + "JOIN RoleEntity r ON ur.role.id = r.id "
             + "JOIN PlotUserEntity pu ON pu.user.id = u.id "
-            + "WHERE r.description = 'Owner' "
+            + "WHERE r.description = 'Propietario' "
             + "AND pu.plotId = :plotId "
             + "AND u.active = true")
     Optional<UserEntity> findUserByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
@@ -66,7 +66,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
             + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
             + "JOIN RoleEntity r ON ur.role.id = r.id "
             + "JOIN PlotUserEntity pu ON pu.user.id = u.id "
-            + "AND u.active = true")
+            + "WHERE u.active = true AND pu.plotId = :plotId")
     Optional<List<UserEntity>> findUsersByPlotId(@Param("plotId") Integer plotId);
 
     /**
@@ -76,4 +76,30 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      */
     @Query("SELECT o FROM UserEntity o WHERE o.active = true")
     List<UserEntity> findAllActives();
+
+    /**
+     * Busca un usuario por su dni.
+     *
+     * @param dni numero de dni.
+     * @return un {@link UserEntity}
+     */
+    UserEntity findByDni(String dni);
+
+    /**
+     * Verifica si existe un usuario con nombre de usuario
+     * igual al pasado por parámetro.
+     *
+     * @param username nombre de usuario.
+     * @return true si existe, false si no.
+     */
+    boolean existsByUsername(String username);
+
+    /**
+     * Verifica si existe un usuario con dni igual al pasado por parámetro.
+     *
+     * @param dni numero de dni.
+     * @return true si existe, false si no.
+     */
+    boolean existsByDni(String dni);
+
 }

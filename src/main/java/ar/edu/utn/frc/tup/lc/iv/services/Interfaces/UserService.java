@@ -1,7 +1,11 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Interfaces;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import org.springframework.stereotype.Service;
@@ -17,10 +21,18 @@ public interface UserService {
     /**
      * Crea un usuario.
      *
-     * @param postUserDto
+     * @param postUserDto dto con información requerida para el alta de un usuario.
      * @return el usuario creado.
      */
     GetUserDto createUser(PostUserDto postUserDto);
+
+    /**
+     * Crea un usuario.
+     *
+     * @param postOwnerUserDto dto con información requerida para el alta de un usuario.
+     * @return el usuario creado.
+     */
+    GetOwnerUserDto createOwnerUser(PostOwnerUserDto postOwnerUserDto);
 
     /**
      * Obtener todos los usuarios.
@@ -31,7 +43,7 @@ public interface UserService {
 
     /**
      * Obtener un usuario por id.
-     * @param userId
+     * @param userId id del usuario.
      * @return un usuario si existe.
      */
     GetUserDto getUserById(Integer userId);
@@ -39,7 +51,7 @@ public interface UserService {
     /**
      * Actualiza un usuario.
      *
-     * @param userId la id del usuario a actualizar.
+     * @param userId el ID del usuario a actualizar.
      * @param putUserDto el dto con la información necesaria para actualizar un usuario.
      * @return el usuario actualizado.
      */
@@ -64,7 +76,7 @@ public interface UserService {
     /**
      * Obtener un usuario por email.
      *
-     * @param email correo electronico de un usuario
+     * @param email correo electrónico de un usuario
      * @return un usuario si existe.
      */
     GetUserDto getUserByEmail(String email);
@@ -88,7 +100,7 @@ public interface UserService {
     /**
      * Verifica un inicio de sesión.
      *
-     * @param postLoginDto dto con informacion requerida para el metodo.
+     * @param postLoginDto dto con información requerida para el metodo.
      * @return un booleano de confirmación.
      */
     GetUserDto verifyLogin(PostLoginDto postLoginDto);
@@ -100,4 +112,30 @@ public interface UserService {
      * @return lista de GetUserDto.
      */
     List<GetUserDto> getAllUsersByPlotId(Integer plotId);
+
+    /**
+     * Busca todos los usuarios asociados a un lote,
+     * incluido el propietario.
+     *
+     * @return la lista de usuarios por lote.
+     */
+    List<GetPlotUserDto> getAllPlotUsers();
+
+    /**
+     * Busca todos los usuarios (familiares) asociados a un propietario,
+     * incluido el propietario.
+     *
+     * @param ownerId id del propietario.
+     * @return la lista de usuarios por propietario.
+     */
+    List<GetUserDto> getUsersByOwner(Integer ownerId);
+
+    List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId);
+
+    /**
+     * Cambia la contraseña de un usuario.
+     *
+     * @param changePassword dto con información requerida para el cambio de contraseña.
+     */
+    void changePassword(ChangePassword changePassword);
 }

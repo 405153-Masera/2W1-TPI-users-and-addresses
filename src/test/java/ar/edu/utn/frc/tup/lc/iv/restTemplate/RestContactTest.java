@@ -83,7 +83,7 @@ class RestContactTest {
         when(restTemplate.postForEntity(anyString(), any(ContactRequest.class), eq(Void.class)))
                 .thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
-        boolean result = restContact.saveContact(userId, value, contactType);
+        boolean result = restContact.saveContact(userId, value, contactType,1);
 
         assertTrue(result);
     }
@@ -96,7 +96,7 @@ class RestContactTest {
 
         doNothing().when(restTemplate).put(anyString(), any(ContactRequest.class));
 
-        boolean result = restContact.updateContact(userId, value, contactType);
+        boolean result = restContact.updateContact(userId, value, contactType,1);
         assertTrue(result);
     }
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
- * DTO que representa una respuesta que contiene la infromación de
+ * DTO que representa una respuesta que contiene la información de
  * un usuario.
  */
 @Data
@@ -48,7 +48,7 @@ public class GetUserDto {
     private String email;
 
     /**
-     * Número de telefono del usuario que se obtiene
+     * Número de teléfono del usuario que se obtiene
      * desde el microservicio de Contactos.
      */
     private String phone_number;
@@ -57,6 +57,11 @@ public class GetUserDto {
      * Número de DNI del usuario.
      */
     private String dni;
+
+    /**
+     * Tipo de DNI del usuario.
+     */
+    private String dni_type;
 
     /**
      * Representa sí el usuario está activo o no.
@@ -75,6 +80,12 @@ public class GetUserDto {
     private LocalDate datebirth;
 
     /**
+     * Fecha de creación del usuario.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDate create_date;
+
+    /**
      * Lista de los roles que tiene el usuario.
      */
     private String[] roles;
@@ -82,7 +93,7 @@ public class GetUserDto {
     /**
      * Identificador del lote asignado al usuario.
      */
-    private Integer plot_id;
+    private Integer[] plot_id;
 
     /**
      * Identificador de la plataforma telegram utilizada en notificaciones.

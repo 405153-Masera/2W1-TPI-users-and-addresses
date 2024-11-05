@@ -5,6 +5,8 @@ import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Conecta la aplicación con la base de datos para manejar la tabla intermedia PlotUser.
  */
@@ -12,10 +14,10 @@ import org.springframework.stereotype.Repository;
 public interface PlotUserRepository extends JpaRepository<PlotUserEntity, Integer> {
 
     /**
-     * Busca por un PlotUserEntity mediante un UserEntity pasado por parametro.
+     * Busca por una lista de PlotUserEntity mediante un UserEntity pasado por parámetro.
      *
      * @param userEntity un UserEntity.
-     * @return un {@link PlotUserEntity}
+     * @return una lista de {@link PlotUserEntity}
      */
-    PlotUserEntity findByUser(UserEntity userEntity);
+    List<PlotUserEntity> findByUser(UserEntity userEntity);
 }

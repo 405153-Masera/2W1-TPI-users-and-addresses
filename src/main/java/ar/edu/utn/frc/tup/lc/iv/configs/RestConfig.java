@@ -8,9 +8,8 @@ import java.time.Duration;
 
 /**
  * Configuración de Spring para la creación de un bean RestTemplate.
- *
  * Esta clase se encarga de definir un bean RestTemplate que será utilizado
- * para realizar llamadas a APIs REST en la aplicación.
+ * para realizar llamadas a API REST en la aplicación.
  */
 @Configuration
 public class RestConfig {

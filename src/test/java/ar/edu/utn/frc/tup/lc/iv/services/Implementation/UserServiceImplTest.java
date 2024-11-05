@@ -1,23 +1,20 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
-import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
-import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
-import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
-import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
-import ar.edu.utn.frc.tup.lc.iv.repositories.PlotUserRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.RoleRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
-import ar.edu.utn.frc.tup.lc.iv.repositories.UserRoleRepository;
+import ar.edu.utn.frc.tup.lc.iv.entities.*;
+import ar.edu.utn.frc.tup.lc.iv.helpers.UserTestHelper;
+import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import jakarta.persistence.EntityNotFoundException;
-import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -64,6 +61,9 @@ class UserServiceImplTest {
     @MockBean
     private PlotUserRepository plotUserRepositoryMock;
 
+    @MockBean
+    private DniTypeRepository dniTypeRepositoryMock;
+
     @SpyBean
     private UserServiceImpl userServiceSpy;
 
@@ -78,63 +78,16 @@ class UserServiceImplTest {
     @Test
     void createUser_Success() {
         // Definimos los datos de entrada
-        PostUserDto postUserDto = new PostUserDto();
-        postUserDto.setName("Juan");
-        postUserDto.setLastname("Perez");
-        postUserDto.setUsername("JuanPa");
-        postUserDto.setPassword("123456");
-        postUserDto.setEmail("juanpa@gmail.com");
-        postUserDto.setPhone_number("45645465898");
-        postUserDto.setDni("12345678");
-        postUserDto.setActive(true);
-        postUserDto.setAvatar_url("url");
-        postUserDto.setDatebirth(LocalDate.now());
-        postUserDto.setRoles(new String[]{"Admin"});
-        postUserDto.setPlot_id(101);
-        postUserDto.setTelegram_id(123456);
-        postUserDto.setUserUpdateId(1);
+        PostUserDto postUserDto = UserTestHelper.createPostUserDto();
 
-        // UserEntity a guardar
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(3);  // Simulamos un ID generado por la base de datos
-        userEntity.setName(postUserDto.getName());
-        userEntity.setLastname(postUserDto.getLastname());
-        userEntity.setUsername(postUserDto.getUsername());
-        userEntity.setPassword(postUserDto.getPassword());
-        userEntity.setDni(postUserDto.getDni());
-        userEntity.setActive(postUserDto.getActive());
-        userEntity.setAvatar_url(postUserDto.getAvatar_url());
-        userEntity.setDatebirth(postUserDto.getDatebirth());
+        //UserEntity a guardar en la base de datos
+        UserEntity userEntity = UserTestHelper.createUserEntity(postUserDto);
 
         // Datos de salida esperados
-        GetUserDto getUserDto = new GetUserDto();
-        getUserDto.setId(userEntity.getId());
-        getUserDto.setName(userEntity.getName());
-        getUserDto.setLastname(userEntity.getLastname());
-        getUserDto.setUsername(userEntity.getUsername());
-        getUserDto.setPassword(userEntity.getPassword());
-        getUserDto.setDni(userEntity.getDni());
-        getUserDto.setActive(userEntity.getActive());
-        getUserDto.setAvatar_url(userEntity.getAvatar_url());
-        getUserDto.setDatebirth(userEntity.getDatebirth());
-        getUserDto.setRoles(postUserDto.getRoles());
-        getUserDto.setPhone_number(postUserDto.getPhone_number());
-        getUserDto.setPlot_id(postUserDto.getPlot_id());
-
-        // Establecer valores de auditoría en el userEntity
-        userEntity.setCreatedDate(LocalDateTime.now());
-        userEntity.setCreatedUser(postUserDto.getUserUpdateId());
-        userEntity.setLastUpdatedDate(LocalDateTime.now());
-        userEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        GetUserDto getUserDto = UserTestHelper.createGetUserDto(userEntity, postUserDto);
 
         //RoleEntity a guardar
-        RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setId(null);
-        roleEntity.setDescription("Admin");
-        roleEntity.setCreatedDate(LocalDateTime.now());
-        roleEntity.setLastUpdatedDate(LocalDateTime.now());
-        roleEntity.setCreatedUser(postUserDto.getUserUpdateId());
-        roleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        RoleEntity roleEntity = UserTestHelper.createRoleEntity("Gerente", postUserDto.getUserUpdateId());
 
         // UserRoleEntity a guardar
         UserRoleEntity userRoleEntity = new UserRoleEntity();
@@ -148,21 +101,15 @@ class UserServiceImplTest {
         roleEntity.setUserRoles(List.of(userRoleEntity));
 
         // PlotUserEntity a guardar
-        PlotUserEntity plotUserEntity = new PlotUserEntity();
-        plotUserEntity.setId(null);
-        plotUserEntity.setPlotId(postUserDto.getPlot_id());
-        plotUserEntity.setUser(userEntity);
-        plotUserEntity.setCreatedDate(LocalDateTime.now());
-        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
-        plotUserEntity.setCreatedUser(postUserDto.getUserUpdateId());
-        plotUserEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        PlotUserEntity plotUserEntity = UserTestHelper.createPlotUserEntity(userEntity, postUserDto.getPlot_id(), postUserDto.getUserUpdateId());
 
         // When
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userEntity);
-        when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(roleRepositoryMock.findByDescription("Gerente")).thenReturn(roleEntity);
         when(userRoleRepositoryMock.save(any(UserRoleEntity.class))).thenReturn(userRoleEntity);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1)).thenReturn(true);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2)).thenReturn(true);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1,1)).thenReturn(true);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2,1)).thenReturn(true);
         when(plotUserRepositoryMock.save(any(PlotUserEntity.class))).thenReturn(plotUserEntity);
 
         // Then
@@ -178,11 +125,83 @@ class UserServiceImplTest {
         assertEquals(getUserDto.getAvatar_url(), result.getAvatar_url());
         assertEquals(getUserDto.getDatebirth(), result.getDatebirth());
         assertEquals(getUserDto.getPhone_number(), result.getPhone_number());
-        assertEquals(getUserDto.getPlot_id(), result.getPlot_id());
+        assertArrayEquals(getUserDto.getPlot_id(), result.getPlot_id());
         assertArrayEquals(postUserDto.getRoles(), result.getRoles());
 
     }
 
+
+    @Test
+    void createOwnerUser_Success() {
+        PostOwnerUserDto postUserDto = UserTestHelper.createPostOwnerUserDto();
+        UserEntity userEntity = UserTestHelper.createUserEntity(postUserDto);
+        GetUserDto getUserDto = UserTestHelper.createGetUserDto(userEntity, postUserDto);
+        RoleEntity roleEntity = UserTestHelper.createRoleEntity("Gerente", postUserDto.getUserUpdateId());
+
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        userRoleEntity.setId(null);
+        userRoleEntity.setUser(userEntity);
+        userRoleEntity.setRole(roleEntity);
+        userRoleEntity.setCreatedDate(LocalDateTime.now());
+        userRoleEntity.setLastUpdatedDate(LocalDateTime.now());
+        userRoleEntity.setCreatedUser(postUserDto.getUserUpdateId());
+        userRoleEntity.setLastUpdatedUser(postUserDto.getUserUpdateId());
+        roleEntity.setUserRoles(List.of(userRoleEntity));
+
+        PlotUserEntity plotUserEntity = UserTestHelper.createPlotUserEntity(userEntity, postUserDto.getPlot_id()[0], postUserDto.getUserUpdateId());
+
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userEntity);
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(roleRepositoryMock.findByDescription("Gerente")).thenReturn(roleEntity);
+        when(userRoleRepositoryMock.save(any(UserRoleEntity.class))).thenReturn(userRoleEntity);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1,1)).thenReturn(true);
+        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2,1)).thenReturn(true);
+        when(plotUserRepositoryMock.save(any(PlotUserEntity.class))).thenReturn(plotUserEntity);
+
+        GetOwnerUserDto result = userServiceSpy.createOwnerUser(postUserDto);
+
+        assertEquals(getUserDto.getName(), result.getName());
+        assertEquals(getUserDto.getLastname(), result.getLastname());
+        assertEquals(getUserDto.getUsername(), result.getUsername());
+        assertEquals(getUserDto.getPassword(), result.getPassword());
+        assertEquals(getUserDto.getDni(), result.getDni());
+        assertEquals(getUserDto.getActive(), result.getActive());
+        assertEquals(getUserDto.getAvatar_url(), result.getAvatar_url());
+        assertEquals(getUserDto.getDatebirth(), result.getDatebirth());
+        assertEquals(getUserDto.getPhone_number(), result.getPhone_number());
+        assertArrayEquals(getUserDto.getPlot_id(), result.getPlot_id());
+        assertArrayEquals(postUserDto.getRoles(), result.getRoles());
+
+    }
+
+    @Test
+    void getAllPlotUsers_Success() {
+        PlotUserEntity plotUser1 = new PlotUserEntity();
+        plotUser1.setPlotId(101);
+        UserEntity user1 = new UserEntity();
+        user1.setId(1);
+        plotUser1.setUser(user1);
+        PlotUserEntity plotUser2 = new PlotUserEntity();
+        plotUser2.setPlotId(102);
+        UserEntity user2 = new UserEntity();
+        user2.setId(2);
+        plotUser2.setUser(user2);
+        List<PlotUserEntity> plotUserEntities = Arrays.asList(plotUser1, plotUser2);
+        when(plotUserRepositoryMock.findAll()).thenReturn(plotUserEntities);
+
+
+        List<GetPlotUserDto> result = userServiceSpy.getAllPlotUsers();
+
+        assertEquals(2, result.size());
+
+        GetPlotUserDto resultDto1 = result.get(0);
+        assertEquals(101, resultDto1.getPlot_id());
+        assertEquals(1, resultDto1.getUser_id());
+
+        GetPlotUserDto resultDto2 = result.get(1);
+        assertEquals(102, resultDto2.getPlot_id());
+        assertEquals(2, resultDto2.getUser_id());
+    }
 
     @Test
     void createUser_UsernameInUse(){
@@ -221,7 +240,12 @@ class UserServiceImplTest {
         userEntity.setId(1);
         userEntity.setName("Paola");
         userEntity.setDni("45646545");
+        userEntity.setDniType(new DniTypeEntity());
         userEntity.setDatebirth(LocalDate.now());
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
         userEntity.setActive(true);
 
         GetRoleDto roleDto = new GetRoleDto();
@@ -238,6 +262,7 @@ class UserServiceImplTest {
         //When
         when(restContactMock.getUserIdByEmail("hola@hola")).thenReturn(1);
         when(userRepositoryMock.findById(1)).thenReturn(Optional.of(userEntity));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
         when(restContactMock.getContactById(1)).thenReturn(lcontacts);
 
         GetUserDto result = userServiceSpy.getUserByEmail("hola@hola");
@@ -249,6 +274,7 @@ class UserServiceImplTest {
         assertEquals(userEntity.getActive(), result.getActive());
         assertEquals("hola@hola", result.getEmail());
     }
+
     @Test
     void updateUser_Success(){
         //Given
@@ -257,11 +283,13 @@ class UserServiceImplTest {
         putUserDto.setName("New Name");
         putUserDto.setLastName("New Lastname");
         putUserDto.setDni("30752987");
+        putUserDto.setDni_type_id(1);
         putUserDto.setAvatar_url("urlAvatar");
         putUserDto.setDatebirth(LocalDate.of(1997, 12, 3));
         putUserDto.setEmail("email@email");
         putUserDto.setPhoneNumber("12345678");
         putUserDto.setRoles(new String[]{"Admin"});
+        putUserDto.setUserUpdateId(1);
 
         //User to update
         UserEntity userToUpdated = new UserEntity();
@@ -273,6 +301,7 @@ class UserServiceImplTest {
         //When
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
         when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
         when(modelMapperMock.map(userToUpdated, GetUserDto.class)).thenReturn(new GetUserDto());
 
@@ -303,6 +332,7 @@ class UserServiceImplTest {
         putUserDto.setName("New Name");
         putUserDto.setLastName("New Lastname");
         putUserDto.setDni("30752987");
+        putUserDto.setDni_type_id(1);
         putUserDto.setAvatar_url("urlAvatar");
         putUserDto.setDatebirth(LocalDate.of(1997, 12, 3));
         putUserDto.setEmail("email@email");
@@ -314,8 +344,10 @@ class UserServiceImplTest {
 
         //When
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
         when(roleRepositoryMock.findByDescription("Admins")).thenReturn(null);
+
 
          Exception exception = assertThrows(EntityNotFoundException.class, () -> {
             userServiceSpy.updateUser(userId, putUserDto);
@@ -374,6 +406,11 @@ class UserServiceImplTest {
         userEntity.setId(10);
         userEntity.setName("Pablo");
         userEntity.setLastname("Ortega");
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
+        userEntity.setActive(true);
 
         List<GetRoleDto> lgetRoleDtos = new ArrayList<>();
         GetRoleDto roleDto = new GetRoleDto();
@@ -390,6 +427,7 @@ class UserServiceImplTest {
         //When
         when(userRoleRepositoryMock.findByRoleId(1)).thenReturn(Optional.of(luserRolesEntity));
         when(userRepositoryMock.findById(anyInt())).thenReturn(Optional.of(userEntity));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         when(roleServiceMock.getRolesByUser(anyInt())).thenReturn(lgetRoleDtos);
 
         //Then
@@ -459,6 +497,11 @@ class UserServiceImplTest {
         userEntity.setId(10);
         userEntity.setName("Pablo");
         userEntity.setDni("35654225");
+        userEntity.setCreatedDate(LocalDateTime.now());
+
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
         userEntity.setActive(true);
 
         userEntityList.add(userEntity);
@@ -466,7 +509,7 @@ class UserServiceImplTest {
 
         //When
         when(userRepositoryMock.findByActive(true)).thenReturn(Optional.of(userEntityList));
-
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         //Then
         List<GetUserDto> result = userServiceSpy.getUsersByStatus(true);
 
@@ -493,10 +536,15 @@ class UserServiceImplTest {
         userEntity.setId(10);
         userEntity.setName("Pablo");
         userEntity.setDni("35654225");
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
         userEntity.setActive(true);
 
         //When
         when(userRepositoryMock.findById(10)).thenReturn(Optional.of(userEntity));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
 
         //Then
         GetUserDto result = userServiceSpy.getUserById(10);
@@ -526,13 +574,17 @@ class UserServiceImplTest {
         userEntity.setId(10);
         userEntity.setName("Pablo");
         userEntity.setDni("35654225");
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
         userEntity.setActive(true);
 
         userEntityList.add(userEntity);
 
         //When
         when(userRepositoryMock.findAllActives()).thenReturn(userEntityList);
-
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         //Then
         List<GetUserDto> result = userServiceSpy.getAllUsers();
 
@@ -602,44 +654,20 @@ class UserServiceImplTest {
         });
     }
 
-
-//    @Test
-//    void validateUsername_IllegalArgument(){
-//        //Given
-//        String username = "martaaa1";
-//
-//        //When
-//        Mockito.when(userRepositoryMock.findByUsername(username)).thenReturn(null);
-//
-//        //Then
-//        assertThrows(IllegalArgumentException.class,
-//                () -> userServiceSpy.validateUsername(username));
-//    }
-
     //Test para los mapeadores
     @Test
     public void mapUserPostToUserEntity() {
-        PostUserDto postUserDto = new PostUserDto();
-        postUserDto.setName("Martin");
-        postUserDto.setLastname("Masera");
-        postUserDto.setUsername("MartinMasera");
-        postUserDto.setPassword("5358365");
-        postUserDto.setDni("12345678");
-        postUserDto.setActive(true);
-        postUserDto.setAvatar_url("url");
-        postUserDto.setDatebirth(LocalDate.now());
-
+        PostUserDto postUserDto = UserTestHelper.createPostUserDto();
         UserEntity userEntity = new UserEntity();
+
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
 
         userServiceSpy.mapUserPostToUserEntity(userEntity, postUserDto);
 
-        assertEquals("Martin", userEntity.getName());
-        assertEquals("Masera", userEntity.getLastname());
-        assertEquals("MartinMasera", userEntity.getUsername());
-        assertEquals("5358365", userEntity.getPassword());
-        assertEquals("12345678", userEntity.getDni());
+        assertEquals("Juan", userEntity.getName());
+        assertEquals("Perez", userEntity.getLastname());
+        assertEquals("JuanPa", userEntity.getUsername());
         assertEquals(true, userEntity.getActive());
-        assertEquals("url", userEntity.getAvatar_url());
         assertEquals(postUserDto.getDatebirth(), userEntity.getDatebirth());
     }
 
@@ -656,10 +684,17 @@ class UserServiceImplTest {
         userEntity.setActive(true);
         userEntity.setAvatar_url("url");
         userEntity.setDatebirth(LocalDate.now());
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        userEntity.setDniType(dniTypeEntity);
 
         GetUserDto getUserDto = new GetUserDto();
-        getUserDto = userServiceSpy.mapUserEntityToGet(userEntity, getUserDto);
-        assertEquals(1, getUserDto.getId());
+
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
+
+        userServiceSpy.mapUserEntityToGet(userEntity, getUserDto);
+
         assertEquals("Martin", getUserDto.getName());
         assertEquals("Masera", getUserDto.getLastname());
         assertEquals("MartinMasera", getUserDto.getUsername());
@@ -708,8 +743,5 @@ class UserServiceImplTest {
         assertEquals(userEntity.getId(), userRoleEntity.getUser().getId());
         assertEquals(roleEntity.getId(), userRoleEntity.getRole().getId());
         assertEquals(LocalDateTime.now().getYear(), userRoleEntity.getCreatedDate().getYear());
-
-        //aca tira error porque sacarorn del metodo el seteo de createdUser y lastUpdatedUser
-        //assertEquals(userEntity.getId(), userRoleEntity.getCreatedUser());
     }
 }

@@ -28,7 +28,7 @@ public class UserRoleEntity {
     private Integer id;
 
     /**
-     * Identificador único de un rol representa la relacion muchos a uno
+     * Identificador único de un rol representa la relación muchos a uno
      * entre role y user.
      */
     @ManyToOne
@@ -36,7 +36,7 @@ public class UserRoleEntity {
     private RoleEntity role;
 
     /**
-     * Identificador único de un usuario representa la relacion muchos a uno
+     * Identificador único de un usuario representa la relación muchos a uno
      * entre user y role.
      */
     @ManyToOne
@@ -44,13 +44,13 @@ public class UserRoleEntity {
     private UserEntity user;
 
     /**
-     * Fecha que reprenta cuando se creó la entidad.
+     * Fecha que representa cuando se creó la entidad.
      */
     @Column(name = "created_datetime")
     private LocalDateTime createdDate;
 
     /**
-     * Fecha que reprenta cuando fué la última vez que se modificó la entidad.
+     * Fecha que representa cuando fue la última vez que se modificó la entidad.
      */
     @Column(name = "last_updated_datetime")
     private LocalDateTime lastUpdatedDate;
@@ -62,7 +62,7 @@ public class UserRoleEntity {
     private Integer createdUser;
 
     /**
-     * Itentificador que representa el usuario que modificó por ultima vez
+     * Identificador que representa el usuario que modificó por última vez
      * la entidad.
      */
     @Column(name = "last_updated_user")
