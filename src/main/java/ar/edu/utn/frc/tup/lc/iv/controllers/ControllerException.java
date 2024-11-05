@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
@@ -28,7 +30,17 @@ public class ControllerException {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    // Otros métodos de manejo de excepciones...
+    /**
+     * Metodo para arrojar errores de tipo HTTP.
+     *
+     * @return una respuesta de error tipo HTTP.
+     * @param e excepción.
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorApi> handleError(ResponseStatusException e) {
+        ErrorApi error = buildError(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+        return ResponseEntity.status(e.getStatusCode()).body(error);
+    }
 
     /**
      * Metodo para construir un objeto error API.

@@ -22,7 +22,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -833,13 +836,17 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     public void changePassword(ChangePassword changePasswordDto) {
-        Integer userId = this.getUserByEmail(changePasswordDto.getEmail()).getId();
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        GetUserDto getUserDto = this.getUserByEmail(changePasswordDto.getEmail());
+        if (getUserDto == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email: " + changePasswordDto.getEmail());
+        }
+        UserEntity user = userRepository.findById(getUserDto.getId())
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User not found with email: " + changePasswordDto.getEmail()));
 
 
         if (!PasswordUtil.checkPassword(changePasswordDto.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Current password is incorrect.");
         }
 
         String hashedNewPassword = PasswordUtil.hashPassword(changePasswordDto.getNewPassword());
