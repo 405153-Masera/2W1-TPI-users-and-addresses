@@ -28,7 +28,14 @@ public class SpringSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize
+        http
+        .csrf(csrf -> {
+            csrf.disable();
+        })
+                .cors(cors -> {
+                    cors.disable();
+                })
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui/index.html").permitAll()
