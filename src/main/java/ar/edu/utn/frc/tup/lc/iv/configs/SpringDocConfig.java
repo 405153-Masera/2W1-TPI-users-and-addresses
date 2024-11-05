@@ -11,6 +11,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
 /**
  * Spring Doc configuration class.
@@ -81,4 +83,10 @@ public class SpringDocConfig {
     public PasswordUtil passwordUtil() {
         return new PasswordUtil();
     }
+
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        return DaoAuthenticationProvider authencationProvider = new DaoAuthenticationProvider();
+//
+//    }
 }

@@ -63,7 +63,7 @@ public class AuthController {
             response.put("token", token);
             return response;
         } else {
-            throw new IllegalArgumentException("Credenciales inválidas");
+            throw new IllegalArgumentException("Invalid credentials");
         }
     }
 
@@ -72,9 +72,9 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         try {
             //JwtUtil.validateToken(token);
-            response.put("message", "Token válido");
+            response.put("message", "Valid token");
         } catch (IllegalArgumentException e) {
-            response.put("message", "Token inválido");
+            response.put("message", "Invalid token");
             System.out.println(e.getMessage());
         }
         return response;
