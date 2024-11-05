@@ -210,7 +210,7 @@ class UserServiceImplTest {
         postUserDto.setUsername("JuanPa");
 
         //When
-        when(userRepositoryMock.findByUsername("JuanPa")).thenReturn(new UserEntity());
+        when(userRepositoryMock.findByUsername("JuanPa")).thenReturn(Optional.of(new UserEntity()));
 
         //Then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -646,7 +646,7 @@ class UserServiceImplTest {
         String username = "JuanPa";
 
         //When
-        when(userRepositoryMock.findByUsername(username)).thenReturn(new UserEntity());
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.of(new UserEntity()));
 
         //Then
         assertThrows(IllegalArgumentException.class, () -> {
