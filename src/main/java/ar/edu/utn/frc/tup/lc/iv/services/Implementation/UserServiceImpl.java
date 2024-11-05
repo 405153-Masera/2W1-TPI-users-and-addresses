@@ -716,9 +716,29 @@ public class UserServiceImpl implements UserService {
 
         Integer userId = restContact.getUserIdByEmail(email);
         if (userId == null) {
-            throw new EntityNotFoundException("User not found with email: " + email);
+            return null;
         }
         return getUserById(userId);
+    }
+
+    /**
+     * Obtener un usuario por username.
+     * @param username username de un usuario.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el username proporcionado por parámetro.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID coincidente al username.
+     * @return un usuario si existe.
+     */
+    public GetUserDto getUserByUsername(String username) {
+        // Usar orElse para devolver null si no se encuentra el usuario
+        UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+
+        // Si no se encuentra el usuario, simplemente retornar null
+        if (userEntity == null) {
+            return null;
+        }
+
+        // Si se encuentra el usuario, retornar el DTO correspondiente
+        return getUserById(userEntity.getId());
     }
 
     /**
@@ -793,13 +813,19 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public GetUserDto verifyLogin(PostLoginDto postLoginDto) {
-        GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());
+        GetUserDto user = this.getUserByUsername(postLoginDto.getEmail());
+
+        // Si no se encuentra el usuario por email, buscar por nombre de usuario
         if (user == null) {
-            return null;
+            user = this.getUserByEmail(postLoginDto.getEmail());
         }
-        if (passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())) {
+
+        // Verificar si se encontró un usuario y si la contraseña es correcta
+        if (user != null && passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())) {
             return user;
         }
+
+        // Retornar null si no se encontró el usuario o la contraseña es incorrecta
         return null;
     }
 }

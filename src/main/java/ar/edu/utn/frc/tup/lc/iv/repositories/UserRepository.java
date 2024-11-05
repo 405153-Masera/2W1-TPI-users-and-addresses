@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      * @param username el nombre de usuario.
      * @return un {@link UserEntity}
      */
-    UserEntity findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     /**
      * Busca un usuario por su id.
