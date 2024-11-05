@@ -633,7 +633,7 @@ class UserServiceImplTest {
         String username = "JuanPa";
 
         //When
-        when(userRepositoryMock.findByUsername(username)).thenReturn(null);
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.empty());
 
         //Then
         assertDoesNotThrow(() -> {
