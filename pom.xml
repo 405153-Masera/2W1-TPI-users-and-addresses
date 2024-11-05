@@ -105,22 +105,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-
-        <!-- Spring Security Config -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>5.7.1</version>
-        </dependency>
-
-        <!-- Spring Security Core (opcional pero recomendado) -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>5.7.1</version>
-        </dependency>
-
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

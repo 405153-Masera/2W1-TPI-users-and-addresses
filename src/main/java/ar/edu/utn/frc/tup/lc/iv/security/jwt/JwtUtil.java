@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.function.Function;
 /**
  * Clase para el manejo de JWT.
  */
+@Component
 public class JwtUtil {
 
     /** Tiempo de expiración, es 1 día. */

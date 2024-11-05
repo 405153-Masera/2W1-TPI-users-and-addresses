@@ -4,11 +4,13 @@ import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
 
 @Data
+@Component
 public class CustomUserDetails implements UserDetails {
 
     private final UserEntity user;
