@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.services.Interfaces;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
@@ -131,4 +132,10 @@ public interface UserService {
 
     List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId);
 
+    /**
+     * Cambia la contraseña de un usuario.
+     *
+     * @param changePassword dto con información requerida para el cambio de contraseña.
+     */
+    void changePassword(ChangePassword changePassword);
 }

@@ -392,4 +392,26 @@ class UserControllerTest {
 
         verify(userServiceMock, times(1)).updateUser(1, putUserDto);
     }
+
+    @Test
+    void getUsersByOwner_Success() throws Exception {
+        Integer ownerId = 1;
+        List<GetUserDto> users = new ArrayList<>();
+
+        GetUserDto getUserDto = UserTestHelper.createGetUserDto();
+        users.add(getUserDto);
+
+        when(userServiceMock.getUsersByOwner(ownerId)).thenReturn(users);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/byOwner/" + ownerId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(getUserDto.getId()))
+                .andExpect(jsonPath("$[0].roles[0]").value("Gerente"))
+                .andExpect(jsonPath("$[0].email").value("juapa@gmail.com"));
+
+
+        verify(userServiceMock, times(1)).getUsersByOwner(ownerId);
+    }
 }
