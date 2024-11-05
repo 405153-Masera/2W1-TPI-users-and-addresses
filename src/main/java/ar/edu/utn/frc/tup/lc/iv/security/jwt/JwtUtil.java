@@ -4,11 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-//import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Clase para el manejo de JWT.
@@ -39,10 +40,42 @@ public class JwtUtil {
     /**
      * Método para validar token JWT.
      * @param token es el token a validar.
+     * @param userDetails los detalles del usuario.
+     * @return true si el token es válido, false en caso contrario.
+     */
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    /**
+     * Método para obtener el nombre de usuario del token JWT.
+     * @param token el token JWT.
+     * @return el nombre de usuario.
+     */
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    /**
+     * Método para extraer una reclamación específica del token JWT.
+     * @param token el token JWT.
+     * @param claimsResolver la función que extrae la reclamación.
+     * @param <T> el tipo de la reclamación.
+     * @return el valor de la reclamación.
+     */
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = validateToken(token);
+        return claimsResolver.apply(claims);
+    }
+
+    /**
+     * Método para validar token JWT.
+     * @param token es el token a validar.
      * @return los claims extraídos del token.
      * @throws IllegalArgumentException si el token no es válido.
      */
-    public static Claims validateToken(String token) {
+    private Claims validateToken(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(SECRET_KEY)
@@ -54,21 +87,13 @@ public class JwtUtil {
     }
 
     /**
-     * Método para obtener el objeto UsernamePasswordAuthenticationToken.
+     * Método para comprobar si el token JWT ha expirado.
      * @param token el token JWT.
-     * @param userDetails los detalles del usuario.
-     * @return un objeto de autenticación.
+     * @return true si el token ha expirado, false en caso contrario.
      */
-//    public UsernamePasswordAuthenticationToken getAuthenticationToken(String token, UserDetails userDetails) {
-//        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//    }
-
-    /**
-     * Método para extraer el nombre de usuario del token JWT.
-     * @param token el token JWT.
-     * @return el nombre de usuario.
-     */
-    public String extractUsername(String token) {
-        return validateToken(token).getSubject();
+    private boolean isTokenExpired(String token) {
+        final Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration.before(new Date());
     }
+
 }
