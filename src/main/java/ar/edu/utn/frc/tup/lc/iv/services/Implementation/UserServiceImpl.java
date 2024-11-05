@@ -513,7 +513,7 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException si existe un username igual en la base de datos.
      */
     public void validateUsername(String username) {
-        if (userRepository.findByUsername(username) != null) {
+        if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Error creating user: username already in use.");
         }
     }

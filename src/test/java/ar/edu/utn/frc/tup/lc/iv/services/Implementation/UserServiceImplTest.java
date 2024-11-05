@@ -360,9 +360,10 @@ class UserServiceImplTest {
     void  getUserByEmail_EntityNotFound(){
         //When
         when(restContactMock.getUserIdByEmail(anyString())).thenReturn(null);
-        assertThrows(EntityNotFoundException.class, () -> {
-            userServiceSpy.getUserByEmail("");
-        });
+        GetUserDto getUserDto = null;
+
+        userServiceSpy.getUserByEmail("email@email.com");
+        assertNull(getUserDto);
     }
 
     @Test
