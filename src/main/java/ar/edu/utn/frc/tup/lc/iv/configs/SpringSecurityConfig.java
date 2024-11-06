@@ -39,7 +39,10 @@ public class SpringSecurityConfig {
                         .requestMatchers("/auth/**", "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui/index.html").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
+                        // .anyRequest().authenticated()
+                        // Lo dejo en permitAll para que no haya problemas con el front,
+                        // especialmente para que no lo necesiten otros grupos
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

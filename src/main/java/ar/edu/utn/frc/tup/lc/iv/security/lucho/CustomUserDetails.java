@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.security.lucho;
 
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,9 +14,9 @@ import java.util.Collections;
 @Component
 public class CustomUserDetails implements UserDetails {
 
-    private final UserEntity user;
+    private final GetUserDto user;
 
-    public CustomUserDetails(UserEntity user) {
+    public CustomUserDetails(GetUserDto user) {
         this.user = user;
     }
 
@@ -31,8 +32,10 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
+
+    public String getRealUsername(){return user.getUsername(); }
 
     @Override
     public boolean isAccountNonExpired() {

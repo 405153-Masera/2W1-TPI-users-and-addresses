@@ -1,9 +1,11 @@
 package ar.edu.utn.frc.tup.lc.iv.security.jwt;
 
+import ar.edu.utn.frc.tup.lc.iv.security.lucho.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -46,8 +48,11 @@ public class JwtUtil {
      * @return true si el token es válido, false en caso contrario.
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String usernameToken = extractUsername(token);
+        final String usernameUser = userDetails.getUsername();
+
+        return (usernameToken.equals(usernameUser) && !isTokenExpired(token));
+
     }
 
     /**
