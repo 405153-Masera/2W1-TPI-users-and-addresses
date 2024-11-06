@@ -3,7 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.controllers;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
-import ar.edu.utn.frc.tup.lc.iv.jwt.JwtUtil;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.JwtUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
