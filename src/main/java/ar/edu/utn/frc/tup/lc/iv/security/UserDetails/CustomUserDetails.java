@@ -1,7 +1,6 @@
-package ar.edu.utn.frc.tup.lc.iv.security.lucho;
+package ar.edu.utn.frc.tup.lc.iv.security.UserDetails;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
-import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

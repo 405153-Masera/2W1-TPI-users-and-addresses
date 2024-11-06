@@ -1,10 +1,9 @@
-package ar.edu.utn.frc.tup.lc.iv.security.lucho;
+package ar.edu.utn.frc.tup.lc.iv.security.jwt;
 
-import ar.edu.utn.frc.tup.lc.iv.security.jwt.JwtUtil;
+import ar.edu.utn.frc.tup.lc.iv.security.UserDetails.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;

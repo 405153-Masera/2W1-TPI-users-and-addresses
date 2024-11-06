@@ -1,8 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.configs;
 
 import ar.edu.utn.frc.tup.lc.iv.security.jwt.JwtUtil;
-import ar.edu.utn.frc.tup.lc.iv.security.lucho.CustomUserDetailsService;
-import ar.edu.utn.frc.tup.lc.iv.security.lucho.JwtAuthenticationFilter;
+import ar.edu.utn.frc.tup.lc.iv.security.UserDetails.CustomUserDetailsService;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,7 @@ public class SpringSecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui/index.html").permitAll()
                         .anyRequest().permitAll()
-                        // .anyRequest().authenticated()
+                        //.anyRequest().authenticated()
                         // Lo dejo en permitAll para que no haya problemas con el front,
                         // especialmente para que no lo necesiten otros grupos
                 )
