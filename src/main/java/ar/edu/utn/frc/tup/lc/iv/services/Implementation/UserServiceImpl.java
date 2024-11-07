@@ -15,6 +15,7 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
+import ar.edu.utn.frc.tup.lc.iv.services.PasswordGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.Data;
@@ -853,5 +854,26 @@ public class UserServiceImpl implements UserService {
         user.setPassword(hashedNewPassword);
 
         userRepository.save(user);
+    }
+
+    /**
+     * Cambia la contraseña de un usuario por una aleatoria.
+     */
+    public void passwordRecovery(String userEmail){
+         Integer userId = restContact.getUserIdByEmail(userEmail);
+         if(userId == null){
+             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                     "User not found with email: " + userEmail);
+         }
+         UserEntity userEntity = userRepository.findById(userId).orElseThrow(
+                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                         "User not found" ));
+
+        String newPassword = PasswordGenerator.generateRandomPassword();
+        String hashPassword = passwordEncoder.hashPassword(newPassword);
+        userEntity.setPassword(hashPassword);
+        userRepository.save(userEntity);
+
+        //falta pegarle a notificaciones y enviarles el email y la contraseña nueva generada
     }
 }
