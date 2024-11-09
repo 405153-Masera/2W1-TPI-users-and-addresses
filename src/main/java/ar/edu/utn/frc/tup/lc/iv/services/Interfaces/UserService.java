@@ -138,4 +138,6 @@ public interface UserService {
      * @param changePassword dto con información requerida para el cambio de contraseña.
      */
     void changePassword(ChangePassword changePassword);
+
+    GetUserDto updateTelegramId(String dni, Integer telegramId);
 }

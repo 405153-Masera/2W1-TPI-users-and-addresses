@@ -854,4 +854,11 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    @Override
+    public GetUserDto updateTelegramId(String dni, Integer telegramId) {
+        UserEntity user = userRepository.findByDni(dni);
+        user.setTelegram_id(telegramId);
+        return convertToUserDto(this.userRepository.save(user));
+    }
 }
