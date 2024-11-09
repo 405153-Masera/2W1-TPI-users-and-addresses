@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 
 @Service
 public class PasswordGenerator {
-    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@!#$%&";
     private static final int PASSWORD_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
 

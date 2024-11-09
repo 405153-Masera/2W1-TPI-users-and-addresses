@@ -84,6 +84,7 @@ public class SpringDocConfig {
         return new PasswordUtil();
     }
 
+
 //    @Bean
 //    public AuthenticationProvider authenticationProvider() {
 //        return DaoAuthenticationProvider authencationProvider = new DaoAuthenticationProvider();

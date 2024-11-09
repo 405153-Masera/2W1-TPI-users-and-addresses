@@ -7,6 +7,9 @@ import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RecoveryDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RegisterDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
 import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
@@ -49,6 +52,12 @@ public class UserServiceImpl implements UserService {
      * Servicio para manejar el restTemplate de lotes de propietarios.
      */
     private final RestPlotOwner restPlotOwner;
+
+    /**
+     * Servicio para manejar el restTemplate de notificaciones
+     */
+    private final RestNotifications restNotifications;
+
 
     /**
      * ModelMapper para convertir entre entidades y dtos.
@@ -116,6 +125,8 @@ public class UserServiceImpl implements UserService {
         plot.add(postUserDto.getPlot_id());
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
+        //sendWelcomeEmail(postUserDto.getEmail());todo: Descomentar cuando se necesite postear a notificaciones
+
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         //restAccess.registerUserAccess(postUserDto);
         return getUserDto;
@@ -142,8 +153,9 @@ public class UserServiceImpl implements UserService {
 
         GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
+        //sendWelcomeEmail(postOwnerUserDto.getEmail());
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
-        //restAccess.registerUserAccess(postOwnerUserDto);
+        //restAccess.registerUserAccess(postOwnerUserDto); todo: Descomeentar cuando se necesite postear a notificaciones
         return getUserDto;
     }
 
@@ -859,21 +871,35 @@ public class UserServiceImpl implements UserService {
     /**
      * Cambia la contraseña de un usuario por una aleatoria.
      */
+    @Transactional
     public void passwordRecovery(String userEmail){
-         Integer userId = restContact.getUserIdByEmail(userEmail);
-         if(userId == null){
-             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                     "User not found with email: " + userEmail);
-         }
-         UserEntity userEntity = userRepository.findById(userId).orElseThrow(
-                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                         "User not found" ));
+        Integer userId = restContact.getUserIdByEmail(userEmail);
+        if(userId == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User not found with email: " + userEmail);
+        }
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User not found" ));
 
         String newPassword = PasswordGenerator.generateRandomPassword();
         String hashPassword = passwordEncoder.hashPassword(newPassword);
         userEntity.setPassword(hashPassword);
         userRepository.save(userEntity);
 
-        //falta pegarle a notificaciones y enviarles el email y la contraseña nueva generada
+        RecoveryDto recoveryDto = new RecoveryDto();
+        recoveryDto.setEmail(userEmail);
+        recoveryDto.setPassword(newPassword);
+        restNotifications.sendRecoveryEmail(recoveryDto);
+    }
+
+    /**
+     * Envia un email de bienvenida a un usuario.
+     * @param email email del usuario.
+     */
+    public void sendWelcomeEmail(String email){
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setEmail(email);
+        restNotifications.sendRegisterEmail(registerDto);
     }
 }
