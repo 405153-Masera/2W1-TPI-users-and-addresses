@@ -1,7 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount;
-import ar.edu.utn.frc.tup.lc.iv.services.UserStatsService;
+import ar.edu.utn.frc.tup.lc.iv.services.dashboard.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

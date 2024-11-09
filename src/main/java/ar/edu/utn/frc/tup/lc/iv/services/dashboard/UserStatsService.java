@@ -1,4 +1,4 @@
-package ar.edu.utn.frc.tup.lc.iv.services;
+package ar.edu.utn.frc.tup.lc.iv.services.dashboard;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
