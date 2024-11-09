@@ -140,4 +140,5 @@ public interface UserService {
     void changePassword(ChangePassword changePassword);
 
     GetUserDto updateTelegramId(String dni, Integer telegramId);
+    void passwordRecovery(String userEmail);
 }

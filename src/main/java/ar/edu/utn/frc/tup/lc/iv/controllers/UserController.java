@@ -278,6 +278,13 @@ public class UserController {
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
+
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/recoveryPassword/{email}")
+    public ResponseEntity<Void> recoveryPassword(@PathVariable String email){
+        userService.passwordRecovery(email);
+        return ResponseEntity.ok().build();
     }
 }
