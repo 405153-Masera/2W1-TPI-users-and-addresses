@@ -77,6 +77,11 @@ public class UserStatsService {
                     (counts.getRight() * 100.0) / totalUsers
             ));
         }
+        distribution.sort((d1, d2) -> {
+            int start1 = Integer.parseInt(d1.getAgeRange().split("-")[0].replace("+", ""));
+            int start2 = Integer.parseInt(d2.getAgeRange().split("-")[0].replace("+", ""));
+            return Integer.compare(start1, start2);
+        });
 
         return distribution;
     }
