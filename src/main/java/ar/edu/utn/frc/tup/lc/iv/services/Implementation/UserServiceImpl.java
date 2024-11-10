@@ -877,17 +877,17 @@ public class UserServiceImpl implements UserService {
     }
     /**
      * Cambia la contraseña de un usuario por una aleatoria.
+     * @param userEmail email del usuario.
      */
     @Transactional
-    public void passwordRecovery(String userEmail){
+    public void passwordRecovery(String userEmail) {
         Integer userId = restContact.getUserIdByEmail(userEmail);
-        if(userId == null){
+        if (userId == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "User not found with email: " + userEmail);
         }
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "User not found" ));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         String newPassword = PasswordGenerator.generateRandomPassword();
         String hashPassword = passwordEncoder.hashPassword(newPassword);
@@ -904,7 +904,7 @@ public class UserServiceImpl implements UserService {
      * Envia un email de bienvenida a un usuario.
      * @param email email del usuario.
      */
-    public void sendWelcomeEmail(String email){
+    public void sendWelcomeEmail(String email) {
         RegisterDto registerDto = new RegisterDto();
         registerDto.setEmail(email);
         restNotifications.sendRegisterEmail(registerDto);
