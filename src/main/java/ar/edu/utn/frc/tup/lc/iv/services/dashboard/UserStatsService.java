@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servicio que contiene la lógica de negocio para obtener información
@@ -33,14 +34,31 @@ public class UserStatsService {
     }
 
 
-    public AgeDistributionResponse getAgeData() {
+    public AgeDistributionResponse getAgeData(LocalDate startDate, LocalDate endDate) {
         List<UserEntity> users = userRepository.findAll();
+        List<UserEntity> filteredUsers = users.stream()
+                .filter(user -> isUserInDateRange(user, startDate, endDate))
+                .toList();
+
         AgeDistributionResponse response = new AgeDistributionResponse();
         response.setAgeDistribution(calculateAgeDistribution(users));
         response.setStatics(calculateAgeStatics(users));
         response.setUserStatusDistribution(calculateStatusDistribution(users));
 
         return response;
+    }
+
+    private boolean isUserInDateRange(UserEntity user, LocalDate startDate, LocalDate endDate) {
+        LocalDate userDate = user.getDatebirth();
+
+        if (userDate == null) {
+            return false;
+        }
+
+        boolean afterStartDate = startDate == null || !userDate.isBefore(startDate);
+        boolean beforeEndDate = endDate == null || !userDate.isAfter(endDate);
+
+        return afterStartDate && beforeEndDate;
     }
 
     public List<AgeDistribution> calculateAgeDistribution(List<UserEntity> users) {

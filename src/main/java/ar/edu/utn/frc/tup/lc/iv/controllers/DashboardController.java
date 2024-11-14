@@ -6,10 +6,9 @@ import ar.edu.utn.frc.tup.lc.iv.services.dashboard.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -37,12 +36,15 @@ public class DashboardController {
 
     /**
      * Retorna la distribución de edades de los usuarios.
+     * @param startDate Fecha de inicio del rango de fechas.
+     * @param endDate Fecha de fin del rango de fechas.
      * @return ResponseEntity con información de la distribución de edades.
      */
     @GetMapping("/age-data")
-    public ResponseEntity<AgeDistributionResponse> getAgeData() {
+    public ResponseEntity<AgeDistributionResponse> getAgeData(@RequestParam(required = false) LocalDate startDate,
+                                                             @RequestParam(required = false) LocalDate endDate) {
         try {
-            AgeDistributionResponse response = userStatsService.getAgeData();
+            AgeDistributionResponse response = userStatsService.getAgeData(startDate, endDate);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
