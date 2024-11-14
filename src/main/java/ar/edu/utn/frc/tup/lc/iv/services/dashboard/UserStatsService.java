@@ -41,9 +41,9 @@ public class UserStatsService {
                 .toList();
 
         AgeDistributionResponse response = new AgeDistributionResponse();
-        response.setAgeDistribution(calculateAgeDistribution(users));
-        response.setStatics(calculateAgeStatics(users));
-        response.setUserStatusDistribution(calculateStatusDistribution(users));
+        response.setAgeDistribution(calculateAgeDistribution(filteredUsers));
+        response.setStatics(calculateAgeStatics(filteredUsers));
+        response.setUserStatusDistribution(calculateStatusDistribution(filteredUsers));
 
         return response;
     }
