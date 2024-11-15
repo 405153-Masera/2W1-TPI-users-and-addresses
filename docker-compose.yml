@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  app_users_microservice:
+    container_name: users_microservice
+    image: tpi_users_and_addresses:0.0.1-SNAPSHOT
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "9060:9060"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_users_db:3306/users?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      mysql_users_db:
+        condition: service_healthy
+
+  mysql_users_db:
+    container_name: mysql_users_db
+    image: mysql:8.0.33
+    ports:
+      - "9061:3306"
+    environment:
+      - MYSQL_DATABASE=users
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - db_users_data:/var/lib/mysql
+      - ./users.sql:/docker-entrypoint-initdb.d/users.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql_users_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_users_data:

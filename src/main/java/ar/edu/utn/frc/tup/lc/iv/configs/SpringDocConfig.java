@@ -1,6 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.configs;
 
-import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
@@ -11,6 +11,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
 /**
  * Spring Doc configuration class.
@@ -81,4 +83,11 @@ public class SpringDocConfig {
     public PasswordUtil passwordUtil() {
         return new PasswordUtil();
     }
+
+
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        return DaoAuthenticationProvider authencationProvider = new DaoAuthenticationProvider();
+//
+//    }
 }

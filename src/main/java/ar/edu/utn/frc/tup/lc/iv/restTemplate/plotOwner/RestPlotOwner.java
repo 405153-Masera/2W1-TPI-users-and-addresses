@@ -14,7 +14,7 @@ import java.util.List;
 public class RestPlotOwner {
     @Autowired
     private RestTemplate restTemplate;
-    String url = "http://localhost:8081/plotOwners";
+    String url = "http://localhost:9062/plotOwners";
     public List<GetPlotOwnerDto> getAllPlotOwner() {
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
         List<GetPlotOwnerDto> PlotOwnerDtoList = new ArrayList<>();

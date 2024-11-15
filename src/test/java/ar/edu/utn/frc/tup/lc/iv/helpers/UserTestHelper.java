@@ -8,7 +8,6 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
-import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

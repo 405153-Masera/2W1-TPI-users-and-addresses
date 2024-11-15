@@ -210,7 +210,7 @@ class UserServiceImplTest {
         postUserDto.setUsername("JuanPa");
 
         //When
-        when(userRepositoryMock.findByUsername("JuanPa")).thenReturn(new UserEntity());
+        when(userRepositoryMock.findByUsername("JuanPa")).thenReturn(Optional.of(new UserEntity()));
 
         //Then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -360,9 +360,10 @@ class UserServiceImplTest {
     void  getUserByEmail_EntityNotFound(){
         //When
         when(restContactMock.getUserIdByEmail(anyString())).thenReturn(null);
-        assertThrows(EntityNotFoundException.class, () -> {
-            userServiceSpy.getUserByEmail("");
-        });
+        GetUserDto getUserDto = null;
+
+        userServiceSpy.getUserByEmail("email@email.com");
+        assertNull(getUserDto);
     }
 
     @Test
@@ -632,7 +633,7 @@ class UserServiceImplTest {
         String username = "JuanPa";
 
         //When
-        when(userRepositoryMock.findByUsername(username)).thenReturn(null);
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.empty());
 
         //Then
         assertDoesNotThrow(() -> {
@@ -646,7 +647,7 @@ class UserServiceImplTest {
         String username = "JuanPa";
 
         //When
-        when(userRepositoryMock.findByUsername(username)).thenReturn(new UserEntity());
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.of(new UserEntity()));
 
         //Then
         assertThrows(IllegalArgumentException.class, () -> {

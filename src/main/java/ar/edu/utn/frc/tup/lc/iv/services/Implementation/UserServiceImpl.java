@@ -7,7 +7,10 @@ import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
-import ar.edu.utn.frc.tup.lc.iv.jwt.PasswordUtil;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RecoveryDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RegisterDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
@@ -15,6 +18,7 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
+import ar.edu.utn.frc.tup.lc.iv.services.PasswordGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.Data;
@@ -22,7 +26,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +52,12 @@ public class UserServiceImpl implements UserService {
      * Servicio para manejar el restTemplate de lotes de propietarios.
      */
     private final RestPlotOwner restPlotOwner;
+
+    /**
+     * Servicio para manejar el restTemplate de notificaciones
+     */
+    private final RestNotifications restNotifications;
+
 
     /**
      * ModelMapper para convertir entre entidades y dtos.
@@ -112,6 +125,8 @@ public class UserServiceImpl implements UserService {
         plot.add(postUserDto.getPlot_id());
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
+        //sendWelcomeEmail(postUserDto.getEmail());todo: Descomentar cuando se necesite postear a notificaciones
+
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         //restAccess.registerUserAccess(postUserDto);
         return getUserDto;
@@ -138,8 +153,9 @@ public class UserServiceImpl implements UserService {
 
         GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
+        //sendWelcomeEmail(postOwnerUserDto.getEmail());
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
-        //restAccess.registerUserAccess(postOwnerUserDto);
+        //restAccess.registerUserAccess(postOwnerUserDto); todo: Descomeentar cuando se necesite postear a notificaciones
         return getUserDto;
     }
 
@@ -513,7 +529,7 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException si existe un username igual en la base de datos.
      */
     public void validateUsername(String username) {
-        if (userRepository.findByUsername(username) != null) {
+        if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Error creating user: username already in use.");
         }
     }
@@ -713,9 +729,29 @@ public class UserServiceImpl implements UserService {
 
         Integer userId = restContact.getUserIdByEmail(email);
         if (userId == null) {
-            throw new EntityNotFoundException("User not found with email: " + email);
+            return null;
         }
         return getUserById(userId);
+    }
+
+    /**
+     * Obtener un usuario por username.
+     * @param username username de un usuario.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el username proporcionado por parámetro.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID coincidente al username.
+     * @return un usuario si existe.
+     */
+    public GetUserDto getUserByUsername(String username) {
+        // Usar orElse para devolver null si no se encuentra el usuario
+        UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
+
+        // Si no se encuentra el usuario, simplemente retornar null
+        if (userEntity == null) {
+            return null;
+        }
+
+        // Si se encuentra el usuario, retornar el DTO correspondiente
+        return getUserById(userEntity.getId());
     }
 
     /**
@@ -790,13 +826,19 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public GetUserDto verifyLogin(PostLoginDto postLoginDto) {
-        GetUserDto user = this.getUserByEmail(postLoginDto.getEmail());
+        GetUserDto user = this.getUserByUsername(postLoginDto.getEmail());
+
+        // Si no se encuentra el usuario por email, buscar por nombre de usuario
         if (user == null) {
-            return null;
+            user = this.getUserByEmail(postLoginDto.getEmail());
         }
-        if (passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())) {
+
+        // Verificar si se encontró un usuario y si la contraseña es correcta
+        if (user != null && passwordEncoder.checkPassword(postLoginDto.getPassword(), user.getPassword())) {
             return user;
         }
+
+        // Retornar null si no se encontró el usuario o la contraseña es incorrecta
         return null;
     }
 
@@ -807,18 +849,64 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     public void changePassword(ChangePassword changePasswordDto) {
-        Integer userId = this.getUserByEmail(changePasswordDto.getEmail()).getId();
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        GetUserDto getUserDto = this.getUserByEmail(changePasswordDto.getEmail());
+        if (getUserDto == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with email: " + changePasswordDto.getEmail());
+        }
+        UserEntity user = userRepository.findById(getUserDto.getId())
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "User not found with email: " + changePasswordDto.getEmail()));
 
 
         if (!PasswordUtil.checkPassword(changePasswordDto.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Current password is incorrect.");
         }
 
         String hashedNewPassword = PasswordUtil.hashPassword(changePasswordDto.getNewPassword());
         user.setPassword(hashedNewPassword);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public GetUserDto updateTelegramId(String dni, Integer telegramId) {
+        UserEntity user = userRepository.findByDni(dni);
+        user.setTelegram_id(telegramId);
+        return convertToUserDto(this.userRepository.save(user));
+
+    }
+    /**
+     * Cambia la contraseña de un usuario por una aleatoria.
+     * @param userEmail email del usuario.
+     */
+    @Transactional
+    public void passwordRecovery(String userEmail) {
+        Integer userId = restContact.getUserIdByEmail(userEmail);
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User not found with email: " + userEmail);
+        }
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String newPassword = PasswordGenerator.generateRandomPassword();
+        String hashPassword = passwordEncoder.hashPassword(newPassword);
+        userEntity.setPassword(hashPassword);
+        userRepository.save(userEntity);
+
+        RecoveryDto recoveryDto = new RecoveryDto();
+        recoveryDto.setEmail(userEmail);
+        recoveryDto.setPassword(newPassword);
+        restNotifications.sendRecoveryEmail(recoveryDto);
+    }
+
+    /**
+     * Envia un email de bienvenida a un usuario.
+     * @param email email del usuario.
+     */
+    public void sendWelcomeEmail(String email) {
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setEmail(email);
+        restNotifications.sendRegisterEmail(registerDto);
     }
 }

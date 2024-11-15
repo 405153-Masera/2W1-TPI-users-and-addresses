@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementación de la interfaz VerificationService,
+ * contiene la lógica de verificación.
+ */
 @Service
 @RequiredArgsConstructor
 public class VerificationService {
