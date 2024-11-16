@@ -31,7 +31,7 @@ public class RestContact {
     /**
      * Dirección url donde se levanta el microservicio de contactos.
      */
-    private String url = "http://localhost:8010/contact/search";
+    private String url = "http://localhost:9010/contact/search";
 
     /**
      * Metodo para obtener una lista de contactos según un ID de usuario.
