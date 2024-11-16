@@ -5,6 +5,7 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,9 @@ public class RestContact {
     /**
      * Dirección url donde se levanta el microservicio de contactos.
      */
-    private String url = "http://localhost:9010/contact/search";
+
+    @Value("${contact.service.url}")
+    private String url;
 
     /**
      * Metodo para obtener una lista de contactos según un ID de usuario.
@@ -42,8 +45,7 @@ public class RestContact {
     public List<GetContactDto> getContactById(int userId) {
 
         // JsonNode para no tener que hacer varias clases
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "?userId=" + userId, JsonNode.class);
-
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search?userId=" + userId, JsonNode.class);
         List<GetContactDto> contacts = new ArrayList<>();
 
         GetContactDto contact;
@@ -74,8 +76,7 @@ public class RestContact {
      * @return una lista de tipo {@link String}
      */
     public List<String> getAllEmails() {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
-
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);
         List<String> emails = new ArrayList<>();
 
         if (response.getBody().isArray()) {
@@ -100,8 +101,7 @@ public class RestContact {
      * @return una id de usuario tipo {@link Integer}
      */
     public Integer getUserIdByEmail(String email) {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
-        if (response.getBody().isArray()) {
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);        if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
                 String contactValue = node.get("value").asText();
                 String contactType = node.get("contactType").get("id").asText();
@@ -132,8 +132,7 @@ public class RestContact {
         contact.setEditorId(editorId);
 
         try {
-            ResponseEntity<Void> response = restTemplate.postForEntity("http://localhost:8010/contact/owner", contact, Void.class);
-            return response.getStatusCode().is2xxSuccessful();
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/owner", contact, Void.class);            return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e) {
             // Lanzar la excepción con la excepción original
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
@@ -154,8 +153,7 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no modificar el contacto.
      */
     public boolean updateContact(Integer userId, String value, int contactType, int editorId) {
-        String updateUrl = "http://localhost:8010/contact/update?userId=" + userId + "&personTypeId=3&contactTypeId=" + contactType;
-
+        String updateUrl = url + "/update?userId=" + userId + "&personTypeId=3&contactTypeId=" + contactType;
         ContactPutRequest contact = new ContactPutRequest();
         contact.setUserId(userId);
         contact.setPersonTypeId(3);

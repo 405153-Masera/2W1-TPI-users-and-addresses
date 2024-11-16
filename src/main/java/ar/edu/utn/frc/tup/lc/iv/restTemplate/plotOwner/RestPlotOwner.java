@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotOwnerDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,7 +15,10 @@ import java.util.List;
 public class RestPlotOwner {
     @Autowired
     private RestTemplate restTemplate;
-    String url = "http://localhost:9062/plotOwners";
+
+    @Value("${plotowner.service.url}")
+    private String url;
+
     public List<GetPlotOwnerDto> getAllPlotOwner() {
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
         List<GetPlotOwnerDto> PlotOwnerDtoList = new ArrayList<>();

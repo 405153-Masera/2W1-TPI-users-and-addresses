@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate.access;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.BasePostUser;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,8 +27,8 @@ public class RestAccess {
     /**
      * Dirección url donde se levanta el microservicio de accesos.
      */
-    private String url = "http://localhost:8090/owner_tenant";
-
+    @Value("${access.service.url}")
+    private String url;
 
     /**
      * Metodo para registrar un acceso.
@@ -42,7 +43,7 @@ public class RestAccess {
      * @param document Documento a buscar.
      */
     public void deleteAccess(String document) {
-        restTemplate.put("http://localhost:8090/owner-tenant" + "/unsubscribe/" + document, null, Void.class);
+        restTemplate.put(url + "/unsubscribe/" + document, null, Void.class);
     }
 
     /**

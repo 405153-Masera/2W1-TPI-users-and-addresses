@@ -2,6 +2,7 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class RestNotifications {
     private final RestTemplate restTemplate;
 
-    String url = "http://localhost:8080/user/";
-
+    @Value("${notification.service.url}")
+    private String url;
 
     public boolean sendRecoveryEmail(RecoveryDto dto) {
         try{
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "password", dto, Void.class);
-            return response.getStatusCode().is2xxSuccessful();
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/password", dto, Void.class);            return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e){
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
@@ -34,8 +34,7 @@ public class RestNotifications {
 
     public boolean sendRegisterEmail(RegisterDto dto) {
         try{
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "register", dto, Void.class);
-            return response.getStatusCode().is2xxSuccessful();
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/register", dto, Void.class);            return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e){
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
