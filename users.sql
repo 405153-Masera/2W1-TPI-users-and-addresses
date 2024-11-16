@@ -308,6 +308,7 @@ VALUES
 ('Beatriz', 'Torres', 1, '43210989', '2012-07-30', TRUE, NOW(), 1, NOW(), 1, 'beatriztorres', '12345678', 56745),
 ('Martin', 'Diaz', 3, '23455948170', '1992-12-10', TRUE, NOW(), 1, NOW(), 1, 'martindiaz', '12345678', 90156);
 
+
 INSERT INTO userroles (role_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES 
 (1, 1, NOW(), NOW(), 1, 1),
