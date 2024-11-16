@@ -279,7 +279,7 @@ INSERT INTO users (name, lastname, dni_type_id, dni, birth_date, active, created
 VALUES
 ('Ulises', 'Lara', 1, '42512123', '2000-09-15', TRUE, NOW(), 1, NOW(), 1, 'uliseslara', '12345678', 12345),
 ('Carlos', 'Perez', 1, '41234567', '1985-04-12', TRUE, NOW(), 1, NOW(), 1, 'carlosperez', '12345678', 67890),
-('Maria', 'González', 1, '39876543', '1990-08-25', TRUE, NOW(), 1, NOW(), 1, 'mariagonzalez', '12345678', 23456),
+('Maria', 'Gonzalez', 1, '39876543', '1990-08-25', TRUE, NOW(), 1, NOW(), 1, 'mariagonzalez', '12345678', 23456),
 ('Juan', 'Lopez', 1, '41238945', '1978-03-15', TRUE, NOW(), 1, NOW(), 1, 'juanlopez', '12345678', 78901),
 ('Ana', 'Martinez', 1, '44556677', '1995-07-19', TRUE, NOW(), 1, NOW(), 1, 'anamartinez', '12345678', 34567),
 ('Pedro', 'Ramirez', 1, '40785621', '1982-01-05', TRUE, NOW(), 1, NOW(), 1, 'pedroramirez', '12345678', 89012),
