@@ -37,7 +37,8 @@ public class RestPlotOwner {
      * @throws EntityNotFoundException si hubo un error en la petición.
      */
     public List<GetPlotOwnerDto> getAllPlotOwner() {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
+        //EMa le agregue /plotOwners
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url+"/plotOwners", JsonNode.class);
         List<GetPlotOwnerDto> plotOwnerDtoList = new ArrayList<>();
         JsonNode responseBody = response.getBody();
         if (responseBody != null && responseBody.isArray()) {

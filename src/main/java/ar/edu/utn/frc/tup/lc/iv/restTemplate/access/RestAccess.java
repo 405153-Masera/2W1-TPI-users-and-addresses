@@ -36,7 +36,8 @@ public class RestAccess {
      * @param accessPost Lista de accesos a registrar.
      */
     public void postAccess(List<AccessPost> accessPost) {
-        restTemplate.postForEntity(url + "/register", accessPost, Void.class);
+        //EMA le agregue /owner_tenant
+        restTemplate.postForEntity(url + "/owner_tenant/register", accessPost, Void.class);
     }
 
     /**
@@ -45,7 +46,8 @@ public class RestAccess {
      * @param document Documento a buscar.
      */
     public void deleteAccess(String document) {
-        restTemplate.put(url + "/unsubscribe/" + document, null, Void.class);
+        //EMA le agregue /owner_tenant
+        restTemplate.put(url + "/owner_tenant/unsubscribe/" + document, null, Void.class);
     }
 
     /**

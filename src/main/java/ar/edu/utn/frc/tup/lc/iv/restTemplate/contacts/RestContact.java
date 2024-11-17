@@ -40,9 +40,9 @@ public class RestContact {
      * @return una lista de {@link GetContactDto}
      */
     public List<GetContactDto> getContactById(int userId) {
-
+        //Ema agregue /contact
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(
-                url + "/search?userId=" + userId, JsonNode.class);
+                url + "/contact/search?userId=" + userId, JsonNode.class);
         List<GetContactDto> contacts = new ArrayList<>();
 
         GetContactDto contact;
@@ -71,7 +71,8 @@ public class RestContact {
      * @return una lista de tipo {@link String}
      */
     public List<String> getAllEmails() {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);
+        //EMA le agregue /contact
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/contact/search", JsonNode.class);
         List<String> emails = new ArrayList<>();
 
         if (response.getBody().isArray()) {
