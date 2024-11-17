@@ -60,7 +60,7 @@ public class VerificationController {
      * @return Respuesta con el resultado de la verificación.
      */
     @GetMapping("/dni")
-    public ResponseEntity<Map<String, Boolean>> isDniUnique(@RequestParam String dni) {
+    public ResponseEntity<Map<String, Boolean>> dniUnique(@RequestParam String dni) {
         boolean isUnique = verificationService.isDniUnique(dni);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isUnique", isUnique);

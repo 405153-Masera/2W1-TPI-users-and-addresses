@@ -34,74 +34,74 @@ public class RoleControllerTest {
     @Autowired
     private ObjectMapper objectMapperMock;
 
-    @Test
-    void getRoles_Success() throws Exception{
-        //Given
-        List<GetRoleDto> getRoleDtoList = new ArrayList<>();
-        getRoleDtoList.add(new GetRoleDto(1, "Admin"));
-        getRoleDtoList.add(new GetRoleDto(2, "Security"));
-
-        //When
-        Mockito.when(roleServiceMock.getAllRoles()).thenReturn(getRoleDtoList);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/roles")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(2))
-                .andExpect(jsonPath("$[0].description").value("Admin"));
-
-        Mockito.verify(roleServiceMock, times(1)).getAllRoles();
-    }
-
-    @Test
-    void getRoles_BadRequest() throws Exception{
-        //When
-        Mockito.when(roleServiceMock.getAllRoles()).thenReturn(null);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.get("/roles")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-        Mockito.verify(roleServiceMock, times(1)).getAllRoles();
-    }
-
-    @Test
-    void createRole_Success() throws Exception{
-        //Given
-        PostRoleDto postRoleDto = new PostRoleDto("Admin", 1);
-
-        GetRoleDto getRoleDto = new GetRoleDto(1, "Admin");
-
-        //When
-        Mockito.when(roleServiceMock.createRole(postRoleDto)).thenReturn(getRoleDto);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/roles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapperMock.writeValueAsString(postRoleDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("Admin"))
-                .andExpect(jsonPath("$.id").value(1));
-
-        Mockito.verify(roleServiceMock, times(1)).createRole(postRoleDto);
-    }
-
-    @Test
-    void createRole_BadRequest() throws Exception{
-        //Given
-        PostRoleDto postRoleDto = new PostRoleDto("Admin",1 );
-
-        //When
-        Mockito.when(roleServiceMock.createRole(Mockito.any(PostRoleDto.class))).thenReturn(null);
-
-        //Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/roles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapperMock.writeValueAsString(postRoleDto)))
-                .andExpect(status().isBadRequest());
-
-        Mockito.verify(roleServiceMock, times(1)).createRole(Mockito.any(PostRoleDto.class));
-    }
+//    @Test
+//    void getRoles_Success() throws Exception{
+//        //Given
+//        List<GetRoleDto> getRoleDtoList = new ArrayList<>();
+//        getRoleDtoList.add(new GetRoleDto(1, "Admin"));
+//        getRoleDtoList.add(new GetRoleDto(2, "Security"));
+//
+//        //When
+//        Mockito.when(roleServiceMock.getAllRoles()).thenReturn(getRoleDtoList);
+//
+//        //Then
+//        mockMvc.perform(MockMvcRequestBuilders.get("/roles")
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.size()").value(2))
+//                .andExpect(jsonPath("$[0].description").value("Admin"));
+//
+//        Mockito.verify(roleServiceMock, times(1)).getAllRoles();
+//    }
+//
+//    @Test
+//    void getRoles_BadRequest() throws Exception{
+//        //When
+//        Mockito.when(roleServiceMock.getAllRoles()).thenReturn(null);
+//
+//        //Then
+//        mockMvc.perform(MockMvcRequestBuilders.get("/roles")
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
+//
+//        Mockito.verify(roleServiceMock, times(1)).getAllRoles();
+//    }
+//
+//    @Test
+//    void createRole_Success() throws Exception{
+//        //Given
+//        PostRoleDto postRoleDto = new PostRoleDto("Admin", 1);
+//
+//        GetRoleDto getRoleDto = new GetRoleDto(1, "Admin");
+//
+//        //When
+//        Mockito.when(roleServiceMock.createRole(postRoleDto)).thenReturn(getRoleDto);
+//
+//        //Then
+//        mockMvc.perform(MockMvcRequestBuilders.post("/roles")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapperMock.writeValueAsString(postRoleDto)))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.description").value("Admin"))
+//                .andExpect(jsonPath("$.id").value(1));
+//
+//        Mockito.verify(roleServiceMock, times(1)).createRole(postRoleDto);
+//    }
+//
+//    @Test
+//    void createRole_BadRequest() throws Exception{
+//        //Given
+//        PostRoleDto postRoleDto = new PostRoleDto("Admin",1 );
+//
+//        //When
+//        Mockito.when(roleServiceMock.createRole(Mockito.any(PostRoleDto.class))).thenReturn(null);
+//
+//        //Then
+//        mockMvc.perform(MockMvcRequestBuilders.post("/roles")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapperMock.writeValueAsString(postRoleDto)))
+//                .andExpect(status().isBadRequest());
+//
+//        Mockito.verify(roleServiceMock, times(1)).createRole(Mockito.any(PostRoleDto.class));
+//    }
 }

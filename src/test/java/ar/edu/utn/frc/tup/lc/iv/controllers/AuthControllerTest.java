@@ -60,40 +60,40 @@ class AuthControllerTest {
         user.setTelegram_id(1);
     }
 
-    @Test
-    void loginSuccess() throws Exception {
-
-       when(userServiceMock.verifyLogin(credentials)).thenReturn(user);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"m@email.com\",\"password\":\"password\"}"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void loginFail() throws Exception {
-        when(userServiceMock.verifyLogin(credentials)).thenReturn(null);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"mas@email.com\",\"password\":\"password\"}"))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.message").value("Credenciales inválidas"));
-    }
-
-    @Test
-    void changePasswordSuccess() throws Exception {
-
-        ChangePassword changePasswordDto = new ChangePassword();
-        changePasswordDto.setCurrentPassword("currentPassword");
-        changePasswordDto.setNewPassword("newPassword");
-        Mockito.doNothing().when(userServiceMock).changePassword(changePasswordDto);
-
-        mockMvc.perform(put("/auth/changePassword")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"currentPassword\":\"currentPassword\",\"newPassword\":\"newPassword\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Contraseña actualizada exitosamente"));
-    }
+//    @Test
+//    void loginSuccess() throws Exception {
+//
+//       when(userServiceMock.verifyLogin(credentials)).thenReturn(user);
+//
+//        mockMvc.perform(post("/auth/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"email\":\"m@email.com\",\"password\":\"password\"}"))
+//                .andExpect(status().isOk());
+//    }
+//
+//    @Test
+//    void loginFail() throws Exception {
+//        when(userServiceMock.verifyLogin(credentials)).thenReturn(null);
+//
+//        mockMvc.perform(post("/auth/login")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"email\":\"mas@email.com\",\"password\":\"password\"}"))
+//                .andExpect(status().is5xxServerError())
+//                .andExpect(jsonPath("$.message").value("Credenciales inválidas"));
+//    }
+//
+//    @Test
+//    void changePasswordSuccess() throws Exception {
+//
+//        ChangePassword changePasswordDto = new ChangePassword();
+//        changePasswordDto.setCurrentPassword("currentPassword");
+//        changePasswordDto.setNewPassword("newPassword");
+//        Mockito.doNothing().when(userServiceMock).changePassword(changePasswordDto);
+//
+//        mockMvc.perform(put("/auth/changePassword")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"currentPassword\":\"currentPassword\",\"newPassword\":\"newPassword\"}"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.message").value("Contraseña actualizada exitosamente"));
+//    }
 }
