@@ -68,11 +68,11 @@ public class RestAccess {
         AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
         for (String role : user.getRoles()) {
             if ("Propietario".equals(role)) { // Literal posicionada primero
-                accessUserAllowedType.setDescription("Propietario");
+                accessUserAllowedType.setDescription("Owner");
             }
         }
         if (accessUserAllowedType.getDescription() == null) {
-            accessUserAllowedType.setDescription("Inquilino");
+            accessUserAllowedType.setDescription("Tenant");
         }
         accessPost.setUser_allowed_Type(accessUserAllowedType);
         accessPost.setEmail(user.getEmail());

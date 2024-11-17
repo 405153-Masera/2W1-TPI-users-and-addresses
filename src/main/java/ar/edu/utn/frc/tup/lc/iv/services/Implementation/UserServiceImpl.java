@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         sendWelcomeEmail(postUserDto.getEmail()); //todo: Descomentar cuando se necesite postear a notificaciones
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
-        //restAccess.registerUserAccess(postUserDto);
+        restAccess.registerUserAccess(postUserDto);
         return getUserDto;
     }
 
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
         sendWelcomeEmail(postOwnerUserDto.getEmail());
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
-        //restAccess.registerUserAccess(postOwnerUserDto); //todo: Descomeentar cuando se necesite postear a notificaciones
+        restAccess.registerUserAccess(postOwnerUserDto); //todo: Descomeentar cuando se necesite postear a notificaciones
         return getUserDto;
     }
 
@@ -714,7 +714,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastUpdatedDate(LocalDateTime.now());
         userEntity.setLastUpdatedUser(userUpdateId);
         userRepository.save(userEntity);
-        //restAccess.deleteAccess(userEntity.getDni()); //todo: Descomentar cuando se necesite postear a acceso
+        restAccess.deleteAccess(userEntity.getDni()); //todo: Descomentar cuando se necesite postear a acceso
     }
 
     /**
