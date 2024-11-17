@@ -1,14 +1,16 @@
 package ar.edu.utn.frc.tup.lc.iv.dtos.post;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
 import java.time.LocalDate;
 
+/**
+ * Clase base que representa la solicitud para crear un usuario.
+ * No se debe instanciar directamente.
+ */
 @Data
-public abstract class BasePostUser {
+public class BasePostUser {
 
     /**
      * Nombre del usuario.
@@ -98,4 +100,11 @@ public abstract class BasePostUser {
      * Identificador de la plataforma telegram utilizada en notificaciones.
      */
     private Integer telegram_id;
+
+    /**
+     * Constructor protegido para evitar instanciar la clase directamente.
+     */
+    protected BasePostUser() {
+
+    }
 }

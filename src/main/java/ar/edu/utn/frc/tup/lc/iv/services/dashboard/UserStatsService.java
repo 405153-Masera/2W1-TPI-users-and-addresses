@@ -6,14 +6,13 @@ import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 /**
  * Servicio que contiene la lógica de negocio para obtener información
@@ -28,12 +27,23 @@ public class UserStatsService {
      */
     private final UserRepository userRepository;
 
+    /**
+     * Obtiene la cantidad de usuarios por rol.
+     *
+     * @return una lista con la cantidad de usuarios por rol.
+     */
     public List<UserRoleCount> getUserCountByRole() {
 
         return userRepository.countUsersByRole();
     }
 
-
+    /**
+     * Obtiene la cantidad de usuarios por estado.
+     *
+     * @param startDate fecha de inicio del rango.
+     * @param endDate fecha de fin del rango.
+     * @return una lista con la cantidad de usuarios por estado.
+     */
     public AgeDistributionResponse getAgeData(LocalDate startDate, LocalDate endDate) {
         List<UserEntity> users = userRepository.findAll();
         List<UserEntity> filteredUsers = users.stream()
@@ -48,6 +58,15 @@ public class UserStatsService {
         return response;
     }
 
+    /**
+     * Obtiene la cantidad de usuarios por estado.
+     *
+     * @param startDate fecha de inicio del rango.
+     * @param endDate fecha de fin del rango.
+     * @param user usuario a verificar si está en el rango de fechas.
+     *
+     * @return una lista con la cantidad de usuarios por estado.
+     */
     private boolean isUserInDateRange(UserEntity user, LocalDate startDate, LocalDate endDate) {
         LocalDate userDate = user.getDatebirth();
 
@@ -61,6 +80,12 @@ public class UserStatsService {
         return afterStartDate && beforeEndDate;
     }
 
+    /**
+     * Obtiene la distribución de edades de los usuarios.
+     *
+     * @param users lista de usuarios.
+     * @return una lista con la distribución de edades.
+     */
     public List<AgeDistribution> calculateAgeDistribution(List<UserEntity> users) {
         Map<String, MutablePair<Long, Long>> ageGroups = new HashMap<>();
         String[] ageRanges = {"0-10", "11-17", "18-25", "26-35", "36-50", "51-65", "65+"};
@@ -104,6 +129,12 @@ public class UserStatsService {
         return distribution;
     }
 
+    /**
+     * Calcula las estadísticas de las edades de los usuarios.
+     *
+     * @param users lista de usuarios.
+     * @return un objeto con las estadísticas de las edades.
+     */
     public AgeStatics calculateAgeStatics(List<UserEntity> users) {
         long totalUsers = users.size();
         double averageAge = users.stream().mapToInt(user -> calculateAge(user.getDatebirth())).average().orElse(0);
@@ -118,6 +149,12 @@ public class UserStatsService {
         );
     }
 
+    /**
+     * Calcula la distribución de los estados de los usuarios.
+     *
+     * @param users lista de usuarios.
+     * @return un objeto con la distribución de los estados.
+     */
     private UserStatusDistribution calculateStatusDistribution(List<UserEntity> users) {
         long totalUsers = users.size();
         long activeUsers = users.stream().filter(UserEntity::getActive).count();
@@ -162,6 +199,12 @@ public class UserStatsService {
         return null;
     }
 
+    /**
+     * Calcula la edad de una persona.
+     *
+     * @param birthDate la fecha de nacimiento de la persona.
+     * @return la edad de la persona.
+     */
     private int calculateAge(LocalDate birthDate) {
         if (birthDate == null) {
             return 0;

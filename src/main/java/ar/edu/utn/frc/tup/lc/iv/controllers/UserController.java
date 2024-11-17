@@ -261,17 +261,29 @@ public class UserController {
         }
     }
 
+    /**
+     * Obtiene una lista de usuarios asociados a un propietario específico sin incluir al propietario.
+     *
+     * @param ownerId id del propietario para el cual se desean obtener los usuarios.
+     * @return `ResponseEntity<List<GetUserDto>>` con estado 204 si no se encuentran usuarios, o estado 200 con la lista de usuarios.
+     */
     @GetMapping("/byOwner/{ownerId}/WithoutTheOwner")
     public ResponseEntity<List<GetUserDto>> getUsersByOwnerV2(@PathVariable Integer ownerId) {
         List<GetUserDto> users = userService.getUsersByOwnerWithoutOwner(ownerId);
-        // Verifica si la lista está vacía
         if (users.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay usuarios
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(users); // Devuelve 200 con los usuarios
+            return ResponseEntity.ok(users);
         }
     }
 
+    /**
+     * Actualiza el telegramId de un usuario.
+     *
+     * @param dni identificador de un usuario
+     * @param telegramId telegram id a actualizar
+     * @return el usuario actualizado
+     */
     @PutMapping("/putTelegram/{dni}/{telegramId}")
     public ResponseEntity<GetUserDto> updateUser(@PathVariable String dni, @PathVariable Integer telegramId) {
         GetUserDto result = userService.updateTelegramId(dni, telegramId);
@@ -282,8 +294,14 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Recupera la contraseña de un usuario.
+     *
+     * @param email email del usuario
+     * @return respuesta de confirmación de recuperación de contraseña.
+     */
     @PutMapping("/recoveryPassword/{email}")
-    public ResponseEntity<Void> recoveryPassword(@PathVariable String email){
+    public ResponseEntity<Void> recoveryPassword(@PathVariable String email) {
         userService.passwordRecovery(email);
         return ResponseEntity.ok().build();
     }

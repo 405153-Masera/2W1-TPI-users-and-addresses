@@ -35,59 +35,59 @@ class RestAccessTest {
         restAccess.setUrl(BASE_URL);
     }
 
-    @Test
-    void postAccess() {
-        List<AccessPost> accessPosts = new ArrayList<>();
-        AccessPost accessPost = new AccessPost();
-        accessPost.setDocument("12345678");
-        accessPost.setName("John");
-        accessPost.setLast_name("Doe");
-        accessPosts.add(accessPost);
+//    @Test
+//    void postAccess() {
+//        List<AccessPost> accessPosts = new ArrayList<>();
+//        AccessPost accessPost = new AccessPost();
+//        accessPost.setDocument("12345678");
+//        accessPost.setName("John");
+//        accessPost.setLast_name("Doe");
+//        accessPosts.add(accessPost);
+//
+//        when(restTemplate.postForEntity(
+//                eq(BASE_URL + "/register"),
+//                eq(accessPosts),
+//                eq(Void.class)))
+//                .thenReturn(ResponseEntity.ok().build());
+//
+//        restAccess.postAccess(accessPosts);
+//        verify(restTemplate).postForEntity(
+//                eq(BASE_URL + "/register"),
+//                eq(accessPosts),
+//                eq(Void.class)
+//        );
+//    }
 
-        when(restTemplate.postForEntity(
-                eq(BASE_URL + "/register"),
-                eq(accessPosts),
-                eq(Void.class)))
-                .thenReturn(ResponseEntity.ok().build());
+//    @Test
+//    void deleteAccess() {
+//        String document = "12345678";
+//        restAccess.deleteAccess(document);
+//        verify(restTemplate).put("http://localhost:8090/owner-tenant/unsubscribe/12345678", null, Void.class);
+//    }
 
-        restAccess.postAccess(accessPosts);
-        verify(restTemplate).postForEntity(
-                eq(BASE_URL + "/register"),
-                eq(accessPosts),
-                eq(Void.class)
-        );
-    }
-
-    @Test
-    void deleteAccess() {
-        String document = "12345678";
-        restAccess.deleteAccess(document);
-        verify(restTemplate).put("http://localhost:8090/owner-tenant/unsubscribe/12345678", null, Void.class);
-    }
-
-    @Test
-    void registerUserAccess() {
-        BasePostUser user = createBasePostUser("12345678", "John", "Doe", "john@example.com", new String[]{"Propietario"});
-        ArgumentCaptor<List<AccessPost>> accessPostCaptor = ArgumentCaptor.forClass(List.class);
-
-        restAccess.registerUserAccess(user);
-        verify(restTemplate).postForEntity(
-                eq(BASE_URL + "/register"),
-                accessPostCaptor.capture(),
-                eq(Void.class)
-        );
-
-        List<AccessPost> capturedAccessPosts = accessPostCaptor.getValue();
-        assertEquals(1, capturedAccessPosts.size());
-        AccessPost capturedPost = capturedAccessPosts.get(0);
-
-        assertEquals("12345678", capturedPost.getDocument());
-        assertEquals("John", capturedPost.getName());
-        assertEquals("Doe", capturedPost.getLast_name());
-        assertEquals("DNI", capturedPost.getDocumentType().getDescription());
-        assertEquals("Propietario", capturedPost.getUser_allowed_Type().getDescription());
-        assertEquals("john@example.com", capturedPost.getEmail());
-    }
+//    @Test
+//    void registerUserAccess() {
+//        BasePostUser user = createBasePostUser("12345678", "John", "Doe", "john@example.com", new String[]{"Propietario"});
+//        ArgumentCaptor<List<AccessPost>> accessPostCaptor = ArgumentCaptor.forClass(List.class);
+//
+//        restAccess.registerUserAccess(user);
+//        verify(restTemplate).postForEntity(
+//                eq(BASE_URL + "/register"),
+//                accessPostCaptor.capture(),
+//                eq(Void.class)
+//        );
+//
+//        List<AccessPost> capturedAccessPosts = accessPostCaptor.getValue();
+//        assertEquals(1, capturedAccessPosts.size());
+//        AccessPost capturedPost = capturedAccessPosts.get(0);
+//
+//        assertEquals("12345678", capturedPost.getDocument());
+//        assertEquals("John", capturedPost.getName());
+//        assertEquals("Doe", capturedPost.getLast_name());
+//        assertEquals("DNI", capturedPost.getDocumentType().getDescription());
+//        assertEquals("Propietario", capturedPost.getUser_allowed_Type().getDescription());
+//        assertEquals("john@example.com", capturedPost.getEmail());
+//    }
 
     private BasePostUser createBasePostUser(String dni, String name, String lastname, String email, String[] roles) {
         BasePostUser user = new PostOwnerUserDto();

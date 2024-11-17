@@ -10,32 +10,57 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Clase asociada al restTemplate para consumir el microservicio de notificaciones.
+ */
 @Data
 @Service
 @RequiredArgsConstructor
 public class RestNotifications {
+
+    /**
+     * Instancia de restTemplate para utilizar dentro de la clase.
+     */
     private final RestTemplate restTemplate;
 
+    /**
+     * Dirección url donde se levanta el microservicio de notificaciones.
+     */
     @Value("${notification.service.url}")
     private String url;
 
+    /**
+     * Metodo para enviar un email de recuperación de contraseña.
+     *
+     * @param dto DTO con la información del email.
+     * @return true si se envió correctamente, false en caso contrario.
+     * @throws ResponseStatusException si hubo un error en la petición.
+     */
     public boolean sendRecoveryEmail(RecoveryDto dto) {
-        try{
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/password", dto, Void.class);            return response.getStatusCode().is2xxSuccessful();
-        } catch (HttpClientErrorException e){
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/password", dto, Void.class);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException e) {
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
-            // Lanzar la excepción con la excepción original
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error al enviar el email: " + e.getMessage(), e);
         }
 
     }
 
+    /**
+     * Metodo para enviar un email de registro.
+     *
+     * @param dto DTO con la información del email.
+     * @return true si se envió correctamente, false en caso contrario.
+     * @throws ResponseStatusException si hubo un error en la petición.
+     */
     public boolean sendRegisterEmail(RegisterDto dto) {
-        try{
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/register", dto, Void.class);            return response.getStatusCode().is2xxSuccessful();
-        } catch (HttpClientErrorException e){
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/register", dto, Void.class);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException e) {
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
             // Lanzar la excepción con la excepción original
@@ -43,6 +68,5 @@ public class RestNotifications {
                     "Error al enviar el email: " + e.getMessage(), e);
         }
     }
-
 
 }

@@ -21,7 +21,7 @@ class VerificationControllerTest {
     private VerificationService verificationService;
 
     @Test
-    void isUsernameUnique() throws Exception {
+    void usernameUnique() throws Exception {
         String username = "uniqueUser";
         when(verificationService.isUsernameUnique(username)).thenReturn(true);
 
@@ -32,7 +32,7 @@ class VerificationControllerTest {
     }
 
     @Test
-    void isEmailUnique() throws Exception {
+    void emailUnique() throws Exception {
         String email = "unique@example.com";
         when(verificationService.isEmailUnique(email)).thenReturn(true);
 

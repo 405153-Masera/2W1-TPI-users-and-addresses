@@ -79,7 +79,7 @@ public class RoleServiceImpl implements RoleService {
         for (UserRoleEntity userRole : userRoles) {
             RoleEntity role = roleRepository.findById(userRole.getRole().getId()).orElse(null);
             if (role != null) {
-                GetRoleDto getRoleDto = setIdAndDescriptionOnGetRoleDTO(role);
+                GetRoleDto getRoleDto = idAndDescriptionOnGetRoleDTO(role);
                 roles.add(getRoleDto);
             }
         }
@@ -122,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
      * @param role entidad a mapear.
      * @return un GetRoleDto mapeado.
      */
-    public GetRoleDto setIdAndDescriptionOnGetRoleDTO(RoleEntity role) {
+    public GetRoleDto idAndDescriptionOnGetRoleDTO(RoleEntity role) {
         GetRoleDto getRoleDto = new GetRoleDto();
         getRoleDto.setId(role.getId());
         getRoleDto.setDescription(role.getDescription());

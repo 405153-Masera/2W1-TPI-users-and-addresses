@@ -4,6 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetDniTypeDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.DniTypeEntity;
 import ar.edu.utn.frc.tup.lc.iv.repositories.DniTypeRepository;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.DniTypeService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,14 +48,14 @@ public class DniTypeServiceImpl implements DniTypeService {
      * Obtiene un tipo de DNI por su ID.
      *
      * @param id el ID del tipo de DNI que se desea obtener.
-     * @throws RuntimeException si no se encuentra el tipo de DNI.
+     * @throws EntityNotFoundException si no se encuentra el tipo de DNI.
      * @return el DTO que representa el tipo de DNI encontrado.
      */
     @Override
     public GetDniTypeDto findById(Integer id) {
         Optional<DniTypeEntity> optionalEntity = dniTypeRepository.findById(id);
         if (optionalEntity.isEmpty()) {
-            throw new RuntimeException("DNI type not found with ID: " + id);
+            throw new EntityNotFoundException("DNI type not found with ID: " + id);
         }
         DniTypeEntity entity = optionalEntity.get();
         return new GetDniTypeDto(entity.getDescription());
@@ -84,14 +85,14 @@ public class DniTypeServiceImpl implements DniTypeService {
      *
      * @param id el ID del tipo de DNI a actualizar.
      * @param dniTypeDto el DTO con la información del tipo de DNI a actualizar.
-     * @throws RuntimeException si no se encuentra el tipo de DNI.
+     * @throws EntityNotFoundException si no se encuentra el tipo de DNI.
      * @return el DTO que representa el tipo de DNI actualizado.
      */
     @Override
     public GetDniTypeDto update(Integer id, GetDniTypeDto dniTypeDto) {
         Optional<DniTypeEntity> optionalEntity = dniTypeRepository.findById(id);
         if (optionalEntity.isEmpty()) {
-            throw new RuntimeException("DNI type not found with ID: " + id);
+            throw new EntityNotFoundException("DNI type not found with ID: " + id);
         }
 
         DniTypeEntity existingEntity = optionalEntity.get();

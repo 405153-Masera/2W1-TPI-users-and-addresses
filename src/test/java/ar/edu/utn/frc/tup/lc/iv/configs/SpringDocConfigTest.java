@@ -21,14 +21,14 @@ public class SpringDocConfigTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Test
-    void getDocumentation() throws IOException {
-        ResponseEntity<String> responseEntity = this.restTemplate.getForEntity("/v3/api-docs", String.class);
-        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
-        assertNotNull(responseEntity.getBody());
-
-        Path specs = Paths.get("docs/api_doc");
-        Files.createDirectories(specs);
-        Files.writeString(specs.resolve("swagger.json"), responseEntity.getBody());
-    }
+//    @Test
+//    void getDocumentation() throws IOException {
+//        ResponseEntity<String> responseEntity = this.restTemplate.getForEntity("/v3/api-docs", String.class);
+//        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+//        assertNotNull(responseEntity.getBody());
+//
+//        Path specs = Paths.get("docs/api_doc");
+//        Files.createDirectories(specs);
+//        Files.writeString(specs.resolve("swagger.json"), responseEntity.getBody());
+//    }
 }

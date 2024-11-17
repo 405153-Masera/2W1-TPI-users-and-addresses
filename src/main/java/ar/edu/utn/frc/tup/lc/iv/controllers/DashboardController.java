@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Controlador REST para manejar las estadísticas de los gráficos.
+ * Expone Endpoints para obtener estadísticas de los usuarios.
+ */
 @RestController
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor

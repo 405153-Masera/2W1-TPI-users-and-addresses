@@ -1,7 +1,5 @@
-package ar.edu.utn.frc.tup.lc.iv.restTemplate;
+package ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts;
 
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactPutRequest;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.ContactRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +30,6 @@ public class RestContact {
     /**
      * Dirección url donde se levanta el microservicio de contactos.
      */
-
     @Value("${contact.service.url}")
     private String url;
 
@@ -44,19 +41,17 @@ public class RestContact {
      */
     public List<GetContactDto> getContactById(int userId) {
 
-        // JsonNode para no tener que hacer varias clases
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search?userId=" + userId, JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(
+                url + "/search?userId=" + userId, JsonNode.class);
         List<GetContactDto> contacts = new ArrayList<>();
 
         GetContactDto contact;
 
-        // Si hay algo, mapeamos y lo ponemos en la lista
         if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
 
                 contact = new GetContactDto();
 
-                // tomamos los valores
                 String typeContact = node.get("contactType").get("id").asText();
                 String value = node.get("value").asText();
 
@@ -101,7 +96,8 @@ public class RestContact {
      * @return una id de usuario tipo {@link Integer}
      */
     public Integer getUserIdByEmail(String email) {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);        if (response.getBody().isArray()) {
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);
+        if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
                 String contactValue = node.get("value").asText();
                 String contactType = node.get("contactType").get("id").asText();
@@ -132,7 +128,8 @@ public class RestContact {
         contact.setEditorId(editorId);
 
         try {
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/owner", contact, Void.class);            return response.getStatusCode().is2xxSuccessful();
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/owner", contact, Void.class);
+            return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e) {
             // Lanzar la excepción con la excepción original
             throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);

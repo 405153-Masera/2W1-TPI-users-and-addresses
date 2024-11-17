@@ -12,8 +12,8 @@ import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RegisterDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
 import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.repositories.*;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.GetContactDto;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.GetContactDto;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.RestContact;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     private final RestPlotOwner restPlotOwner;
 
     /**
-     * Servicio para manejar el restTemplate de notificaciones
+     * Servicio para manejar el restTemplate de notificaciones.
      */
     private final RestNotifications restNotifications;
 
@@ -229,18 +229,18 @@ public class UserServiceImpl implements UserService {
         List<Integer> plotsByOwner = new ArrayList<>();
 
         // Obtiene los lotes asociados al propietario
-        for (GetPlotOwnerDto PO : plotOwnerDtoList) {
-            if (PO.getOwner_id().equals(ownerId)) {
-                plotsByOwner.add(PO.getPlot_id());
+        for (GetPlotOwnerDto po : plotOwnerDtoList) {
+            if (po.getOwner_id().equals(ownerId)) {
+                plotsByOwner.add(po.getPlot_id());
             }
         }
 
         List<GetUserDto> userDtoByOwner = new ArrayList<>();
         if (!plotsByOwner.isEmpty()) {
-            for (GetPlotUserDto PU : plotUserDtoList) {
-                if (plotsByOwner.contains(PU.getPlot_id())) {
+            for (GetPlotUserDto pu : plotUserDtoList) {
+                if (plotsByOwner.contains(pu.getPlot_id())) {
                     for (GetUserDto userDto : userDtos) {
-                        if (userDto.getId().equals(PU.getUser_id())) {
+                        if (userDto.getId().equals(pu.getUser_id())) {
                             // Filtra para no incluir al propietario
                             if (!Arrays.asList(userDto.getRoles()).contains("Propietario")) {
                                 userDtoByOwner.add(userDto);
@@ -847,6 +847,7 @@ public class UserServiceImpl implements UserService {
      * @param changePasswordDto DTO con las contraseñas actual y nueva.
      * @throws IllegalArgumentException si la contraseña actual es incorrecta.
      */
+    @Override
     @Transactional
     public void changePassword(ChangePassword changePasswordDto) {
         GetUserDto getUserDto = this.getUserByEmail(changePasswordDto.getEmail());
@@ -868,6 +869,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Actualiza el telegramId de un usuario.
+     * @param dni dni del usuario.
+     * @param telegramId id de telegram.
+     * @return el usuario actualizado.
+     */
     @Override
     public GetUserDto updateTelegramId(String dni, Integer telegramId) {
         UserEntity user = userRepository.findByDni(dni);
@@ -879,6 +886,7 @@ public class UserServiceImpl implements UserService {
      * Cambia la contraseña de un usuario por una aleatoria.
      * @param userEmail email del usuario.
      */
+    @Override
     @Transactional
     public void passwordRecovery(String userEmail) {
         Integer userId = restContact.getUserIdByEmail(userEmail);

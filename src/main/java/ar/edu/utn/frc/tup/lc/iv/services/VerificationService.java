@@ -1,7 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services;
 
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.RestContact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.RestContact;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

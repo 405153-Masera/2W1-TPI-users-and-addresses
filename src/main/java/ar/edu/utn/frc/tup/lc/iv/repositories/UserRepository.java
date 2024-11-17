@@ -103,6 +103,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      */
     boolean existsByDni(String dni);
 
+    /**
+     * Cuenta la cantidad de usuarios por rol.
+     *
+     * @return una lista de {@link UserRoleCount}
+     */
     @Query("SELECT new ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount("
             + "r.description, COUNT(u.id)) "
             + "FROM UserEntity u "

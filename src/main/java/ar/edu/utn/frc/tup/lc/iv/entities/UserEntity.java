@@ -120,26 +120,41 @@ public class UserEntity implements UserDetails {
      */
     private Integer telegram_id;
 
+    /**
+     * Lista de los roles que tiene el usuario.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("user"));
     }
 
+    /**
+     * Retorna si la cuenta del usuario está expirada.
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * Retorna si la cuenta del usuario está bloqueada.
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    /**
+     * Retorna si las credenciales del usuario están expiradas.
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /**
+     * Retorna si el usuario está habilitado.
+     */
     @Override
     public boolean isEnabled() {
         return true;

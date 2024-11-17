@@ -32,7 +32,7 @@ public class VerificationController {
      * @return Respuesta con el resultado de la verificación.
      */
     @GetMapping("/username")
-    public ResponseEntity<Map<String, Boolean>> isUsernameUnique(@RequestParam String username) {
+    public ResponseEntity<Map<String, Boolean>> usernameUnique(@RequestParam String username) {
         boolean isUnique = verificationService.isUsernameUnique(username);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isUnique", isUnique);
@@ -46,7 +46,7 @@ public class VerificationController {
      * @return Respuesta con el resultado de la verificación.
      */
     @GetMapping("/email")
-    public ResponseEntity<Map<String, Boolean>> isEmailUnique(@RequestParam String email) {
+    public ResponseEntity<Map<String, Boolean>> emailUnique(@RequestParam String email) {
         boolean isUnique = verificationService.isEmailUnique(email);
         Map<String, Boolean> response = new HashMap<>();
         response.put("isUnique", isUnique);

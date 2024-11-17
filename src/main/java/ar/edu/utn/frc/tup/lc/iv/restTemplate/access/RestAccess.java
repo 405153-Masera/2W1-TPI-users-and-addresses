@@ -32,6 +32,7 @@ public class RestAccess {
 
     /**
      * Metodo para registrar un acceso.
+     *
      * @param accessPost Lista de accesos a registrar.
      */
     public void postAccess(List<AccessPost> accessPost) {
@@ -40,6 +41,7 @@ public class RestAccess {
 
     /**
      * Metodo para dar de baja un acceso.
+     *
      * @param document Documento a buscar.
      */
     public void deleteAccess(String document) {
@@ -48,6 +50,7 @@ public class RestAccess {
 
     /**
      * Metodo para registrar un acceso.
+     *
      * @param user DTO con los datos del usuario a registrar.
      */
     public void registerUserAccess(BasePostUser user) {
@@ -62,7 +65,7 @@ public class RestAccess {
 
         AccessUserAllowedType accessUserAllowedType = new AccessUserAllowedType();
         for (String role : user.getRoles()) {
-            if (role.equals("Propietario")) {
+            if ("Propietario".equals(role)) { // Literal posicionada primero
                 accessUserAllowedType.setDescription("Propietario");
             }
         }

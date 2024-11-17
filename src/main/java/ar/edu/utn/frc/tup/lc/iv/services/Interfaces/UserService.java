@@ -130,6 +130,13 @@ public interface UserService {
      */
     List<GetUserDto> getUsersByOwner(Integer ownerId);
 
+    /**
+     * Busca todos los usuarios (familiares) asociados a un propietario,
+     * excluyendo al propietario.
+     *
+     * @param ownerId id del propietario.
+     * @return la lista de usuarios por propietario.
+     */
     List<GetUserDto> getUsersByOwnerWithoutOwner(Integer ownerId);
 
     /**
@@ -139,6 +146,19 @@ public interface UserService {
      */
     void changePassword(ChangePassword changePassword);
 
+    /**
+     * Actualiza el telegramId de un usuario.
+     *
+     * @param dni identificador de un usuario.
+     * @param telegramId identificador de telegram.
+     * @return el usuario actualizado.
+     */
     GetUserDto updateTelegramId(String dni, Integer telegramId);
+
+    /**
+     * Recupera la contraseña de un usuario.
+     *
+     * @param userEmail correo electrónico de un usuario.
+     */
     void passwordRecovery(String userEmail);
 }
