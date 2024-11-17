@@ -97,7 +97,8 @@ public class RestContact {
      * @return una id de usuario tipo {@link Integer}
      */
     public Integer getUserIdByEmail(String email) {
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/search", JsonNode.class);
+        //EMA agregue /contact
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/contact/search", JsonNode.class);
         if (response.getBody().isArray()) {
             for (JsonNode node : response.getBody()) {
                 String contactValue = node.get("value").asText();
@@ -122,6 +123,7 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no guardar el contacto.
      */
     public boolean saveContact(Integer userId, String value, int contactType, int editorId) {
+        //EMA agregue /contact
         ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
         contact.setValue(value);
@@ -129,7 +131,7 @@ public class RestContact {
         contact.setEditorId(editorId);
 
         try {
-            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/owner", contact, Void.class);
+            ResponseEntity<Void> response = restTemplate.postForEntity(url + "/contact/owner", contact, Void.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e) {
             // Lanzar la excepción con la excepción original
@@ -151,7 +153,8 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no modificar el contacto.
      */
     public boolean updateContact(Integer userId, String value, int contactType, int editorId) {
-        String updateUrl = url + "/update?userId=" + userId + "&personTypeId=3&contactTypeId=" + contactType;
+        //Ema agregue /contact
+        String updateUrl = url + "/contact/update?userId=" + userId + "&personTypeId=3&contactTypeId=" + contactType;
         ContactPutRequest contact = new ContactPutRequest();
         contact.setUserId(userId);
         contact.setPersonTypeId(3);
