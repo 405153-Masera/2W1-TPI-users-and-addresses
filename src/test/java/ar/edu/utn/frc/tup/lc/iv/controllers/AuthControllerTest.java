@@ -57,7 +57,7 @@ class AuthControllerTest {
         user.setDatebirth(LocalDate.of(1997, 12, 1));
         user.setRoles(new String[]{"Gerente"});
         user.setPlot_id(new Integer[]{1});
-        user.setTelegram_id(1);
+        user.setTelegram_id(1l);
     }
 
 //    @Test

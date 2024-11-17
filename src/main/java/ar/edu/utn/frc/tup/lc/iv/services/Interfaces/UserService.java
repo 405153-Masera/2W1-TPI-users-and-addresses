@@ -153,7 +153,7 @@ public interface UserService {
      * @param telegramId identificador de telegram.
      * @return el usuario actualizado.
      */
-    GetUserDto updateTelegramId(String dni, Integer telegramId);
+    GetUserDto updateTelegramId(String dni, Long telegramId);
 
     /**
      * Recupera la contraseña de un usuario.

@@ -285,7 +285,7 @@ public class UserController {
      * @return el usuario actualizado
      */
     @PutMapping("/putTelegram/{dni}/{telegramId}")
-    public ResponseEntity<GetUserDto> updateUser(@PathVariable String dni, @PathVariable Integer telegramId) {
+    public ResponseEntity<GetUserDto> updateUser(@PathVariable String dni, @PathVariable Long telegramId) {
         GetUserDto result = userService.updateTelegramId(dni, telegramId);
         if (result == null) {
             return ResponseEntity.badRequest().build();

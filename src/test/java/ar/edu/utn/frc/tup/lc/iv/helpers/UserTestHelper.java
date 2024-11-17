@@ -31,7 +31,7 @@ public class UserTestHelper {
         postUserDto.setDatebirth(LocalDate.now());
         postUserDto.setRoles(new String[]{"Gerente"});
         postUserDto.setPlot_id(2);
-        postUserDto.setTelegram_id(4);
+        postUserDto.setTelegram_id(1123L);
         postUserDto.setUserUpdateId(1);
         return postUserDto;
     }
@@ -51,7 +51,7 @@ public class UserTestHelper {
         postOwnerUserDto.setDatebirth(LocalDate.now());
         postOwnerUserDto.setRoles(new String[]{"Gerente"});
         postOwnerUserDto.setPlot_id(new Integer[]{2,3});
-        postOwnerUserDto.setTelegram_id(4);
+        postOwnerUserDto.setTelegram_id(4L);
         postOwnerUserDto.setUserUpdateId(1);
         return postOwnerUserDto;
     }
@@ -115,7 +115,7 @@ public class UserTestHelper {
         getUserDto.setDatebirth(LocalDate.now());
         getUserDto.setRoles(new String[]{"Gerente"});
         getUserDto.setPlot_id(new Integer[]{2,3});
-        getUserDto.setTelegram_id(4);
+        getUserDto.setTelegram_id(4L);
         return getUserDto;
     }
 

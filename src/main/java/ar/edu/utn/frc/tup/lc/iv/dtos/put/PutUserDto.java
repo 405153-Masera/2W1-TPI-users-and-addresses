@@ -87,5 +87,5 @@ public class PutUserDto {
      * Identificador de la plataforma telegram utilizada en notificaciones.
      */
     @NotNull
-    private Integer telegram_id;
+    private Long telegram_id;
 }

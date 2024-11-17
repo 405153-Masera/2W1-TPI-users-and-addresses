@@ -118,7 +118,7 @@ public class UserEntity implements UserDetails {
     /**
      * Identificador de la plataforma telegram utilizada en notificaciones.
      */
-    private Integer telegram_id;
+    private Long telegram_id;
 
     /**
      * Lista de los roles que tiene el usuario.
