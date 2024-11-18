@@ -743,15 +743,18 @@ public class UserServiceImpl implements UserService {
      */
     public GetUserDto getUserByUsername(String username) {
         // Usar orElse para devolver null si no se encuentra el usuario
-        LOG.info("Buscando el usuario: " + username);
+        LOG.debug("Buscando el usuario: " + username);
+        System.out.println("Buscando el usuario: " + username);
         UserEntity userEntity = userRepository.findByUsername(username).orElse(null);
 
         // Si no se encuentra el usuario, simplemente retornar null
         if (userEntity == null) {
-            LOG.info("No encontrado el usuario: " + username);
+            LOG.debug("No encontrado el usuario: " + username);
+            System.out.println("Buscando el usuario: " + username);
             return null;
         }
-        LOG.info("Si encontro el usuario: " + username);
+        LOG.debug("Si encontro el usuario: " + username);
+        System.out.println("Buscando el usuario: " + username);
         // Si se encuentra el usuario, retornar el DTO correspondiente
         return getUserById(userEntity.getId());
     }
