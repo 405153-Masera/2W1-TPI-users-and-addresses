@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
+import ar.edu.utn.frc.tup.lc.iv.configs.TestSecurityConfig;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
+@Import(TestSecurityConfig.class)
 class AuthControllerTest {
 
     @Autowired
@@ -60,17 +63,17 @@ class AuthControllerTest {
         user.setTelegram_id(1l);
     }
 
-//    @Test
-//    void loginSuccess() throws Exception {
-//
-//       when(userServiceMock.verifyLogin(credentials)).thenReturn(user);
-//
-//        mockMvc.perform(post("/auth/login")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"email\":\"m@email.com\",\"password\":\"password\"}"))
-//                .andExpect(status().isOk());
-//    }
-//
+    @Test
+    void loginSuccess() throws Exception {
+
+       when(userServiceMock.verifyLogin(credentials)).thenReturn(user);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"m@email.com\",\"password\":\"password\"}"))
+                .andExpect(status().isOk());
+    }
+
 //    @Test
 //    void loginFail() throws Exception {
 //        when(userServiceMock.verifyLogin(credentials)).thenReturn(null);
@@ -81,19 +84,19 @@ class AuthControllerTest {
 //                .andExpect(status().is5xxServerError())
 //                .andExpect(jsonPath("$.message").value("Credenciales inválidas"));
 //    }
-//
-//    @Test
-//    void changePasswordSuccess() throws Exception {
-//
-//        ChangePassword changePasswordDto = new ChangePassword();
-//        changePasswordDto.setCurrentPassword("currentPassword");
-//        changePasswordDto.setNewPassword("newPassword");
-//        Mockito.doNothing().when(userServiceMock).changePassword(changePasswordDto);
-//
-//        mockMvc.perform(put("/auth/changePassword")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"currentPassword\":\"currentPassword\",\"newPassword\":\"newPassword\"}"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.message").value("Contraseña actualizada exitosamente"));
-//    }
+
+    @Test
+    void changePasswordSuccess() throws Exception {
+
+        ChangePassword changePasswordDto = new ChangePassword();
+        changePasswordDto.setCurrentPassword("currentPassword");
+        changePasswordDto.setNewPassword("newPassword");
+        Mockito.doNothing().when(userServiceMock).changePassword(changePasswordDto);
+
+        mockMvc.perform(put("/auth/changePassword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"currentPassword\",\"newPassword\":\"newPassword\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Contraseña actualizada exitosamente"));
+    }
 }

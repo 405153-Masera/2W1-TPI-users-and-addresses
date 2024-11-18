@@ -1,5 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
+import ar.edu.utn.frc.tup.lc.iv.configs.TestSecurityConfig;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,9 +27,8 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/*
 @WebMvcTest(UserController.class)
-@TestPropertySource(properties = "spring.security.enabled=false")
+@Import(TestSecurityConfig.class)
 class UserControllerTest {
 
     @Autowired
@@ -42,7 +43,6 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    /*
     @Test
     void getUserByEmailIT_Success() throws Exception {
         // Given
@@ -437,4 +437,3 @@ class UserControllerTest {
         verify(userServiceMock, times(1)).getUsersByOwner(ownerId);
     }
 }
- /*
