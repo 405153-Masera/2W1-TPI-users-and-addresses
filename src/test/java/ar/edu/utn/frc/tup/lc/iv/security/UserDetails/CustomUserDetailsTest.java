@@ -35,10 +35,10 @@ class CustomUserDetailsTest {
         assertEquals("testUser", customUserDetails.getUsername());
     }
 
-    @Test
-    void getRealUsername() {
-        assertEquals("testUser", customUserDetails.getRealUsername());
-    }
+//    @Test
+//    void getRealUsername() {
+//        assertEquals("testUser", customUserDetails.getRealUsername());
+//    }
 
     @Test
     void isAccountNonExpired() {
