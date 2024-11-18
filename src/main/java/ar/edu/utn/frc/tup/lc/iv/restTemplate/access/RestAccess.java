@@ -60,6 +60,7 @@ public class RestAccess {
         accessPost.setDocument(user.getDni());
         accessPost.setName(user.getName());
         accessPost.setLast_name(user.getLastname());
+        accessPost.setUserId(user.getUserUpdateId());
 
         AccessDocumentType accessDocumentType = new AccessDocumentType();
         accessDocumentType.setDescription("DNI");
