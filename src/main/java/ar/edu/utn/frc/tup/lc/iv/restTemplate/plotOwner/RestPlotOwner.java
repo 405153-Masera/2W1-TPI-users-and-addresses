@@ -38,7 +38,7 @@ public class RestPlotOwner {
      */
     public List<GetPlotOwnerDto> getAllPlotOwner() {
         //EMa le agregue /plotOwners
-        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url+"/plotOwners", JsonNode.class);
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/plotOwners", JsonNode.class);
         List<GetPlotOwnerDto> plotOwnerDtoList = new ArrayList<>();
         JsonNode responseBody = response.getBody();
         if (responseBody != null && responseBody.isArray()) {
