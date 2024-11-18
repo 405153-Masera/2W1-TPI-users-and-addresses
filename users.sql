@@ -255,17 +255,17 @@ DELIMITER ;
 INSERT INTO roles (description, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES
     ('SuperAdmin', NOW(), NOW(), 1, 1),
-    ('Gerente', NOW(), NOW(), 1, 1),
+    ('Gerente general', NOW(), NOW(), 1, 1),
     ('Propietario', NOW(), NOW(), 1, 1),
     ('Familiar mayor', NOW(), NOW(), 1, 1),
     ('Familiar menor', NOW(), NOW(), 1, 1),
     ('Inquilino', NOW(), NOW(), 1, 1),
-    ('Gerente Finanzas', NOW(), NOW(), 1, 1),
+    ('Gerente finanzas', NOW(), NOW(), 1, 1),
     ('Contador', NOW(), NOW(), 1, 1),
     ('Seguridad', NOW(), NOW(), 1, 1),
-    ('Gerente Inventario', NOW(), NOW(), 1, 1),
-    ('Gerente Empleados', NOW(), NOW(), 1, 1),
-    ('Gerente Multas', NOW(), NOW(), 1, 1);
+    ('Gerente inventario', NOW(), NOW(), 1, 1),
+    ('Gerente empleados', NOW(), NOW(), 1, 1),
+    ('Gerente multas', NOW(), NOW(), 1, 1);
     
 
 -- Insertar tipos de DNI
