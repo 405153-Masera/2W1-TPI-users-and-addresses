@@ -690,7 +690,7 @@ public class UserServiceImpl implements UserService {
         Integer[] newPlots = putUserDto.getPlot_id();
 
         addNewPlots(userEntity, putUserDto, newPlots, actualPlots, putUserDto.getUserUpdateId());
-        removeOldPlots(userId, newPlots, actualPlots);
+        removeOldPlots(userId, actualPlots, newPlots);
     }
 
     /**
@@ -711,6 +711,21 @@ public class UserServiceImpl implements UserService {
                 plotUserEntity.setLastUpdatedUser(userUpdateId);
                 validatePlot(plotUserEntity);
                 plotUserRepository.save(plotUserEntity);
+            }
+        }
+    }
+
+    /**
+     * Elimina los plots actuales que no están en los nuevos para actualizar.
+     *
+     * @param ownerId el id del propietario.
+     * @param newPlots los nuevos plots.
+     * @param actualPlots los plots actuales.
+     */
+    private void removeOldPlots(Integer ownerId, Integer[] actualPlots, Integer... newPlots) {
+        for (Integer plotId : actualPlots) {
+            if (!Arrays.asList(newPlots).contains(plotId)) {
+                plotUserRepository.deleteByUserIdAndPlotId(ownerId, plotId);
             }
         }
     }
@@ -744,21 +759,6 @@ public class UserServiceImpl implements UserService {
         return plotUserRepository.findByUserId(userId).stream()
                 .map(plotUser -> plotUser.getPlotId())
                 .toArray(Integer[]::new);
-    }
-
-    /**
-     * Elimina los plots actuales que no están en los nuevos para actualizar.
-     *
-     * @param ownerId el id del propietario.
-     * @param newPlots los nuevos plots.
-     * @param actualPlots los plots actuales.
-     */
-    private void removeOldPlots(Integer ownerId, Integer[] actualPlots, Integer... newPlots) {
-        for (Integer plotId : actualPlots) {
-            if (!Arrays.asList(newPlots).contains(plotId)) {
-                plotUserRepository.deleteByUserIdAndPlotId(ownerId, plotId);
-            }
-        }
     }
 
     /**
