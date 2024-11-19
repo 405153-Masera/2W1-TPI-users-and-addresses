@@ -1,7 +1,6 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.AgeDistributionResponse;
-import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount;
 import ar.edu.utn.frc.tup.lc.iv.services.dashboard.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,19 +23,6 @@ public class DashboardController {
      * Servicio para manejar las estadísticas de los gráficos.
      */
     private final UserStatsService userStatsService;
-
-
-    /**
-     * Maneja las estadísticas de las manzanas.
-     *
-     * @return ResponseEntity con una lista de BlockData
-     * que contiene datos de las manzanas.
-     */
-    @GetMapping("/users-by-role")
-    public ResponseEntity<List<UserRoleCount>> getUserCountByRole() {
-        List<UserRoleCount> stats = userStatsService.getUserCountByRole();
-        return ResponseEntity.ok(stats);
-    }
 
     /**
      * Retorna la distribución de edades de los usuarios.
