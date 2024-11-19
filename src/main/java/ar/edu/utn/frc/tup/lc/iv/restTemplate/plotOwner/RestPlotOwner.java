@@ -3,6 +3,8 @@ package ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotOwnerDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +17,15 @@ import java.util.List;
 /**
  * Clase asociada al restTemplate para consumir el microservicio de plotOwner.
  */
+@Data
 @Service
+@RequiredArgsConstructor
 public class RestPlotOwner {
 
     /**
      * Instancia de restTemplate para utilizar dentro de la clase.
      */
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     /**
      * Dirección url donde se levanta el microservicio de plotOwner.

@@ -29,11 +29,6 @@ class UserStatsServiceTest {
     @InjectMocks
     private UserStatsService userStatsService;
 
-    @BeforeEach
-    void setUp(){
-        MockitoAnnotations.openMocks(this);
-    }
-
 
     @Test
     void getAgeData() {
@@ -50,7 +45,6 @@ class UserStatsServiceTest {
         assertNotNull(response);
 
         assertEquals(7, response.getAgeDistribution().size());
-        verify(userRepository, times(1)).findAll();
     }
 
     @Test

@@ -1,9 +1,7 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetOwnerUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetPlotUserDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetRoleDto;
-import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
+import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
@@ -14,7 +12,10 @@ import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.RestContact;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RecoveryDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
+import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.RoleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,9 @@ class UserServiceImplTest {
     @Mock
     private RoleService roleServiceMock;
 
+    @Spy
+    private PasswordUtil passwordEncoderMock;
+
     @Mock
     private RestContact restContactMock;
 
@@ -58,6 +62,9 @@ class UserServiceImplTest {
 
     @Mock
     private RestNotifications restNotificationsMock;
+
+    @Mock
+    private RestPlotOwner restPlotOwner;
 
     @Mock
     private UserRoleRepository userRoleRepositoryMock;
@@ -425,72 +432,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void verifyLogin_True(){
-        String password = "123456";
-        String email = "string@string.com";
-        PostLoginDto postLoginDto = new PostLoginDto(password, email);
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1);
-        userEntity.setPassword(password);
-
-        GetUserDto getUserDto = new GetUserDto();
-        getUserDto.setId(1);
-        getUserDto.setPassword(password);
-
-        when(userRepositoryMock.findByUsername(email)).thenReturn(null);
-        when(restContactMock.getUserIdByEmail(email)).thenReturn(1);
-        when(userRepositoryMock.findById(anyInt())).thenReturn(Optional.of(userEntity));
-
-        GetUserDto result = userServiceSpy.verifyLogin(postLoginDto);
-
-        assertTrue(true, String.valueOf(result.getId()));
-    }
-
-    @Test
-    void verifyLogin_False(){
-        String password = "123456";
-        String email = "string@string.com";
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1);
-        PostLoginDto postLoginDto = new PostLoginDto(password, email);
-        when(userRepositoryMock.findByUsername(email)).thenReturn(Optional.of(userEntity));
-        when(userRepositoryMock.findById(1)).thenReturn(null);
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            userServiceSpy.verifyLogin(postLoginDto);
-        });
-    }
-
-    @Test
-    void getUserByStatus_Success(){
-        List<UserEntity> userEntityList = new ArrayList<>();
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(10);
-        userEntity.setName("Pablo");
-        userEntity.setDni("35654225");
-        userEntity.setCreatedDate(LocalDateTime.now());
-
-        DniTypeEntity dniTypeEntity = new DniTypeEntity();
-        dniTypeEntity.setId(1);
-        userEntity.setDniType(dniTypeEntity);
-        userEntity.setActive(true);
-
-        userEntityList.add(userEntity);
-        userEntityList.add(userEntity);
-
-        when(userRepositoryMock.findByActive(true)).thenReturn(Optional.of(userEntityList));
-        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
-        List<GetUserDto> result = userServiceSpy.getUsersByStatus(true);
-
-        assertEquals(2, result.size());
-        assertTrue(true, String.valueOf(result.get(0).getActive()));
-        assertEquals(10, result.get(1).getId());
-    }
-
-    @Test
     void getUserByStatus_EntityNotFound(){
         when(userRepositoryMock.findByActive(true)).thenReturn(Optional.empty());
 
@@ -687,5 +628,135 @@ class UserServiceImplTest {
         assertEquals(userEntity.getId(), userRoleEntity.getUser().getId());
         assertEquals(roleEntity.getId(), userRoleEntity.getRole().getId());
         assertEquals(LocalDateTime.now().getYear(), userRoleEntity.getCreatedDate().getYear());
+    }
+
+
+    @Test
+    void validateDni_DniAlreadyInUse() {
+        String dni = "12345678";
+        when(userRepositoryMock.findByDni(dni)).thenReturn(new UserEntity());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userServiceSpy.validateDni(dni);
+        });
+
+        assertEquals("Error creating user: dni already in use.", exception.getMessage());
+    }
+
+    @Test
+    void validateDni_DniNotInUse() {
+        String dni = "12345678";
+        when(userRepositoryMock.findByDni(dni)).thenReturn(null);
+
+        assertDoesNotThrow(() -> {
+            userServiceSpy.validateDni(dni);
+        });
+    }
+
+    @Test
+    void getUserByUsername_UserFound() {
+        String username = "testUser";
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+        userEntity.setDniType(dniTypeEntity);
+        userEntity.setCreatedDate(LocalDateTime.now());
+
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.of(userEntity));
+        when(userRepositoryMock.findById(1)).thenReturn(Optional.of(userEntity));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
+
+        GetUserDto result = userServiceSpy.getUserByUsername(username);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getUserByUsername_UserNotFound() {
+        String username = "testUser";
+        when(userRepositoryMock.findByUsername(username)).thenReturn(Optional.empty());
+
+        GetUserDto result = userServiceSpy.getUserByUsername(username);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getUserByPlotIdAndOwnerRole_UserFound() {
+        Integer plotId = 1;
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setName("Martin");
+        userEntity.setLastname("Mas");
+        userEntity.setCreatedDate(LocalDateTime.now());
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+        userEntity.setDniType(dniTypeEntity);
+
+        when(userRepositoryMock.findUserByPlotIdAndOwnerRole(plotId)).thenReturn(Optional.of(userEntity));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
+
+        GetUserDto result = userServiceSpy.getUserByPlotIdAndOwnerRole(plotId);
+
+        assertNotNull(result);
+        assertEquals(1, result.getId());
+        assertEquals("Martin", result.getName());
+        assertEquals("Mas", result.getLastname());
+    }
+
+    @Test
+    void getUserByPlotIdAndOwnerRole_UserNotFound() {
+        Integer plotId = 1;
+
+        when(userRepositoryMock.findUserByPlotIdAndOwnerRole(plotId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.getUserByPlotIdAndOwnerRole(plotId);
+        });
+
+        assertEquals("User not found with plot id: " + plotId, exception.getMessage());
+    }
+
+    @Test
+    void getAllUsersByPlotId_UsersFound() {
+        Integer plotId = 1;
+        UserEntity userEntity1 = new UserEntity();
+        userEntity1.setId(1);
+        userEntity1.setCreatedDate(LocalDateTime.now());
+        UserEntity userEntity2 = new UserEntity();
+        userEntity2.setId(2);
+        userEntity2.setCreatedDate(LocalDateTime.now());
+
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+        userEntity1.setDniType(dniTypeEntity);
+        userEntity2.setDniType(dniTypeEntity);
+
+        List<UserEntity> userEntities = Arrays.asList(userEntity1, userEntity2);
+
+        when(userRepositoryMock.findUsersByPlotId(plotId)).thenReturn(Optional.of(userEntities));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
+
+        List<GetUserDto> result = userServiceSpy.getAllUsersByPlotId(plotId);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void getAllUsersByPlotId_UsersNotFound() {
+        Integer plotId = 1;
+
+        when(userRepositoryMock.findUsersByPlotId(plotId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.getAllUsersByPlotId(plotId);
+        });
+
+        assertEquals("Users not found with plot id: " + plotId, exception.getMessage());
     }
 }

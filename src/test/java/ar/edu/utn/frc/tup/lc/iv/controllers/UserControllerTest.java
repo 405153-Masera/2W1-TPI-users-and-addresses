@@ -5,6 +5,8 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.helpers.UserTestHelper;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.services.Interfaces.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -434,5 +437,104 @@ class UserControllerTest {
 
 
         verify(userServiceMock, times(1)).getUsersByOwner(ownerId);
+    }
+
+    @Test
+    void postAccessIT_Success() throws Exception {
+        AccessPost accessPost = new AccessPost();
+        doNothing().when(restAccessMock).postAccess(anyList());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/access")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accessPost)))
+                .andExpect(status().isNoContent());
+
+        verify(restAccessMock, times(1)).postAccess(anyList());
+    }
+
+    @Test
+    void putAccessIT_Success() throws Exception {
+        AccessPut accessPut = new AccessPut();
+        accessPut.setDocument("document");
+        doNothing().when(restAccessMock).deleteAccess(anyString());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/access/delete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(accessPut)))
+                .andExpect(status().isNoContent());
+
+        verify(restAccessMock, times(1)).deleteAccess(anyString());
+    }
+
+    @Test
+    void getUsersByOwnerIT_Success() throws Exception {
+        Integer ownerId = 1;
+        List<GetUserDto> users = Collections.singletonList(UserTestHelper.createGetUserDto());
+        when(userServiceMock.getUsersByOwner(ownerId)).thenReturn(users);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/byOwner/" + ownerId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Juan"))
+                .andExpect(jsonPath("$[0].lastname").value("Perez"))
+                .andExpect(jsonPath("$[0].username").value("JuanPa"));
+
+        verify(userServiceMock, times(1)).getUsersByOwner(ownerId);
+    }
+
+    @Test
+    void getUsersByOwnerIT_NoContent() throws Exception {
+        Integer ownerId = 1;
+        when(userServiceMock.getUsersByOwner(ownerId)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/byOwner/" + ownerId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(userServiceMock, times(1)).getUsersByOwner(ownerId);
+    }
+
+    @Test
+    void getUsersByOwnerV2IT_Success() throws Exception {
+        Integer ownerId = 1;
+        List<GetUserDto> users = Collections.singletonList(UserTestHelper.createGetUserDto());
+        when(userServiceMock.getUsersByOwnerWithoutOwner(ownerId)).thenReturn(users);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/byOwner/" + ownerId + "/WithoutTheOwner")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Juan"))
+                .andExpect(jsonPath("$[0].lastname").value("Perez"))
+                .andExpect(jsonPath("$[0].username").value("JuanPa"));
+
+        verify(userServiceMock, times(1)).getUsersByOwnerWithoutOwner(ownerId);
+    }
+
+    @Test
+    void getUsersByOwnerV2IT_NoContent() throws Exception {
+        Integer ownerId = 1;
+        when(userServiceMock.getUsersByOwnerWithoutOwner(ownerId)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/byOwner/" + ownerId + "/WithoutTheOwner")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(userServiceMock, times(1)).getUsersByOwnerWithoutOwner(ownerId);
+    }
+
+    @Test
+    void recoveryPasswordIT_Success() throws Exception {
+        String email = "test@example.com";
+        doNothing().when(userServiceMock).passwordRecovery(email);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/recoveryPassword/" + email)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(userServiceMock, times(1)).passwordRecovery(email);
     }
 }
