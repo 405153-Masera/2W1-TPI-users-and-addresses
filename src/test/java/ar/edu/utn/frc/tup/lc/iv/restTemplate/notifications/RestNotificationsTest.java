@@ -30,6 +30,8 @@ class RestNotificationsTest {
         restNotifications.setUrl("http://localhost:8080");
     }
 
+    // Test para sendRecoveryEmail
+
     @Test
     void sendRecoveryEmail_Success() {
         RecoveryDto dto = new RecoveryDto();
@@ -56,6 +58,34 @@ class RestNotificationsTest {
         verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
     }
 
+    @Test
+    void sendRecoveryEmail_GeneralException() {
+        RecoveryDto dto = new RecoveryDto();
+        when(restTemplate.postForEntity(eq("http://localhost:8080/user/password"), eq(dto), eq(Void.class)))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            restNotifications.sendRecoveryEmail(dto);
+        });
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+        assertTrue(exception.getMessage().contains("Unexpected error"));
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
+    }
+
+    @Test
+    void sendRecoveryEmail_UnsuccessfulResponse() {
+        RecoveryDto dto = new RecoveryDto();
+        when(restTemplate.postForEntity(eq("http://localhost:8080/user/password"), eq(dto), eq(Void.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+
+        boolean result = restNotifications.sendRecoveryEmail(dto);
+
+        assertFalse(result);
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
+    }
+
+    // Test para sendRegisterEmail
 
     @Test
     void sendRegisterEmail_Success() {
@@ -80,6 +110,33 @@ class RestNotificationsTest {
         });
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
+    }
+
+    @Test
+    void sendRegisterEmail_GeneralException() {
+        RegisterDto dto = new RegisterDto();
+        when(restTemplate.postForEntity(eq("http://localhost:8080/user/register"), eq(dto), eq(Void.class)))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            restNotifications.sendRegisterEmail(dto);
+        });
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+        assertTrue(exception.getMessage().contains("Unexpected error"));
+        verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
+    }
+
+    @Test
+    void sendRegisterEmail_UnsuccessfulResponse() {
+        RegisterDto dto = new RegisterDto();
+        when(restTemplate.postForEntity(eq("http://localhost:8080/user/register"), eq(dto), eq(Void.class)))
+                .thenReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        boolean result = restNotifications.sendRegisterEmail(dto);
+
+        assertFalse(result);
         verify(restTemplate, times(1)).postForEntity(anyString(), any(), any());
     }
 }
