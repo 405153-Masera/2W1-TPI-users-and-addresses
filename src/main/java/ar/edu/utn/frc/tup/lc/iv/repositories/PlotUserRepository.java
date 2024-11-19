@@ -20,4 +20,28 @@ public interface PlotUserRepository extends JpaRepository<PlotUserEntity, Intege
      * @return una lista de {@link PlotUserEntity}
      */
     List<PlotUserEntity> findByUser(UserEntity userEntity);
+
+    /**
+     * Busca por una lista de PlotUserEntity mediante un ID de usuario pasado por parámetro.
+     *
+     * @param userId un ID de usuario.
+     * @return una lista de {@link PlotUserEntity}
+     */
+    List<PlotUserEntity> findByUserId(int userId);
+
+    /**
+     * Elimina un PlotOwnerEntity por el id de un propietario y el id de un lote.
+     *
+     * @param ownerId el id de un propietario.
+     * @param plotId el id de un lote.
+     */
+    void deleteByUserIdAndPlotId(int ownerId, int plotId);
+
+    /**
+     * Busca un PlotUserEntity por el id de un lote.
+     *
+     * @param plotId el id de un lote.
+     * @return una lista de {@link PlotUserEntity}
+     */
+    PlotUserEntity findByPlotId(int plotId);
 }

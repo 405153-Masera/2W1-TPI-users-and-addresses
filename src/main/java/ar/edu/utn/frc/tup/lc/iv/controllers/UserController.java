@@ -5,6 +5,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
@@ -113,6 +114,22 @@ public class UserController {
     @PutMapping("/put/{userId}")
     public ResponseEntity<GetUserDto> updateUser(@PathVariable Integer userId, @RequestBody PutUserDto putUserDto) {
         GetUserDto result = userService.updateUser(userId, putUserDto);
+        if (result == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Modifica un usuario buscado por el ID.
+     *
+     * @return el usuario modificado con campos actualizados.
+     * @param userId identificador de un usuario.
+     * @param putUserDto dto con información necesaria para modificar un usuario.
+     */
+    @PutMapping("/put/owner/{userId}")
+    public ResponseEntity<GetUserDto> updateUserOwner(@PathVariable Integer userId, @RequestBody PutUserOwnerDto putUserDto) {
+        GetUserDto result = userService.updateUserOwner(userId, putUserDto);
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }

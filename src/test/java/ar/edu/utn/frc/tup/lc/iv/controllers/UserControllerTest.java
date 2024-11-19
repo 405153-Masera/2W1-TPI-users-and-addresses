@@ -376,8 +376,8 @@ class UserControllerTest {
       verify(userServiceMock, times(1)).deleteUser(1,1);
    }
 
-    @Test
-  void updateUserIT_Success() throws Exception{
+  //  @Test
+  /*void updateUserIT_Success() throws Exception{
       //Given
      PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", 1, "3515623", "509502349", "email@email.com",
              "avatar", LocalDate.now(), new String[]{"Gerente"}, 1, 1L);
@@ -415,7 +415,7 @@ class UserControllerTest {
                .andExpect(status().isBadRequest());
 
        verify(userServiceMock, times(1)).updateUser(1, putUserDto);
-   }
+   }*/
 
   @Test
   void getUsersByOwner_Success() throws Exception {

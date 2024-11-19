@@ -2,7 +2,9 @@ package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.*;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.BasePutUser;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
@@ -607,7 +609,7 @@ public class UserServiceImpl implements UserService {
      * @param putUserDto dto que contiene la información del usuario.
      * @throws EntityNotFoundException si no encuentra un dniType con el id asignado.
      */
-    public void mapPutUserToUserEntity(PutUserDto putUserDto, UserEntity userEntity) {
+    public void mapPutUserToUserEntity(BasePutUser putUserDto, UserEntity userEntity) {
         userEntity.setName(putUserDto.getName());
         userEntity.setLastname(putUserDto.getLastName());
         userEntity.setDni(putUserDto.getDni());
@@ -648,12 +650,138 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Actualiza un usuario de tipo propietario.
+     *
+     * @param userId el ID del usuario a actualizar.
+     * @param putUserDto el dto con la información necesaria para actualizar un usuario.
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID proporcionado como parámetro
+     * en la base de datos.
+     * @return el usuario actualizado.
+     */
+    @Override
+    @Transactional
+    public GetUserDto updateUserOwner(Integer userId, PutUserOwnerDto putUserDto) {
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        updateUserFields(user, putUserDto);
+        updateUserRoles(user, putUserDto);
+        updateUserContacts(user, putUserDto);
+
+        //Aca actualizaria los lotes del usuario
+        updatePlotsForUser(userId, user, putUserDto);
+
+        GetUserDto getUserDto = modelMapper.map(user, GetUserDto.class);
+        getUserDto.setRoles(putUserDto.getRoles());
+        getUserDto.setEmail(putUserDto.getEmail());
+        getUserDto.setPhone_number(putUserDto.getPhoneNumber());
+        return getUserDto;
+    }
+
+    /**
+     * Actualiza los lotes de un usuario propietario.
+     *
+     * @param userId el ID del usuario a actualizar.
+     * @param putUserDto el dto con la información necesaria para actualizar los lotes del usuario.
+     */
+    private void updatePlotsForUser(Integer userId, UserEntity userEntity, PutUserOwnerDto putUserDto) {
+        Integer[] actualPlots = getActualPlots(userId);
+        Integer[] newPlots = putUserDto.getPlot_id();
+
+        addNewPlots(userEntity, putUserDto, newPlots, actualPlots, putUserDto.getUserUpdateId());
+        removeOldPlots(userId, newPlots, actualPlots);
+    }
+
+    /**
+     * Agrega los nuevos plots que no están en los actuales para
+     * actualizar.
+     *
+     * @param userEntity la entidad del usuario.
+     * @param putUser el DTO con la información del usuario.
+     * @param newPlots los nuevos plots.
+     * @param actualPlots los plots actuales.
+     * @param userUpdateId el id del usuario que actualiza.
+     */
+    private void addNewPlots(UserEntity userEntity, PutUserOwnerDto putUser, Integer[] newPlots, Integer[] actualPlots, Integer userUpdateId) {
+        for (Integer plotId : newPlots) {
+            if (!Arrays.asList(actualPlots).contains(plotId)) {
+                PlotUserEntity plotUserEntity = mapPlotUserEntity(userEntity, putUser, plotId);
+                plotUserEntity.setCreatedUser(userUpdateId);
+                plotUserEntity.setLastUpdatedUser(userUpdateId);
+                validatePlot(plotUserEntity);
+                plotUserRepository.save(plotUserEntity);
+            }
+        }
+    }
+
+    /**
+     * Crea la relación entre un propietario y un lote.
+     *
+     * @param userEntity  la entidad del usuario.
+     * @param putUserOwnerDto el DTO con la información del usuario.
+     * @param plotId el id del lote a asignar.
+     * @return la entidad creada.
+     */
+    public PlotUserEntity mapPlotUserEntity(UserEntity userEntity, PutUserOwnerDto putUserOwnerDto, Integer plotId) {
+        PlotUserEntity plotUserEntity = new PlotUserEntity();
+        plotUserEntity.setUser(userEntity);
+        plotUserEntity.setPlotId(plotId);
+        plotUserEntity.setCreatedUser(putUserOwnerDto.getUserUpdateId());
+        plotUserEntity.setCreatedDate(LocalDateTime.now());
+        plotUserEntity.setLastUpdatedUser(putUserOwnerDto.getUserUpdateId());
+        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
+        return plotUserEntity;
+    }
+
+    /**
+     * Obtiene los plots actuales asociados al usuario.
+     *
+     * @param userId el ID del propietario.
+     * @return un arreglo de ids de plots actuales.
+     */
+    public Integer[] getActualPlots(Integer userId) {
+        return plotUserRepository.findByUserId(userId).stream()
+                .map(plotUser -> plotUser.getPlotId())
+                .toArray(Integer[]::new);
+    }
+
+    /**
+     * Elimina los plots actuales que no están en los nuevos para actualizar.
+     *
+     * @param ownerId el id del propietario.
+     * @param newPlots los nuevos plots.
+     * @param actualPlots los plots actuales.
+     */
+    private void removeOldPlots(Integer ownerId, Integer[] actualPlots, Integer... newPlots) {
+        for (Integer plotId : actualPlots) {
+            if (!Arrays.asList(newPlots).contains(plotId)) {
+                plotUserRepository.deleteByUserIdAndPlotId(ownerId, plotId);
+            }
+        }
+    }
+
+    /**
+     * Valida si el lote no existe y si ya tiene un propietario asignado.
+     *
+     * @param plotUser entidad de PlotUser.
+     * @throws EntityNotFoundException si no se encuentra un lote con esa id.
+     * @throws IllegalArgumentException si ya existe un propietario activo que tenga ese lote.
+     */
+    public void validatePlot(PlotUserEntity plotUser) {
+        if (plotUserRepository.findByPlotId(plotUser.getPlotId()) != null
+                && userRepository.existsByIdAndActive(plotUser.getUser().getId(), true)) {
+            throw new IllegalArgumentException("Plot already has an active owner.");
+        }
+    }
+
+    /**
      * Actualiza los campos de un usuario.
      *
      * @param user usuario a actualizar.
      * @param putUserDto con la información necesaria para actualizar un usuario.
      */
-    public void updateUserFields(UserEntity user, PutUserDto putUserDto) {
+    public void updateUserFields(UserEntity user, BasePutUser putUserDto) {
         mapPutUserToUserEntity(putUserDto, user);
         userRepository.save(user);
     }
@@ -664,7 +792,7 @@ public class UserServiceImpl implements UserService {
      * @param user usuario a actualizar los roles.
      * @param putUserDto con la información necesaria para actualizar los roles del usuario.
      */
-    public void updateUserRoles(UserEntity user, PutUserDto putUserDto) {
+    public void updateUserRoles(UserEntity user, BasePutUser putUserDto) {
         userRoleRepository.deleteByUser(user);
         assignRolesToUser(user, putUserDto.getRoles(), putUserDto.getUserUpdateId());
     }
@@ -675,7 +803,7 @@ public class UserServiceImpl implements UserService {
      * @param user usuario para actualizar los contactos.
      * @param putUserDto con la información necesaria para actualizar los contactos del usuario.
      */
-    public void updateUserContacts(UserEntity user, PutUserDto putUserDto) {
+    public void updateUserContacts(UserEntity user, BasePutUser putUserDto) {
         restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
         restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
     }
