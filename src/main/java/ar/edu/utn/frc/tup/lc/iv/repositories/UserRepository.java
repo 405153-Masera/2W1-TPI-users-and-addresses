@@ -1,6 +1,5 @@
 package ar.edu.utn.frc.tup.lc.iv.repositories;
 
-import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -102,17 +101,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      * @return true si existe, false si no.
      */
     boolean existsByDni(String dni);
-
-    /**
-     * Cuenta la cantidad de usuarios por rol.
-     *
-     * @return una lista de {@link UserRoleCount}
-     */
-    @Query("SELECT new ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount("
-            + "r.description, COUNT(u.id)) "
-            + "FROM UserEntity u "
-            + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
-            + "JOIN RoleEntity r ON ur.role.id = r.id "
-            + "GROUP BY r.description")
-    List<UserRoleCount> countUsersByRole();
 }

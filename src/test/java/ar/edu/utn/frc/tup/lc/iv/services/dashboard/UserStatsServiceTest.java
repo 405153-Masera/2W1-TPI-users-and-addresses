@@ -3,7 +3,6 @@ package ar.edu.utn.frc.tup.lc.iv.services.dashboard;
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.AgeDistribution;
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.AgeDistributionResponse;
 import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.AgeStatics;
-import ar.edu.utn.frc.tup.lc.iv.dtos.dashboard.UserRoleCount;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,21 +34,6 @@ class UserStatsServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void getUserCountByRole() {
-        List<UserRoleCount> expectedCounts = Arrays.asList(
-                new UserRoleCount("ADMIN", 5L),
-                new UserRoleCount("USER", 10L)
-        );
-        when(userRepository.countUsersByRole()).thenReturn(expectedCounts);
-
-        List<UserRoleCount> actualCounts = userStatsService.getUserCountByRole();
-
-        assertNotNull(actualCounts);
-        assertTrue(actualCounts.isEmpty());
-        assertEquals(expectedCounts, actualCounts);
-        verify(userRepository, times(1)).countUsersByRole();
-    }
 
     @Test
     void getAgeData() {

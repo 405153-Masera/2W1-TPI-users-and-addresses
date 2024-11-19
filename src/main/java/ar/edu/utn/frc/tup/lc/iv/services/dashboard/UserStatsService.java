@@ -28,16 +28,6 @@ public class UserStatsService {
     private final UserRepository userRepository;
 
     /**
-     * Obtiene la cantidad de usuarios por rol.
-     *
-     * @return una lista con la cantidad de usuarios por rol.
-     */
-    public List<UserRoleCount> getUserCountByRole() {
-
-        return userRepository.countUsersByRole();
-    }
-
-    /**
      * Obtiene la cantidad de usuarios por estado.
      *
      * @param startDate fecha de inicio del rango.
