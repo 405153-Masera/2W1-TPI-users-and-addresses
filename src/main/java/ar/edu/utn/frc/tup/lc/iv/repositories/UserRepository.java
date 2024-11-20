@@ -101,4 +101,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
      * @return true si existe, false si no.
      */
     boolean existsByDni(String dni);
+
+    /**
+     * Busca un usuario por su id y estado.
+     *
+     * @param id el identificador del usuario.
+     * @param active el estado a buscar.
+     * @return true si existe, false en caso contrario.
+     */
+    boolean existsByIdAndActive(Integer id, Boolean active);
 }

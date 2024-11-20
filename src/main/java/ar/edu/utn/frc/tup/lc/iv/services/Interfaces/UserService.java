@@ -8,6 +8,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +57,15 @@ public interface UserService {
      * @return el usuario actualizado.
      */
     GetUserDto updateUser(Integer userId, PutUserDto putUserDto);
+
+    /**
+     * Actualiza un usuario tipo propietario.
+     *
+     * @param userId el ID del usuario a actualizar.
+     * @param putUserDto el dto con la información necesaria para actualizar un usuario.
+     * @return el usuario actualizado.
+     */
+    GetUserDto updateUserOwner(Integer userId, PutUserOwnerDto putUserDto);
 
     /**
      * Obtener todos los usuarios por un estado.
