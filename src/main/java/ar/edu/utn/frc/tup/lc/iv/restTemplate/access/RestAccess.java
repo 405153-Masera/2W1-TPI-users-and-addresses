@@ -4,8 +4,10 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.post.BasePostUser;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +46,14 @@ public class RestAccess {
      * Metodo para dar de baja un acceso.
      *
      * @param document Documento a buscar.
+     * @throws RuntimeException si falla la petición.
      */
     public void deleteAccess(String document) {
-        //EMA le agregue /owner_tenant
-        restTemplate.put(url + "/owner_tenant/unsubscribe/" + document, null, Void.class);
+        try {
+            restTemplate.put(url + "/owner_tenant/unsubscribe/" + document, null, Void.class);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete access for document: " + document, e);
+        }
     }
 
     /**

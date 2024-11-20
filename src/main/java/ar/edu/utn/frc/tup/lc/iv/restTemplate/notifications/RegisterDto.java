@@ -11,4 +11,7 @@ public class RegisterDto {
     /** Nombre del usuario. */
     private String email;
 
+    /** Identificador del usuario. */
+    private Integer userId;
+
 }

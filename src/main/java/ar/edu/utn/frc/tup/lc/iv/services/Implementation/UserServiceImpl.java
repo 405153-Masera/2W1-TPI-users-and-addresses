@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
         plot.add(postUserDto.getPlot_id());
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
-        sendWelcomeEmail(postUserDto.getEmail()); //todo: Descomentar cuando se necesite postear a notificaciones
+        sendWelcomeEmail(postUserDto.getEmail(),postUserDto.getUserUpdateId()); //todo: Descomentar cuando se necesite postear a notificaciones
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postUserDto);
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
         GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
-        sendWelcomeEmail(postOwnerUserDto.getEmail());
+        sendWelcomeEmail(postOwnerUserDto.getEmail(), postOwnerUserDto.getUserUpdateId());
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postOwnerUserDto); //todo: Descomeentar cuando se necesite postear a notificaciones
         return getUserDto;
@@ -1046,9 +1046,10 @@ public class UserServiceImpl implements UserService {
      * Envia un email de bienvenida a un usuario.
      * @param email email del usuario.
      */
-    public void sendWelcomeEmail(String email) {
+    public void sendWelcomeEmail(String email, Integer userId) {
         RegisterDto registerDto = new RegisterDto();
         registerDto.setEmail(email);
+        registerDto.setUserId(userId);
         restNotifications.sendRegisterEmail(registerDto);
     }
 }

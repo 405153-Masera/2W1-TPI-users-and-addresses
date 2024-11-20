@@ -58,7 +58,6 @@ public class RestNotifications {
      * @throws ResponseStatusException si hubo un error en la petición.
      */
     public boolean sendRegisterEmail(RegisterDto dto) {
-        //Ema le agregue /user
         try {
             ResponseEntity<Void> response = restTemplate.postForEntity(url + "/user/register", dto, Void.class);
             return response.getStatusCode().is2xxSuccessful();
