@@ -1,18 +1,16 @@
 package ar.edu.utn.frc.tup.lc.iv.services.Implementation;
 
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.*;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.ChangePassword;
-import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostLoginDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
 import ar.edu.utn.frc.tup.lc.iv.entities.*;
 import ar.edu.utn.frc.tup.lc.iv.helpers.UserTestHelper;
 import ar.edu.utn.frc.tup.lc.iv.repositories.*;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.RestAccess;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.GetContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.RestContact;
-import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RecoveryDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.plotOwner.RestPlotOwner;
 import ar.edu.utn.frc.tup.lc.iv.security.jwt.PasswordUtil;
@@ -758,5 +756,65 @@ class UserServiceImplTest {
         });
 
         assertEquals("Users not found with plot id: " + plotId, exception.getMessage());
+    }
+
+    @Test
+    void updateUserOwner_Success() {
+        Integer userId = 1;
+        PutUserOwnerDto putUserDto = new PutUserOwnerDto();
+        putUserDto.setName("New Name");
+        putUserDto.setLastName("New Lastname");
+        putUserDto.setDni("30752987");
+        putUserDto.setDni_type_id(1);
+        putUserDto.setAvatar_url("urlAvatar");
+        putUserDto.setDatebirth(LocalDate.of(1997, 12, 3));
+        putUserDto.setEmail("email@email.com");
+        putUserDto.setPhoneNumber("12345678");
+        putUserDto.setRoles(new String[]{"Admin"});
+        putUserDto.setUserUpdateId(1);
+        putUserDto.setPlot_id(new Integer[]{1, 2});
+
+        UserEntity userToUpdated = new UserEntity();
+        userToUpdated.setId(userId);
+
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setDescription("Admin");
+
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(userId);
+        getUserDto.setName(putUserDto.getName());
+        getUserDto.setLastname(putUserDto.getLastName());
+        getUserDto.setDni(putUserDto.getDni());
+        getUserDto.setAvatar_url(putUserDto.getAvatar_url());
+        getUserDto.setDatebirth(putUserDto.getDatebirth());
+
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
+        when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
+        when(modelMapperMock.map(userToUpdated, GetUserDto.class)).thenReturn(getUserDto);
+
+        GetUserDto result = userServiceSpy.updateUserOwner(userId, putUserDto);
+
+        assertEquals(putUserDto.getName(), result.getName());
+        assertEquals(putUserDto.getLastName(), result.getLastname());
+        assertEquals(putUserDto.getDni(), result.getDni());
+        assertEquals(putUserDto.getAvatar_url(), result.getAvatar_url());
+        assertEquals(putUserDto.getDatebirth(), result.getDatebirth());
+        assertEquals(putUserDto.getEmail(), result.getEmail());
+    }
+
+    @Test
+    void updateUserOwner_UserNotFound() {
+        Integer userId = 1;
+        PutUserOwnerDto putUserDto = new PutUserOwnerDto();
+
+        when(userRepositoryMock.findById(userId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            userServiceSpy.updateUserOwner(userId, putUserDto);
+        });
+
+        assertEquals("User not found with id: " + userId, exception.getMessage());
     }
 }

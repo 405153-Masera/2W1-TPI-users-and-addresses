@@ -4,6 +4,7 @@ import ar.edu.utn.frc.tup.lc.iv.configs.TestSecurityConfig;
 import ar.edu.utn.frc.tup.lc.iv.dtos.get.GetUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
+import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
 import ar.edu.utn.frc.tup.lc.iv.helpers.UserTestHelper;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPost;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.access.AccessPut;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
@@ -376,46 +378,75 @@ class UserControllerTest {
       verify(userServiceMock, times(1)).deleteUser(1,1);
    }
 
-  //  @Test
-  /*void updateUserIT_Success() throws Exception{
-      //Given
-     PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", 1, "3515623", "509502349", "email@email.com",
-             "avatar", LocalDate.now(), new String[]{"Gerente"}, 1, 1L);
+    @Test
+    void updateUser_Success() throws Exception {
+        Integer userId = 1;
+        PutUserDto putUserDto = new PutUserDto();
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(userId);
+        getUserDto.setRoles(new String[]{"Gerente"});
+        getUserDto.setEmail("email@email.com");
 
-      GetUserDto getUserDto = UserTestHelper.createGetUserDto(putUserDto, 1);
-      //When
-     when(userServiceMock.updateUser(1, putUserDto)).thenReturn(getUserDto);
+        when(userServiceMock.updateUser(userId, putUserDto)).thenReturn(getUserDto);
 
-     //Then
-     mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
-                 .contentType(MediaType.APPLICATION_JSON)
-                     .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(putUserDto)))
-           .andExpect(status().isOk())
-             .andExpect(jsonPath("$.phone_number").value("509502349"))
-              .andExpect(jsonPath("$.roles[0]").value("Gerente"));
+        mockMvc.perform(put("/users/put/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(putUserDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.roles[0]").value("Gerente"))
+                .andExpect(jsonPath("$.email").value("email@email.com"));
 
-       verify(userServiceMock, times(1)).updateUser(1, putUserDto);
+        verify(userServiceMock, times(1)).updateUser(userId, putUserDto);
     }
 
-  @Test
-  void updateUserIT_BadRequest() throws Exception{
-       //Given
-     PutUserDto putUserDto = new PutUserDto("Lucía", "Fernanda", 1, "3515623", "509502349", "email@email.com",
-               "avatar", LocalDate.now(), new String[]{"Admin"}, 1, 1L);
+    @Test
+    void updateUser_BadRequest() throws Exception {
+        Integer userId = 1;
+        PutUserDto putUserDto = new PutUserDto();
 
-        //When
-      when(userServiceMock.updateUser(1, putUserDto)).thenReturn(null);
+        when(userServiceMock.updateUser(userId, putUserDto)).thenReturn(null);
 
-        //Then
-      mockMvc.perform(MockMvcRequestBuilders.put("/users/put/" + 1)
-                       .contentType(MediaType.APPLICATION_JSON)
-                     .accept(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(putUserDto)))
-               .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/users/put/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(putUserDto)))
+                .andExpect(status().isBadRequest());
 
-       verify(userServiceMock, times(1)).updateUser(1, putUserDto);
-   }*/
+        verify(userServiceMock, times(1)).updateUser(userId, putUserDto);
+    }
+
+    @Test
+    void updateUserOwner_Success() throws Exception {
+        Integer userId = 1;
+        PutUserOwnerDto putUserOwnerDto = new PutUserOwnerDto();
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setId(userId);
+
+        when(userServiceMock.updateUserOwner(userId, putUserOwnerDto)).thenReturn(getUserDto);
+
+        mockMvc.perform(put("/users/put/owner/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(putUserOwnerDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId));
+
+        verify(userServiceMock, times(1)).updateUserOwner(userId, putUserOwnerDto);
+    }
+
+    @Test
+    void updateUserOwner_BadRequest() throws Exception {
+        Integer userId = 1;
+        PutUserOwnerDto putUserOwnerDto = new PutUserOwnerDto();
+
+        when(userServiceMock.updateUserOwner(userId, putUserOwnerDto)).thenReturn(null);
+
+        mockMvc.perform(put("/users/put/owner/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(putUserOwnerDto)))
+                .andExpect(status().isBadRequest());
+
+        verify(userServiceMock, times(1)).updateUserOwner(userId, putUserOwnerDto);
+    }
 
   @Test
   void getUsersByOwner_Success() throws Exception {
@@ -458,7 +489,7 @@ class UserControllerTest {
         accessPut.setDocument("document");
         doNothing().when(restAccessMock).deleteAccess(anyString());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/access/delete")
+        mockMvc.perform(put("/users/access/delete")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(accessPut)))
                 .andExpect(status().isNoContent());
@@ -531,7 +562,7 @@ class UserControllerTest {
         String email = "test@example.com";
         doNothing().when(userServiceMock).passwordRecovery(email);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/recoveryPassword/" + email)
+        mockMvc.perform(put("/users/recoveryPassword/" + email)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
