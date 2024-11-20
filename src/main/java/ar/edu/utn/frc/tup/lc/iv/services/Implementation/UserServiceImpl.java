@@ -843,7 +843,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastUpdatedDate(LocalDateTime.now());
         userEntity.setLastUpdatedUser(userUpdateId);
         userRepository.save(userEntity);
-        restAccess.deleteAccess(userEntity.getDni()); //todo: Descomentar cuando se necesite postear a acceso
+        restAccess.deleteAccess(userEntity.getDni(),userEntity.getDniType().getDescription(),userUpdateId); //todo: Descomentar cuando se necesite postear a acceso
     }
 
     /**

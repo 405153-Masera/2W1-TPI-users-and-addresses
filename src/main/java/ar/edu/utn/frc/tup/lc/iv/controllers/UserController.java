@@ -257,7 +257,7 @@ public class UserController {
      */
     @PutMapping("/access/delete")
     public ResponseEntity<Void> putAccess(@RequestBody AccessPut accessPut) {
-        restAccess.deleteAccess(accessPut.getDocument());
+        restAccess.deleteAccess(accessPut.getDocument(),accessPut.getDniType(),accessPut.getUserId());
         return ResponseEntity.noContent().build();
     }
 

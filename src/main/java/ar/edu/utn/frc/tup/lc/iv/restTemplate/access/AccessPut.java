@@ -12,4 +12,14 @@ public class AccessPut {
      * Documento actualizado del acceso.
      */
     private String document;
+
+    /**
+     * Tipo de documento del acceso.
+     */
+    private String dniType;
+
+    /**
+     * Id del usuario que hace el cambio.
+     */
+    private Integer userId;
 }

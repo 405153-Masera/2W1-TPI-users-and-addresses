@@ -48,11 +48,20 @@ public class RestAccess {
      * @param document Documento a buscar.
      * @throws RuntimeException si falla la petición.
      */
-    public void deleteAccess(String document) {
+    public void deleteAccess(String document, String dniType , Integer userId) {
+
+        if (dniType == "CUIT/CUIL") {
+            dniType = "CUIT";
+        }
+
+        if (dniType == "Pasaporte") {
+            dniType = "PASSPORT";
+        }
+
         try {
-            restTemplate.put(url + "/owner_tenant/unsubscribe/" + document, null, Void.class);
+            restTemplate.put(url + "/owner-tenant/unsubscribe/" + dniType +"/" + document+ "/" + userId, null, Void.class);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete access for document: " + document, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete access for document: " + dniType, e);
         }
     }
 

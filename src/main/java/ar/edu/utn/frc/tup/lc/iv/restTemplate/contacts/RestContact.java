@@ -71,7 +71,6 @@ public class RestContact {
      * @return una lista de tipo {@link String}
      */
     public List<String> getAllEmails() {
-        //EMA le agregue /contact
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url + "/contact/search", JsonNode.class);
         List<String> emails = new ArrayList<>();
 

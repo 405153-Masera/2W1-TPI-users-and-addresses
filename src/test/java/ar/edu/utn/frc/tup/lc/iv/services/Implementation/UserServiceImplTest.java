@@ -358,8 +358,13 @@ class UserServiceImplTest {
     void deleteUser_Success() {
         LocalDateTime oldDate = LocalDateTime.now().minus(Duration.ofDays(1));
 
+        DniTypeEntity dniType = new DniTypeEntity();
+        dniType.setId(1);
+        dniType.setDescription("DNI");
+
         UserEntity userEntity = new UserEntity();
         userEntity.setActive(true);
+        userEntity.setDniType(dniType);
         userEntity.setLastUpdatedDate(oldDate);
 
         when(userRepositoryMock.findById(1)).thenReturn(Optional.of(userEntity));

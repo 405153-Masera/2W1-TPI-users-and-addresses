@@ -487,14 +487,16 @@ class UserControllerTest {
     void putAccessIT_Success() throws Exception {
         AccessPut accessPut = new AccessPut();
         accessPut.setDocument("document");
-        doNothing().when(restAccessMock).deleteAccess(anyString());
+        accessPut.setDniType("documentType");
+        accessPut.setUserId(1);
+        doNothing().when(restAccessMock).deleteAccess(anyString(),anyString(),anyInt());
 
         mockMvc.perform(put("/users/access/delete")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(accessPut)))
                 .andExpect(status().isNoContent());
 
-        verify(restAccessMock, times(1)).deleteAccess(anyString());
+        verify(restAccessMock, times(1)).deleteAccess(anyString(),anyString(),anyInt());
     }
 
     @Test

@@ -60,11 +60,12 @@ class RestAccessTest {
     @Test
     void deleteAccess() {
         String document = "12345678";
-        restAccess.deleteAccess(document);
+        String dni = "DNI";
+        Integer userId = 1;
+        restAccess.deleteAccess(document,dni,userId);
         verify(restTemplate).put(
-                eq(BASE_URL + "/owner_tenant/unsubscribe/" + document),
-                isNull(),
-                eq(Void.class)
+                eq(BASE_URL + "/owner-tenant/unsubscribe/" + dni + "/" + document + "/" + userId),
+                isNull(), eq(Void.class)
         );
     }
 
