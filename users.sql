@@ -306,8 +306,8 @@ VALUES
 ('Marta', 'Rojas', 1, '40654323', '2015-06-18', TRUE, NOW(), 1, NOW(), 1, 'martarojas', '$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 23412),
 ('Felix', 'Torres', 1, '43210988', '1980-05-25', TRUE, NOW(), 1, NOW(), 1, 'felixtorres', '$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 78934),
 ('Beatriz', 'Torres', 1, '43210989', '2012-07-30', TRUE, NOW(), 1, NOW(), 1, 'beatriztorres', '$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 56745),
-('Martin', 'Diaz', 3, '23455948170', '1992-12-10', TRUE, NOW(), 1, NOW(), 1, 'martindiaz', '$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 90156);
-
+('Martin', 'Diaz', 3, '23455948170', '1992-12-10', TRUE, NOW(), 1, NOW(), 1, 'martindiaz', '$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 90156),
+('tester', 'multas', 1, '36253980', '1992-12-10', TRUE, NOW(), 1, NOW(), 1, 'testermultas','$2a$10$HbYuOzZ4mw4S8KTNtDqJSOKQVTAr9.wqw9ntQrW6kNp1.lcTbe5VW', 50135); --testerMultas
 
 INSERT INTO userroles (role_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES 
@@ -340,7 +340,10 @@ VALUES
 (5, 27, NOW(), NOW(), 1, 1), -- Familiar de Laura Rojas
 (4, 28, NOW(), NOW(), 1, 1), -- Familiar de José Torres
 (5, 29, NOW(), NOW(), 1, 1), -- Familiar de José Torres
-(4, 30, NOW(), NOW(), 1, 1); -- Familiar de Carmen Díaz
+(4, 30, NOW(), NOW(), 1, 1), -- Familiar de Carmen Díaz
+(3, 31, NOW(), NOW(), 1, 1), -- testerMultas
+(6, 31, NOW(), NOW(), 1, 1), --testerMultas
+(12, 31, NOW(), NOW(), 1, 1); --testerMultas
 
 INSERT INTO plotusers (plot_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES
