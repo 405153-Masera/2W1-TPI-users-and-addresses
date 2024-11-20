@@ -342,8 +342,8 @@ VALUES
 (5, 29, NOW(), NOW(), 1, 1), -- Familiar de José Torres
 (4, 30, NOW(), NOW(), 1, 1), -- Familiar de Carmen Díaz
 (3, 31, NOW(), NOW(), 1, 1), -- testerMultas
-(6, 31, NOW(), NOW(), 1, 1), --testerMultas
-(12, 31, NOW(), NOW(), 1, 1); --testerMultas
+(6, 31, NOW(), NOW(), 1, 1), -- testerMultas
+(12, 31, NOW(), NOW(), 1, 1); -- testerMultas
 
 INSERT INTO plotusers (plot_id, user_id, created_datetime, last_updated_datetime, created_user, last_updated_user)
 VALUES

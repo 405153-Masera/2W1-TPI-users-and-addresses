@@ -174,4 +174,27 @@ public class RestContact {
                     "Server error while updating the contact: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Metodo para eliminar un contacto de un usuario en el microservicio de contactos.
+     *
+     * @param userId identificador del usuario asociado al contacto.
+     * @param personTypeId identificador del tipo de persona.
+     * @param contactTypeId identificador del tipo de contacto a eliminar.
+     */
+    public void deleteContact(Integer userId, Integer personTypeId, Integer contactTypeId) {
+        String deleteUrl = url + "/contact/delete?userId=" + userId
+                + "&personTypeId=" + personTypeId
+                + "&contactTypeId=" + contactTypeId;
+
+        try {
+            restTemplate.delete(deleteUrl);
+        } catch (HttpClientErrorException e) {
+            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Server error while deleting the contact: " + e.getMessage(), e);
+        }
+    }
+
 }
