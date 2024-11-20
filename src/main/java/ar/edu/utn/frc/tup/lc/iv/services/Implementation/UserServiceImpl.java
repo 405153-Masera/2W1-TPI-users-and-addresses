@@ -683,6 +683,7 @@ public class UserServiceImpl implements UserService {
      * Actualiza los lotes de un usuario propietario.
      *
      * @param userId el ID del usuario a actualizar.
+     * @param userEntity la entidad del usuario
      * @param putUserDto el dto con la información necesaria para actualizar los lotes del usuario.
      */
     private void updatePlotsForUser(Integer userId, UserEntity userEntity, PutUserOwnerDto putUserDto) {
@@ -703,7 +704,8 @@ public class UserServiceImpl implements UserService {
      * @param actualPlots los plots actuales.
      * @param userUpdateId el id del usuario que actualiza.
      */
-    private void addNewPlots(UserEntity userEntity, PutUserOwnerDto putUser, Integer[] newPlots, Integer[] actualPlots, Integer userUpdateId) {
+    private void addNewPlots(UserEntity userEntity, PutUserOwnerDto putUser,
+                             Integer[] newPlots, Integer[] actualPlots, Integer userUpdateId) {
         for (Integer plotId : newPlots) {
             if (!Arrays.asList(actualPlots).contains(plotId)) {
                 PlotUserEntity plotUserEntity = mapPlotUserEntity(userEntity, putUser, plotId);
