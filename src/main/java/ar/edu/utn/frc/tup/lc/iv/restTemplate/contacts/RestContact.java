@@ -66,6 +66,38 @@ public class RestContact {
     }
 
     /**
+     * Metodo para obtener una lista de todos contactos de los usuarios.
+     *
+     * @return una lista de {@link GetAllContactDto}
+     */
+    public List<GetAllContactDto> getAllContacts() {
+        //Ema agregue /contact
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(
+                url + "/contact/search", JsonNode.class);
+        List<GetAllContactDto> contacts = new ArrayList<>();
+
+        GetAllContactDto contact;
+
+        if (response.getBody().isArray()) {
+            for (JsonNode node : response.getBody()) {
+
+                contact = new GetAllContactDto();
+
+                String userId = node.get("userId").asText();
+                String typeContact = node.get("contactType").get("id").asText();
+                String value = node.get("value").asText();
+
+                contact.setUserId(Integer.parseInt(userId));
+                contact.setType_contact(Integer.parseInt(typeContact));
+                contact.setValue(value);
+
+                contacts.add(contact);
+            }
+        }
+        return contacts;
+    }
+
+    /**
      * Metodo para obtener una lista de todos los emails.
      *
      * @return una lista de tipo {@link String}

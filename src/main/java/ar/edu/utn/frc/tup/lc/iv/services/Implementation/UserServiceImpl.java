@@ -9,6 +9,7 @@ import ar.edu.utn.frc.tup.lc.iv.entities.PlotUserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.RoleEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserEntity;
 import ar.edu.utn.frc.tup.lc.iv.entities.UserRoleEntity;
+import ar.edu.utn.frc.tup.lc.iv.restTemplate.contacts.GetAllContactDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RecoveryDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RegisterDto;
 import ar.edu.utn.frc.tup.lc.iv.restTemplate.notifications.RestNotifications;
@@ -127,7 +128,8 @@ public class UserServiceImpl implements UserService {
         plot.add(postUserDto.getPlot_id());
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
-        sendWelcomeEmail(postUserDto.getEmail(),postUserDto.getUserUpdateId()); //todo: Descomentar cuando se necesite postear a notificaciones
+        //todo: Descomentar cuando se necesite postear a notificaciones
+        sendWelcomeEmail(postUserDto.getEmail(), postUserDto.getUserUpdateId());
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postUserDto);
@@ -498,6 +500,21 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Metodo para mapear roles y contactos de un usuario a un GetUserDto.
+     *
+     * @param userEntity representa la entidad de un usuario.
+     * @param getUserDto dto que contiene la información del usuario.
+     */
+    public void mapUserRoles(UserEntity userEntity, GetUserDto getUserDto) {
+        List<GetRoleDto> roleDtos = roleService.getRolesByUser(userEntity.getId());
+        String[] roles = roleDtos.stream()
+                .map(GetRoleDto::getDescription)
+                .toArray(String[]::new);
+
+        getUserDto.setRoles(roles);
+    }
+
+    /**
      * Metodo para mapear de un UserEntity y un RoleEntity a un UserRoleEntity.
      *
      * @param userEntity representa la entidad de un usuario.
@@ -569,9 +586,33 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<GetUserDto> getAllUsers() {
+        List<GetAllContactDto> allContacts = restContact.getAllContacts();
+
         return userRepository.findAllActives().stream()
-                .map(this::convertToUserDto)
+                .map(user -> {
+                    GetUserDto userDto = convertToUserDtoAll(user);
+                    assignContact(userDto, allContacts);
+                    return userDto;
+                })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Metodo para actualizar los campos de un usuario.
+     *
+     * @param userDto usuario a actualizar.
+     * @param allContacts dto que contiene la información del usuario.
+     */
+    private void assignContact(GetUserDto userDto, List<GetAllContactDto> allContacts) {
+        for (GetAllContactDto contact : allContacts) {
+            if (contact.getUserId().equals(userDto.getId())) {
+                if (contact.getType_contact().equals(1)) {
+                    userDto.setEmail(contact.getValue());
+                } else {
+                    userDto.setPhone_number(contact.getValue());
+                }
+            }
+        }
     }
 
     /**
@@ -599,6 +640,19 @@ public class UserServiceImpl implements UserService {
         GetUserDto userDto = new GetUserDto();
         mapUserEntityToGet(user, userDto);
         mapUserRolesAndContacts(user, userDto);
+        return userDto;
+    }
+
+    /**
+     * Metodo para convertir un UserEntity a un GetUserDto.
+     *
+     * @param user representa la entidad de un usuario.
+     * @return un GetUserDto con la información del usuario.
+     */
+    public GetUserDto convertToUserDtoAll(UserEntity user) {
+        GetUserDto userDto = new GetUserDto();
+        mapUserEntityToGet(user, userDto);
+        mapUserRoles(user, userDto);
         return userDto;
     }
 
@@ -844,8 +898,9 @@ public class UserServiceImpl implements UserService {
         userEntity.setLastUpdatedUser(userUpdateId);
         userEntity.setUsername(null);
         userRepository.save(userEntity);
-        restAccess.deleteAccess(userEntity.getDni(),userEntity.getDniType().getDescription(),userUpdateId); //todo: Descomentar cuando se necesite postear a acceso
-        restContact.deleteContact(userId, 3,1);
+        //todo: Descomentar cuando se necesite postear a acceso
+        restAccess.deleteAccess(userEntity.getDni(), userEntity.getDniType().getDescription(), userUpdateId);
+        restContact.deleteContact(userId, 3, 1);
     }
 
     /**
@@ -1045,7 +1100,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Envia un email de bienvenida a un usuario.
+     * Envía un email de bienvenida a un usuario.
+     * @param userId el ID del usuario.
      * @param email email del usuario.
      */
     public void sendWelcomeEmail(String email, Integer userId) {
