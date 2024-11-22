@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
         //todo: Descomentar cuando se necesite postear a notificaciones
-        sendWelcomeEmail(postUserDto.getEmail(), postUserDto.getUserUpdateId());
+        sendWelcomeEmail(postUserDto.getEmail(), userSaved.getId());
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postUserDto);
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
         GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
-        sendWelcomeEmail(postOwnerUserDto.getEmail(), postOwnerUserDto.getUserUpdateId());
+        sendWelcomeEmail(postOwnerUserDto.getEmail(), userSaved.getId());
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postOwnerUserDto); //todo: Descomeentar cuando se necesite postear a notificaciones
         return getUserDto;
