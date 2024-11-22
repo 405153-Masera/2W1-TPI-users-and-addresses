@@ -50,18 +50,58 @@ public class RestAccess {
      */
     public void deleteAccess(String document, String dniType , Integer userId) {
 
-        if (dniType == "CUIT/CUIL") {
-            dniType = "CUIT";
-        }
-
-        if (dniType == "Pasaporte") {
-            dniType = "PASSPORT";
-        }
+        dniType = mapDocumentType(dniType);
 
         try {
             restTemplate.put(url + "/owner-tenant/unsubscribe/" + dniType +"/" + document+ "/" + userId, null, Void.class);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete access for document: " + dniType, e);
+        }
+    }
+
+    /**
+     * Metodo para actualizar los documentos de un usuario.
+     *
+     * @param oldDocument      Documento antiguo.
+     * @param oldDocumentType  Tipo del documento antiguo.
+     * @param newDocument      Nuevo documento.
+     * @param newDocumentType  Tipo del nuevo documento.
+     * @param userId           ID del usuario asociado.
+     */
+    public void updateDocument(String oldDocument, String oldDocumentType, String newDocument, String newDocumentType, Integer userId) {
+
+        oldDocumentType = mapDocumentType(oldDocumentType);
+        newDocumentType = mapDocumentType(newDocumentType);
+
+        String endpoint = this.url + "/updateDoc/"
+                + oldDocument + "/"
+                + oldDocumentType + "/"
+                + newDocument + "/"
+                + newDocumentType + "/"
+                + userId;
+
+        try {
+            restTemplate.put(endpoint, null, Void.class);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al actualizar el documento: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Metodo para mapear el tipo de documento.
+     *
+     * @param documentType Tipo de documento a mapear.
+     * @return Tipo de documento mapeado.
+     */
+    private String mapDocumentType(String documentType) {
+        switch (documentType) {
+            case "CUIT/CUIL":
+                return "CUIT";
+            case "Pasaporte":
+                return "PASSPORT";
+            default:
+                return documentType;
         }
     }
 

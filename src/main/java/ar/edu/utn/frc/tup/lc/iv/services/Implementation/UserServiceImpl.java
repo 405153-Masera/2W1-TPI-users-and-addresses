@@ -695,12 +695,20 @@ public class UserServiceImpl implements UserService {
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
         updateUserContacts(user, putUserDto);
+        updateUserAccess(user, putUserDto);
+
 
         GetUserDto getUserDto = modelMapper.map(user, GetUserDto.class);
         getUserDto.setRoles(putUserDto.getRoles());
         getUserDto.setEmail(putUserDto.getEmail());
         getUserDto.setPhone_number(putUserDto.getPhoneNumber());
         return getUserDto;
+    }
+
+    public void updateUserAccess(UserEntity user, BasePutUser putUserDto) {
+        String newDocument = dniTypeRepository.findById(putUserDto.getDni_type_id())
+                .orElseThrow(() -> new EntityNotFoundException("DniType not found")).getDescription();
+        restAccess.updateDocument(user.getDni(),user.getDniType().getDescription(),putUserDto.getDni(),newDocument,putUserDto.getUserUpdateId());
     }
 
     /**
@@ -722,6 +730,7 @@ public class UserServiceImpl implements UserService {
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
         updateUserContacts(user, putUserDto);
+        updateUserAccess(user, putUserDto);
 
         //Aca actualizaria los lotes del usuario
         updatePlotsForUser(userId, user, putUserDto);
@@ -844,7 +853,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Actualiza los roles de un usuario.
-     *
+     *|
      * @param user usuario a actualizar los roles.
      * @param putUserDto con la información necesaria para actualizar los roles del usuario.
      */

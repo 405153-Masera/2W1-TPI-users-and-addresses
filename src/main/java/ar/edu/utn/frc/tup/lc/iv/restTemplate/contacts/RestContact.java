@@ -154,7 +154,6 @@ public class RestContact {
      * @return un booleano indicando si se pudo o no guardar el contacto.
      */
     public boolean saveContact(Integer userId, String value, int contactType, int editorId) {
-        //EMA agregue /contact
         ContactRequest contact = new ContactRequest();
         contact.setUserId(userId);
         contact.setValue(value);
