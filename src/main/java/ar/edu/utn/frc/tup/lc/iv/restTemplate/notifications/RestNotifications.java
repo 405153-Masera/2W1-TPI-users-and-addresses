@@ -62,12 +62,15 @@ public class RestNotifications {
             ResponseEntity<Void> response = restTemplate.postForEntity(url + "/user/register", dto, Void.class);
             return response.getStatusCode().is2xxSuccessful();
         } catch (HttpClientErrorException e) {
-            throw new ResponseStatusException(e.getStatusCode(), e.getMessage(), e);
+            // Registrar el error y devolver false para que no interrumpa la transacción
+            System.err.println("Error al enviar el email: " + e.getMessage()); // Puedes usar un logger en lugar de System.err
+            return false;
         } catch (Exception e) {
-            // Lanzar la excepción con la excepción original
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al enviar el email: " + e.getMessage(), e);
+            // Registrar cualquier otro error inesperado
+            System.err.println("Error inesperado al enviar el email: " + e.getMessage());
+            return false;
         }
     }
+
 
 }
