@@ -692,10 +692,10 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
+        updateUserAccess(user, putUserDto);
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
         updateUserContacts(user, putUserDto);
-        updateUserAccess(user, putUserDto);
 
 
         GetUserDto getUserDto = modelMapper.map(user, GetUserDto.class);
