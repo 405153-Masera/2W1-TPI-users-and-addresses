@@ -276,11 +276,17 @@ class UserServiceImplTest {
         putUserDto.setRoles(new String[]{"Admin"});
         putUserDto.setUserUpdateId(1);
 
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+
         UserEntity userToUpdated = new UserEntity();
         userToUpdated.setId(userId);
+        userToUpdated.setDniType(dniTypeEntity);
 
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setDescription("Admin");
+
 
         GetUserDto getUserDto = new GetUserDto();
         getUserDto.setId(userId);
@@ -292,7 +298,7 @@ class UserServiceImplTest {
 
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
-        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
         when(modelMapperMock.map(userToUpdated, GetUserDto.class)).thenReturn(getUserDto);
 
@@ -329,11 +335,16 @@ class UserServiceImplTest {
         putUserDto.setPhoneNumber("12345678");
         putUserDto.setRoles(new String[]{"Admins"});
 
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+
         UserEntity userToUpdated = new UserEntity();
         userToUpdated.setId(userId);
+        userToUpdated.setDniType(dniTypeEntity);
 
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
-        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
         when(roleRepositoryMock.findByDescription("Admins")).thenReturn(null);
 
@@ -779,8 +790,13 @@ class UserServiceImplTest {
         putUserDto.setUserUpdateId(1);
         putUserDto.setPlot_id(new Integer[]{1, 2});
 
+        DniTypeEntity dniTypeEntity = new DniTypeEntity();
+        dniTypeEntity.setId(1);
+        dniTypeEntity.setDescription("DNI");
+
         UserEntity userToUpdated = new UserEntity();
         userToUpdated.setId(userId);
+        userToUpdated.setDniType(dniTypeEntity);
 
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setDescription("Admin");
@@ -795,7 +811,7 @@ class UserServiceImplTest {
 
         when(userRepositoryMock.findById(userId)).thenReturn(Optional.of(userToUpdated));
         when(userRepositoryMock.save(any(UserEntity.class))).thenReturn(userToUpdated);
-        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(new DniTypeEntity()));
+        when(dniTypeRepositoryMock.findById(1)).thenReturn(Optional.of(dniTypeEntity));
         when(roleRepositoryMock.findByDescription("Admin")).thenReturn(roleEntity);
         when(modelMapperMock.map(userToUpdated, GetUserDto.class)).thenReturn(getUserDto);
 

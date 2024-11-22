@@ -727,10 +727,11 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
+        updateUserAccess(user, putUserDto);
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
         updateUserContacts(user, putUserDto);
-        updateUserAccess(user, putUserDto);
+
 
         //Aca actualizaria los lotes del usuario
         updatePlotsForUser(userId, user, putUserDto);
