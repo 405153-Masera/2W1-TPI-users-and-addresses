@@ -106,7 +106,6 @@ class UserServiceImplTest {
         when(roleRepositoryMock.findByDescription("Gerente")).thenReturn(roleEntity);
         when(userRoleRepositoryMock.save(any(UserRoleEntity.class))).thenReturn(userRoleEntity);
         when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1,1)).thenReturn(true);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2,1)).thenReturn(true);
         when(plotUserRepositoryMock.save(any(PlotUserEntity.class))).thenReturn(plotUserEntity);
 
 
@@ -151,7 +150,6 @@ class UserServiceImplTest {
         when(roleRepositoryMock.findByDescription("Gerente")).thenReturn(roleEntity);
         when(userRoleRepositoryMock.save(any(UserRoleEntity.class))).thenReturn(userRoleEntity);
         when(restContactMock.saveContact(userEntity.getId(), postUserDto.getEmail(), 1,1)).thenReturn(true);
-        when(restContactMock.saveContact(userEntity.getId(), postUserDto.getPhone_number(), 2,1)).thenReturn(true);
         when(plotUserRepositoryMock.save(any(PlotUserEntity.class))).thenReturn(plotUserEntity);
 
         GetOwnerUserDto result = userServiceSpy.createOwnerUser(postUserDto);

@@ -43,7 +43,6 @@ public class BasePutUser {
     /**
      * Teléfono del usuario que se modifica mediante en el microservicio de contactos.
      */
-    @NotNull(message = "El contacto no puede ser nulo")
     @Size(min = 10, max = 20, message = "El numero de teléfono debe tener un formato valido")
     private String phoneNumber;
 
@@ -51,7 +50,6 @@ public class BasePutUser {
      * Correo electrónico del usuario utilizado en el login que se modifica en el microservicio
      * de contactos.
      */
-    @NotNull(message = "El correo electrónico no puede ser nulo")
     @Email(message = "El correo electrónico debe ser válido")
     private String email;
 
@@ -63,7 +61,6 @@ public class BasePutUser {
     /**
      * Fecha de nacimiento del usuario.
      */
-    @NotNull(message = "La fecha de nacimiento no puede ser nula")
     private LocalDate datebirth;
 
     /**

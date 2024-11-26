@@ -44,14 +44,12 @@ public class BasePostUser {
      * Correo electrónico del usuario utilizado en el login y en el microservicio
      * de contactos.
      */
-    @NotNull(message = "El correo electrónico no puede ser nulo")
     @Email(message = "El correo electrónico debe ser válido")
     private String email;
 
     /**
      * Teléfono del usuario que se guarda en el microservicio de contactos.
      */
-    @NotNull(message = "El teléfono no puede ser nulo")
     @Size(min = 10, max = 20, message = "El numero de teléfono debe tener un formato valido")
     private String phone_number;
 
@@ -82,7 +80,6 @@ public class BasePostUser {
     /**
      * Fecha de nacimiento del usuario.
      */
-    @NotNull(message = "La fecha de nacimiento no puede ser nula")
     private LocalDate datebirth;
 
     /**

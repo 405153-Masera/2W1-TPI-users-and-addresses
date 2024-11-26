@@ -129,7 +129,9 @@ public class UserServiceImpl implements UserService {
         getUserDto.setPlot_id(plot.toArray(new Integer[0]));
 
         //todo: Descomentar cuando se necesite postear a notificaciones
-        sendWelcomeEmail(postUserDto.getEmail(), userSaved.getId());
+        if (postUserDto.getEmail() != null) {
+            sendWelcomeEmail(postUserDto.getEmail(), userSaved.getId());
+        }
 
         // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
         restAccess.registerUserAccess(postUserDto);
@@ -157,9 +159,13 @@ public class UserServiceImpl implements UserService {
 
         GetOwnerUserDto getUserDto = mapToGetOwnerUserDto(userSaved, postOwnerUserDto);
         getUserDto.setPlot_id(postOwnerUserDto.getPlot_id());
-        sendWelcomeEmail(postOwnerUserDto.getEmail(), userSaved.getId());
-        // Hace el post al microservicio de accesos todo: Descomentar cuando se necesite postear a acceso
-        restAccess.registerUserAccess(postOwnerUserDto); //todo: Descomeentar cuando se necesite postear a notificaciones
+        //todo: Descomeentar cuando se necesite postear a notificaciones
+        if (postOwnerUserDto.getEmail() != null) {
+            sendWelcomeEmail(postOwnerUserDto.getEmail(), userSaved.getId());
+        }
+        // Hace el post al microservicio de accesos
+        // todo: Descomentar cuando se necesite postear a acceso
+        restAccess.registerUserAccess(postOwnerUserDto);
         return getUserDto;
     }
 
@@ -338,11 +344,12 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalStateException si falla el intento de guardar contactos.
      */
     public void saveContact(UserEntity userSaved, String email, String phone) {
-        boolean emailSaved = restContact.saveContact(userSaved.getId(), email, 1, userSaved.getCreatedUser());
-        boolean phoneSaved = restContact.saveContact(userSaved.getId(), phone, 2, userSaved.getCreatedUser());
-        if (!emailSaved && !phoneSaved) {
-            throw new IllegalStateException("Failed to save contact information.");
+        if (email != null) {
+            restContact.saveContact(userSaved.getId(), email, 1, userSaved.getCreatedUser());
+        } else if (phone != null) {
+            restContact.saveContact(userSaved.getId(), phone, 2, userSaved.getCreatedUser());
         }
+
     }
 
     /**
@@ -490,11 +497,13 @@ public class UserServiceImpl implements UserService {
 
         getUserDto.setRoles(roles);
         List<GetContactDto> contactDtos = restContact.getContactById(userEntity.getId());
-        for (GetContactDto contactDto : contactDtos) {
-            if (contactDto.getType_contact() == 1) {
-                getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES")));
-            } else {
-                getUserDto.setPhone_number(contactDto.getValue());
+        if (contactDtos != null && !contactDtos.isEmpty()) {
+            for (GetContactDto contactDto : contactDtos) {
+                if (contactDto.getType_contact() == 1) {
+                    getUserDto.setEmail(contactDto.getValue().toLowerCase(Locale.forLanguageTag("es-ES")));
+                } else {
+                    getUserDto.setPhone_number(contactDto.getValue());
+                }
             }
         }
     }
@@ -535,8 +544,10 @@ public class UserServiceImpl implements UserService {
      */
     public void validateUser(BasePostUser user) {
         validateUsername(user.getUsername());
-        validateEmail(user.getEmail());
         validateDni(user.getDni());
+        if (user.getEmail() != null) {
+            validateEmail(user.getEmail());
+        }
     }
 
     /**
@@ -688,20 +699,41 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public GetUserDto updateUser(Integer userId, PutUserDto putUserDto) {
-
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         updateUserAccess(user, putUserDto);
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
-        updateUserContacts(user, putUserDto);
 
+        List<GetContactDto> existingContacts = restContact.getContactById(user.getId());
+
+        boolean emailExists = existingContacts.stream()
+                .anyMatch(contact -> contact.getType_contact() == 1); // Tipo 1: Email
+        boolean phoneExists = existingContacts.stream()
+                .anyMatch(contact -> contact.getType_contact() == 2); // Tipo 2: Teléfono
+
+        if (putUserDto.getEmail() != null) {
+            if (emailExists) {
+                restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+            } else {
+                restContact.saveContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+            }
+        }
+
+        if (putUserDto.getPhoneNumber() != null) {
+            if (phoneExists) {
+                restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+            } else {
+                restContact.saveContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+            }
+        }
 
         GetUserDto getUserDto = modelMapper.map(user, GetUserDto.class);
         getUserDto.setRoles(putUserDto.getRoles());
         getUserDto.setEmail(putUserDto.getEmail());
         getUserDto.setPhone_number(putUserDto.getPhoneNumber());
+
         return getUserDto;
     }
 
@@ -730,8 +762,29 @@ public class UserServiceImpl implements UserService {
         updateUserAccess(user, putUserDto);
         updateUserFields(user, putUserDto);
         updateUserRoles(user, putUserDto);
-        updateUserContacts(user, putUserDto);
 
+        List<GetContactDto> existingContacts = restContact.getContactById(user.getId());
+
+        boolean emailExists = existingContacts.stream()
+                .anyMatch(contact -> contact.getType_contact() == 1); // Tipo 1: Email
+        boolean phoneExists = existingContacts.stream()
+                .anyMatch(contact -> contact.getType_contact() == 2); // Tipo 2: Teléfono
+
+        if (putUserDto.getEmail() != null) {
+            if (emailExists) {
+                restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+            } else {
+                restContact.saveContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+            }
+        }
+
+        if (putUserDto.getPhoneNumber() != null) {
+            if (phoneExists) {
+                restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+            } else {
+                restContact.saveContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+            }
+        }
 
         //Aca actualizaria los lotes del usuario
         updatePlotsForUser(userId, user, putUserDto);
@@ -870,8 +923,11 @@ public class UserServiceImpl implements UserService {
      * @param putUserDto con la información necesaria para actualizar los contactos del usuario.
      */
     public void updateUserContacts(UserEntity user, BasePutUser putUserDto) {
-        restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
-        restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+        if (putUserDto.getEmail() != null) {
+            restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
+        } else if (putUserDto.getPhoneNumber() != null) {
+            restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
+        }
     }
 
     /**
@@ -910,7 +966,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
         //todo: Descomentar cuando se necesite postear a acceso
         restAccess.deleteAccess(userEntity.getDni(), userEntity.getDniType().getDescription(), userUpdateId);
-        restContact.deleteContact(userId, 3, 1);
+
+        try {
+            restContact.deleteContact(userId, 3, 1);
+        } catch (Exception e) {
+            LOG.error("Error deleting contact", e);
+        }
     }
 
     /**

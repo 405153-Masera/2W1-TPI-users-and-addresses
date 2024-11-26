@@ -52,8 +52,14 @@ public class AuthController {
             claims.put("plot_id", user.getPlot_id());
             claims.put("telegram_id", user.getTelegram_id());
 
+            String token = "";
             // Generar el token
-            String token = JwtUtil.generateToken(user.getEmail(), claims);
+            if (user.getEmail() == null) {
+                token = JwtUtil.generateToken(user.getUsername(), claims);
+            }
+            else {
+                token = JwtUtil.generateToken(user.getEmail(), claims);
+            }
 
             // Devolver el token
             Map<String, String> response = new HashMap<>();
