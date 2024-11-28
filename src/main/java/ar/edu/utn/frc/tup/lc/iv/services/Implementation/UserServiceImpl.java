@@ -642,6 +642,26 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Obtener un usuario propietario por medio de un userId de un
+     * propietario secundario.
+     *
+     * @param userId identificador del propietario secundario.
+     * @throws EntityNotFoundException si no encuentra un usuario con la misma id en la base de datos.
+     * @return un usuario propietario.
+     */
+    @Override
+    public GetUserDto getOwnerUserBySecondOwner(Integer userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        List<PlotUserEntity> commonPlot = plotUserRepository.findByUser(userEntity);
+        UserEntity ownerEntity = userRepository.findUserByPlotIdAndOwnerRole(commonPlot.get(0).getPlotId())
+                .orElseThrow(() -> new EntityNotFoundException("Owner not found with plot id: " + commonPlot.get(0).getPlotId()));
+
+        return convertToUserDto(ownerEntity);
+    }
+
+    /**
      * Metodo para convertir un UserEntity a un GetUserDto.
      *
      * @param user representa la entidad de un usuario.

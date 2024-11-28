@@ -220,6 +220,16 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/get/owner/{userId}/secondary")
+    public ResponseEntity<GetUserDto> getOwnerBySecondary(@PathVariable Integer userId) {
+        GetUserDto result = userService.getOwnerUserBySecondOwner(userId);
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
     /**
      * Obtiene una lista de usuarios de rol "Owner" perteneciente a un lote específico.
      *

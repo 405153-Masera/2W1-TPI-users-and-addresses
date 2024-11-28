@@ -9,6 +9,7 @@ import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostOwnerUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.post.PostUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.put.PutUserOwnerDto;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -130,6 +131,15 @@ public interface UserService {
      * @return la lista de usuarios por lote.
      */
     List<GetPlotUserDto> getAllPlotUsers();
+
+    /**
+     * Obtener un usuario propietario por medio de un userId de un
+     * propietario secundario.
+     *
+     * @param userId identificador del propietario secundario.
+     * @return un usuario propietario.
+     */
+    GetUserDto getOwnerUserBySecondOwner(Integer userId);
 
     /**
      * Busca todos los usuarios (familiares) asociados a un propietario,
