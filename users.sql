@@ -266,7 +266,7 @@ VALUES
     ('Gerente inventario', NOW(), NOW(), 1, 1),
     ('Gerente empleados', NOW(), NOW(), 1, 1),
     ('Gerente multas', NOW(), NOW(), 1, 1),
-    ('Propietario secundario', NOW(), NOW(), 1, 1);
+    ('Co-Propietario', NOW(), NOW(), 1, 1);
     
 
 -- Insertar tipos de DNI

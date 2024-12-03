@@ -728,11 +728,21 @@ public class UserServiceImpl implements UserService {
 
         List<GetContactDto> existingContacts = restContact.getContactById(user.getId());
 
+        // Manejo de contactos existentes
         boolean emailExists = existingContacts.stream()
                 .anyMatch(contact -> contact.getType_contact() == 1); // Tipo 1: Email
         boolean phoneExists = existingContacts.stream()
                 .anyMatch(contact -> contact.getType_contact() == 2); // Tipo 2: Teléfono
 
+        if (emailExists && putUserDto.getEmail() == null) {
+            restContact.deleteContact(user.getId(), 3, 1);
+        }
+
+        if (phoneExists && putUserDto.getPhoneNumber() == null) {
+            restContact.deleteContact(user.getId(), 3, 2);
+        }
+
+        // Manejo del correo electrónico
         if (putUserDto.getEmail() != null) {
             if (emailExists) {
                 restContact.updateContact(user.getId(), putUserDto.getEmail(), 1, putUserDto.getUserUpdateId());
@@ -741,6 +751,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // Manejo del número de teléfono
         if (putUserDto.getPhoneNumber() != null) {
             if (phoneExists) {
                 restContact.updateContact(user.getId(), putUserDto.getPhoneNumber(), 2, putUserDto.getUserUpdateId());
@@ -1052,6 +1063,25 @@ public class UserServiceImpl implements UserService {
         }
         UserEntity user = userEntity.get();
         return convertToUserDto(user);
+    }
+
+    /**
+     * Obtener un usuario de rol "Co-Propietario" con un plotId especifíco.
+     *
+     * @param plotId identificador de un lote.
+     * @throws EntityNotFoundException si no encuentra a un usuario asignado al lote según el ID del
+     * lote proporcionado por parámetro.
+     * @return un usuario si existe.
+     */
+    @Override
+    public List<GetUserDto> getUserByPlotIdAndSecondaryRole(Integer plotId) {
+        List<UserEntity> userEntity = userRepository.findUserByPlotIdAndSecondaryRole(plotId);
+        if (userEntity.isEmpty()) {
+            throw new EntityNotFoundException("User not found with plot id: " + plotId);
+        }
+        return userEntity.stream()
+                .map(this::convertToUserDto)
+                .collect(Collectors.toList());
     }
 
     /**

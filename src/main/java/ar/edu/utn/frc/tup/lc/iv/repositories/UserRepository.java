@@ -57,6 +57,22 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findUserByPlotIdAndOwnerRole(@Param("plotId") Integer plotId);
 
     /**
+     * Busca un usuario que tenga rol "Owner" y que coincida con el plotId
+     * pasado por parámetro.
+     *
+     * @param plotId el identificador de un lote.
+     * @return un {@link UserEntity}
+     */
+    @Query("SELECT u FROM UserEntity u "
+            + "JOIN UserRoleEntity ur ON ur.user.id = u.id "
+            + "JOIN RoleEntity r ON ur.role.id = r.id "
+            + "JOIN PlotUserEntity pu ON pu.user.id = u.id "
+            + "WHERE r.description = 'Co-Propietario' "
+            + "AND pu.plotId = :plotId "
+            + "AND u.active = true")
+    List<UserEntity> findUserByPlotIdAndSecondaryRole(@Param("plotId") Integer plotId);
+
+    /**
      * Busca una lista de usuarios activos por lote.
      *
      * @param plotId identificador de lote.

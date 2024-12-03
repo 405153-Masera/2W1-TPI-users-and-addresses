@@ -220,6 +220,22 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Obtiene un usuario de rol "Co-Owner" perteneciente a un lote específico.
+     *
+     * @param plotId del lote perteneciente al usuario a buscar.
+     * @return el usuario encontrado.
+     */
+    @GetMapping("/get/secondary/{plotId}")
+    public ResponseEntity<List<GetUserDto>> getUserByPlotIdAndSecondaryRole(@PathVariable Integer plotId) {
+        List<GetUserDto> result = userService.getUserByPlotIdAndSecondaryRole(plotId);
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/get/owner/{userId}/secondary")
     public ResponseEntity<GetUserDto> getOwnerBySecondary(@PathVariable Integer userId) {
         GetUserDto result = userService.getOwnerUserBySecondOwner(userId);

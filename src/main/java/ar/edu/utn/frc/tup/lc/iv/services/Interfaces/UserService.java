@@ -109,6 +109,14 @@ public interface UserService {
     List<GetUserDto> getUsersByRole(Integer roleId);
 
     /**
+     * Obtener un usuario de rol "Co-Propietario" con un plotId especifíco.
+     *
+     * @param plotId identificador de un lote.
+     * @return un usuario si existe.
+     */
+    List<GetUserDto> getUserByPlotIdAndSecondaryRole(Integer plotId);
+
+    /**
      * Verifica un inicio de sesión.
      *
      * @param postLoginDto dto con información requerida para el metodo.
