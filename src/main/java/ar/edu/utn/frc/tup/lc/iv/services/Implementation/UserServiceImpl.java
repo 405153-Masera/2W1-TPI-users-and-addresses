@@ -201,26 +201,34 @@ public class UserServiceImpl implements UserService {
         List<GetPlotUserDto> plotUserDtoList = this.getAllPlotUsers();
         List<GetUserDto> userDtos = this.getAllUsers();
         List<Integer> plotsByOwner = new ArrayList<>();
+
+        // Obtener todos los lotes asociados al propietario
         for (GetPlotOwnerDto getPlotOwnerDto : plotOwnerDtoList) {
             if (getPlotOwnerDto.getOwner_id().equals(ownerId)) {
-                plotsByOwner.add(getPlotOwnerDto.getPlot_id());
+                if (!plotsByOwner.contains(getPlotOwnerDto.getPlot_id())) {
+                    plotsByOwner.add(getPlotOwnerDto.getPlot_id());
+                }
             }
         }
-        List<GetPlotUserDto> usersByPlots = new ArrayList<>();
-        List<GetUserDto> userDtoByOwner = new ArrayList<>();
+
+        // Lista sin duplicados
+        Set<GetUserDto> uniqueUsers = new HashSet<>();
+
+        // Filtrar los usuarios asociados a los lotes
         if (!plotsByOwner.isEmpty()) {
             for (GetPlotUserDto getPlotUserDto : plotUserDtoList) {
                 if (plotsByOwner.contains(getPlotUserDto.getPlot_id())) {
                     for (GetUserDto userDto : userDtos) {
                         if (userDto.getId().equals(getPlotUserDto.getUser_id())) {
-                            userDtoByOwner.add(userDto);
+                            uniqueUsers.add(userDto); // Usamos un Set para evitar duplicados
                             break;
                         }
                     }
                 }
             }
         }
-        return userDtoByOwner;
+
+        return new ArrayList<>(uniqueUsers); // Convertimos el Set a una lista antes de retornarlo
     }
 
     /**
@@ -1066,25 +1074,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Obtener un usuario de rol "Co-Propietario" con un plotId especifíco.
-     *
-     * @param plotId identificador de un lote.
-     * @throws EntityNotFoundException si no encuentra a un usuario asignado al lote según el ID del
-     * lote proporcionado por parámetro.
-     * @return un usuario si existe.
-     */
-    @Override
-    public List<GetUserDto> getUserByPlotIdAndSecondaryRole(Integer plotId) {
-        List<UserEntity> userEntity = userRepository.findUserByPlotIdAndSecondaryRole(plotId);
-        if (userEntity.isEmpty()) {
-            throw new EntityNotFoundException("User not found with plot id: " + plotId);
-        }
-        return userEntity.stream()
-                .map(this::convertToUserDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Obtener una lista de usuarios activos por lote.
      *
      * @param plotId identificador de un lote.
@@ -1128,6 +1117,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return usersDto;
+    }
+
+    @Override
+    public List<GetUserDto> getUserByPlotIdAndSecondaryRole(Integer plotId) {
+        List<UserEntity> userEntities = userRepository.findUserByPlotIdAndSecondaryRole(plotId);
+        return userEntities.stream()
+                .map(this::convertToUserDto)
+                .collect(Collectors.toList());
     }
 
     /**
