@@ -348,4 +348,17 @@ public class UserController {
         userService.passwordRecovery(email);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/post/userplot/{userId}/{plotId}/{userUpdateId}")
+    public ResponseEntity<Void> postUserPlot(@PathVariable Integer userId, @PathVariable Integer plotId,  @PathVariable Integer userUpdateId) {
+        userService.createPlotUser(userId, plotId, userUpdateId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/userplot/{userId}/{plotId}")
+    public ResponseEntity<Void> deleteUserPlot(@PathVariable Integer userId, @PathVariable Integer plotId) {
+        userService.deletePlotUser(userId, plotId);
+        return ResponseEntity.ok().build();
+    }
+
 }

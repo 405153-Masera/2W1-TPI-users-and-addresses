@@ -783,6 +783,38 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * Borra la tabla intermedia de plotUser.
+     *
+     * @param userId el ID del usuario a actualizar.
+     * @param plotId el ID del lote a borrar
+     */
+    @Transactional
+    public void deletePlotUser(Integer userId, Integer plotId) {
+        plotUserRepository.deleteByUserIdAndPlotId(userId, plotId);
+    }
+
+    /**
+     * Crea una relacion plotUser.
+     *
+     * @param userId el usuario
+     * @param plotId el lote
+     * @param userUpdateId el usuario que realiza la operación
+     * @throws EntityNotFoundException si no se encuentra un usuario con el ID proporcionado como parámetro
+     *
+     */
+    public void createPlotUser(Integer userId, Integer plotId, Integer userUpdateId) {
+        PlotUserEntity plotUserEntity = new PlotUserEntity();
+        plotUserEntity.setUser(userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId)));
+        plotUserEntity.setPlotId(plotId);
+        plotUserEntity.setCreatedUser(userUpdateId);
+        plotUserEntity.setLastUpdatedDate(LocalDateTime.now());
+        plotUserEntity.setCreatedDate(LocalDateTime.now());
+        plotUserEntity.setLastUpdatedUser(userUpdateId);
+        plotUserRepository.save(plotUserEntity);
+    }
+
+    /**
      * Actualiza un usuario de tipo propietario.
      *
      * @param userId el ID del usuario a actualizar.
