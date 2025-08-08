@@ -101,8 +101,9 @@ Este sistema incluye funcionalidades para:
 | Cifuentes Pilar             |
 | Lara, Ulises                |
 | Lopez, Camila Antonella     |
+| Masera, Gustavo Martin      |
 | Moro, Benjamín              |
 | Ruiz, Facundo Nicolás       |
-|  Sánchez, Juan Manuel       |
+| Sánchez, Juan Manuel        |
 
 </div>
