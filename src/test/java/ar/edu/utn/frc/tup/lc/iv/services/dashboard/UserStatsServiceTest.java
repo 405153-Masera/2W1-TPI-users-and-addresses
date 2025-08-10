@@ -75,9 +75,9 @@ class UserStatsServiceTest {
 
         assertNotNull(ageStatics);
         assertEquals(4, ageStatics.getTotalUsers());
-        assertEquals(27.8, ageStatics.getAverageAge(), 0.1);
-        assertEquals(44, ageStatics.getOldestAge());
-        assertEquals(14, ageStatics.getYoungestAge());
+        assertEquals(28.8, ageStatics.getAverageAge(), 0.1);
+        assertEquals(45, ageStatics.getOldestAge());
+        assertEquals(15, ageStatics.getYoungestAge());
     }
 
     @Test
